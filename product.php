@@ -53,6 +53,7 @@ $pageTitle = $search ? "Kết quả tìm kiếm: $search" : ($category ? "Điệ
 $basePath = "";
 
 include 'includes/header.php';
+?>
 
 <style>
 .scrollbar-hide::-webkit-scrollbar { display: none; }
