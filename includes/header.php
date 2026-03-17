@@ -17,7 +17,7 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-light fixed-top navbar-premium">
-        <div class="container justify-content-center">
+        <div class="container-fluid px-md-5">
             <div class="navbar-unified-container">
                 <!-- 1. Logo bên trái -->
                 <a class="navbar-brand" href="<?php echo $basePath; ?>index.php">
@@ -32,7 +32,7 @@
                 </div>
 
                 <!-- 3. Nhóm Icon chức năng bên phải -->
-                <div class="navbar-icons-group gap-3">
+                <div class="navbar-icons-group">
                     <a href="#" id="searchTrigger" class="search-trigger-btn">
                         <i class="bi bi-search"></i>
                     </a>
@@ -76,26 +76,28 @@
             </div>
         </div>
         
-        <!-- Mobile Menu Collapse -->
-        <div class="collapse navbar-collapse d-md-none bg-white border-bottom" id="navbarNav">
-            <div class="container py-3">
-                <ul class="navbar-nav gap-2">
-                    <li class="nav-item">
-                        <a class="nav-link py-2 fs-6 fw-bold border-bottom" href="<?php echo $basePath; ?>product.php">
-                            <i class="bi bi-phone me-2"></i> Điện thoại
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link py-2 fs-6 fw-bold border-bottom" href="<?php echo $basePath; ?>warranty.php">
-                            <i class="bi bi-shield-check me-2"></i> Bảo hành
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link py-2 fs-6 fw-bold" href="<?php echo $basePath; ?>news.php">
-                            <i class="bi bi-newspaper me-2"></i> Tin tức
-                        </a>
-                    </li>
-                </ul>
+        <!-- Mobile Menu Collapse (Ẩn hoàn toàn trên PC) -->
+        <div class="collapse navbar-collapse d-md-none" id="navbarNav">
+            <div class="bg-white border-bottom w-100">
+                <div class="container py-3">
+                    <ul class="navbar-nav gap-2">
+                        <li class="nav-item">
+                            <a class="nav-link py-2 fs-6 fw-bold border-bottom" href="<?php echo $basePath; ?>product.php">
+                                <i class="bi bi-phone me-2"></i> Điện thoại
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link py-2 fs-6 fw-bold border-bottom" href="<?php echo $basePath; ?>warranty.php">
+                                <i class="bi bi-shield-check me-2"></i> Bảo hành
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link py-2 fs-6 fw-bold" href="<?php echo $basePath; ?>news.php">
+                                <i class="bi bi-newspaper me-2"></i> Tin tức
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
