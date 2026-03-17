@@ -58,6 +58,8 @@ img {
     padding: 0;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
+    display: flex;
+    align-items: center;
 }
 
 .navbar-unified-container {
@@ -65,10 +67,9 @@ img {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    max-width: 1200px;
     height: 100%;
     margin: 0 auto;
-    padding: 0 20px;
+    position: relative;
 }
 
 .navbar-nav-centered {
@@ -86,6 +87,7 @@ img {
     opacity: 0.8;
     padding: 0;
     transition: opacity 0.2s;
+    text-decoration: none;
 }
 
 .navbar-nav-centered .nav-link:hover {
@@ -101,10 +103,40 @@ img {
 .navbar-icons-group i {
     font-size: 18px;
     color: #1d1d1f;
+    line-height: 1;
+    display: block;
 }
 
 .navbar-brand img {
     height: 18px;
+}
+
+/* Ẩn mũi tên mặc định của Bootstrap Dropdown */
+.no-caret::after,
+.dropdown-toggle.no-caret::after {
+    display: none !important;
+    content: none !important;
+}
+
+.dropdown-toggle {
+    text-decoration: none !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+}
+
+/* Xóa spinner nếu trình duyệt hiểu nhầm là input number */
+.dropdown-toggle::-webkit-inner-spin-button,
+.dropdown-toggle::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 /* Responsive Navbar */
@@ -115,27 +147,46 @@ img {
     .navbar-nav-centered {
         display: none !important;
     }
-    .navbar-unified-container {
-        padding: 0 15px;
-    }
     .navbar-icons-group {
-        gap: 18px;
+        gap: 10px;
+        position: relative;
+        z-index: 1060;
     }
     .navbar-icons-group i {
         font-size: 20px;
+        padding: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .dropdown-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        min-height: 40px;
+        position: relative;
+        z-index: 1070;
     }
     .navbar-brand img {
         height: 16px;
     }
-    /* Sửa lỗi nút toggler không hiện icon */
     .navbar-toggler {
-        padding: 0;
-        margin-left: 10px;
+        z-index: 1060;
+        margin-left: 5px;
+        padding: 5px;
+        display: block !important;
     }
     .navbar-toggler-icon {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.7%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
         width: 24px !important;
         height: 24px !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .navbar-toggler {
+        display: none !important;
     }
 }
 
@@ -1000,12 +1051,26 @@ img {
 /* --- RESPONSIVE FIXES --- */
 
 /* Mobile & Tablet Fixes */
+.dropdown-menu {
+    z-index: 2000 !important;
+    border-radius: 20px !important;
+}
+
 @media (max-width: 768px) {
     /* Navbar Mobile */
     .navbar-premium {
         height: auto;
         padding: 10px 0;
         z-index: 1050 !important;
+    }
+    .navbar-icons-group {
+        gap: 10px;
+        position: relative;
+        z-index: 1060;
+    }
+    .dropdown-menu-end {
+        right: 0;
+        left: auto;
     }
     .navbar-unified-container {
         gap: 15px;
@@ -1017,6 +1082,19 @@ img {
     }
     .navbar-icons-group i {
         font-size: 20px;
+        padding: 8px; /* Tăng mạnh diện tích chạm cho mobile */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .dropdown-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        min-height: 40px;
+        position: relative;
+        z-index: 1070;
     }
     
     /* Hero Mobile */

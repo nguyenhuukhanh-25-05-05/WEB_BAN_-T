@@ -20,9 +20,7 @@ CREATE TABLE IF NOT EXISTS orders (
     customer_phone VARCHAR(20),
     total_price DECIMAL(15, 2) NOT NULL,
     status VARCHAR(50) DEFAULT 'Pending', -- Pending, Processing, Completed, Cancelled
-    payment_method VARCHAR(50) DEFAULT 'COD',
-    is_installment BOOLEAN DEFAULT FALSE,
-    user_id INT REFERENCES users(id),
+    payment_method VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -74,13 +72,6 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_method VARCHAR(50);
 
 -- Migration: Thêm cột is_featured vào bảng products nếu chưa có
 ALTER TABLE products ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
-
--- Migration: Thêm cột status vào bảng users nếu chưa có
-ALTER TABLE users ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
-
--- Migration: Thêm cột is_installment vào bảng orders nếu chưa có
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS is_installment BOOLEAN DEFAULT FALSE;
-
 -- Tạo bảng news để lưu bài viết công nghệ
 CREATE TABLE IF NOT EXISTS news (
     id SERIAL PRIMARY KEY,
@@ -96,7 +87,7 @@ CREATE TABLE IF NOT EXISTS news (
 ALTER TABLE cart_items ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
 
 -- Thêm bảng Bảo hành (Warranties)
-CREATE TABLE IF NOT EXISTS warranties (
+CREATE TABLE warranties (
     id SERIAL PRIMARY KEY,
     imei VARCHAR(50) UNIQUE NOT NULL,
     product_id INT REFERENCES products(id),
@@ -107,7 +98,7 @@ CREATE TABLE IF NOT EXISTS warranties (
 );
 
 -- Thêm bảng Đăng ký nhận tin (Subscribers)
-CREATE TABLE IF NOT EXISTS subscribers (
+CREATE TABLE subscribers (
     id SERIAL PRIMARY KEY,
     email VARCHAR(100) UNIQUE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

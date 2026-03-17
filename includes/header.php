@@ -19,16 +19,19 @@
     <nav class="navbar navbar-expand-md navbar-light fixed-top navbar-premium">
         <div class="container justify-content-center">
             <div class="navbar-unified-container">
-                <a class="navbar-brand py-0 m-0" href="<?php echo $basePath; ?>index.php">
-                    <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" alt="NHK Mobile">
+                <!-- 1. Logo bên trái -->
+                <a class="navbar-brand" href="<?php echo $basePath; ?>index.php">
+                    <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="18" alt="Logo">
                 </a>
 
-                <div class="d-none d-md-flex navbar-nav-centered">
+                <!-- 2. Menu chính nằm giữa (Chỉ hiện trên PC) -->
+                <div class="navbar-nav-centered d-none d-md-flex">
                     <a class="nav-link" href="<?php echo $basePath; ?>product.php">Điện thoại</a>
                     <a class="nav-link" href="<?php echo $basePath; ?>warranty.php">Bảo hành</a>
                     <a class="nav-link" href="<?php echo $basePath; ?>news.php">Tin tức</a>
                 </div>
 
+                <!-- 3. Nhóm Icon chức năng bên phải -->
                 <div class="navbar-icons-group gap-3">
                     <a href="#" id="searchTrigger" class="search-trigger-btn">
                         <i class="bi bi-search"></i>
@@ -65,8 +68,9 @@
                         </ul>
                     </div>
                     
+                    <!-- Nút Hamburger (Chỉ hiện trên Mobile) -->
                     <button class="navbar-toggler border-0 ms-2 d-md-none shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span class="navbar-toggler-icon" style="width: 20px;"></span>
+                        <span class="navbar-toggler-icon"></span>
                     </button>
                 </div>
             </div>
