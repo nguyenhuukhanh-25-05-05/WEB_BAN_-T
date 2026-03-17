@@ -77,7 +77,7 @@ include 'includes/header.php';
                     <p class="text-secondary max-w-600 mx-auto">Đơn đặt hàng của bạn đã được gửi đến ban quản trị để phê duyệt. Vui lòng chờ nhân viên kiểm tra tình trạng kho và xác nhận lại với bạn trong ít phút tới.</p>
                     <div class="mt-5">
                         <a href="index.php" class="btn btn-dark rounded-pill px-5 py-3 fw-bold">Về trang chủ</a>
-                        <a href="#" class="btn btn-outline-dark rounded-pill px-5 py-3 fw-bold ms-3">Theo dõi đơn hàng</a>
+                        <a href="order_history.php" class="btn btn-outline-dark rounded-pill px-5 py-3 fw-bold ms-3">Theo dõi đơn hàng</a>
                     </div>
                 </div>
             <?php else: ?>

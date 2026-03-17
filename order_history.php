@@ -76,8 +76,13 @@ include 'includes/header.php';
                             <?php
                                 // Chuyển đổi trạng thái sang nhãn đẹp mắt
                                 $statusClass = 'bg-secondary text-white';
-                                $statusText = htmlspecialchars($order['status']);
-                                switch (strtolower($order['status'])) {
+                                $statusValue = $order['status'];
+                                $statusText = htmlspecialchars($statusValue);
+                                
+                                // Dùng mảng map để linh hoạt hơn (hỗ trợ cả tiếng Việt hoa/thường)
+                                $statusLower = mb_strtolower($statusValue, 'UTF-8');
+                                
+                                switch ($statusLower) {
                                     case 'chờ duyệt':
                                     case 'pending':
                                         $statusClass = 'bg-warning text-dark';
@@ -99,6 +104,7 @@ include 'includes/header.php';
                                         $statusText = '✅ Thành công';
                                         break;
                                     case 'hủy':
+                                    case 'đã hủy':
                                     case 'cancelled':
                                         $statusClass = 'bg-danger text-white';
                                         $statusText = '❌ Đã hủy';
