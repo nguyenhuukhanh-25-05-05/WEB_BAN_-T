@@ -67,6 +67,11 @@ CREATE TABLE IF NOT EXISTS admins (
 
 -- Cập nhật cấu trúc Orders (Thêm user_id để theo dõi lịch sử)
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_phone VARCHAR(20);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_method VARCHAR(50);
+
+-- Migration: Thêm cột is_featured vào bảng products nếu chưa có
+ALTER TABLE products ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
 -- Tạo bảng news để lưu bài viết công nghệ
 CREATE TABLE IF NOT EXISTS news (
     id SERIAL PRIMARY KEY,
@@ -82,7 +87,7 @@ CREATE TABLE IF NOT EXISTS news (
 ALTER TABLE cart_items ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
 
 -- Thêm bảng Bảo hành (Warranties)
-CREATE TABLE warranties (
+CREATE TABLE IF NOT EXISTS warranties (
     id SERIAL PRIMARY KEY,
     imei VARCHAR(50) UNIQUE NOT NULL,
     product_id INT REFERENCES products(id),
@@ -93,7 +98,7 @@ CREATE TABLE warranties (
 );
 
 -- Thêm bảng Đăng ký nhận tin (Subscribers)
-CREATE TABLE subscribers (
+CREATE TABLE IF NOT EXISTS subscribers (
     id SERIAL PRIMARY KEY,
     email VARCHAR(100) UNIQUE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

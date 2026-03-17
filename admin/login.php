@@ -20,6 +20,8 @@ if (isset($_POST['login'])) {
     if ($user == 'admin' && $pass == 'admin123') {
         // Nếu đúng, lưu biến đánh dấu vào Session
         $_SESSION['admin_logged_in'] = true;
+        $_SESSION['admin_id'] = 1; // Giả lập ID admin
+        $_SESSION['admin_user'] = 'admin';
         
         // Chuyển hướng sang trang Dashboard chính
         header("Location: dashboard.php");
