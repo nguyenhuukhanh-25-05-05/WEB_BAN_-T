@@ -69,8 +69,10 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
 -- Cập nhật cấu trúc Cart Items (Cho phép liên kết với user_id thay vì chỉ session_id)
 ALTER TABLE cart_items ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
 
--- Dữ liệu mẫu Admin (Mặc định: admin / admin123)
--- Lưu ý: Thực tế nên dùng password_hash, đây là bản demo
+-- Dữ liệu mẫu Admin (Sử dụng để quản trị cửa hàng)
+-- Tài khoản mặc định: nhk_admin / nhk@2026
+INSERT INTO admins (username, password) VALUES ('nhk_admin', 'nhk@2026') ON CONFLICT (username) DO NOTHING;
+-- Bạn cũng có thể dùng tài khoản phụ: admin / admin123
 INSERT INTO admins (username, password) VALUES ('admin', 'admin123') ON CONFLICT (username) DO NOTHING;
 
 -- Dữ liệu mẫu Sản phẩm (Tất cả ảnh thật trong assets/images)
