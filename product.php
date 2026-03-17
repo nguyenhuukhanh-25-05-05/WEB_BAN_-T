@@ -5,9 +5,14 @@ session_start();
 // Nhúng file kết nối cơ sở dữ liệu Postgres
 require_once 'includes/db.php';
 
-// Xử lý tìm kiếm và lọc danh mục
+// Xử lý tìm kiếm, lọc danh mục và sắp xếp
 $category = isset($_GET['category']) ? $_GET['category'] : null;
 $search = isset($_GET['q']) ? $_GET['q'] : null;
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
+
+// Lấy danh sách tất cả các hãng (Categories) từ DB để làm bộ lọc động
+$stmtCats = $pdo->query("SELECT DISTINCT category FROM products ORDER BY category ASC");
+$categories = $stmtCats->fetchAll(PDO::FETCH_COLUMN);
 
 // Xây dựng câu lệnh SQL cơ bản
 $sql = "SELECT * FROM products WHERE 1=1";
@@ -25,7 +30,18 @@ if ($search) {
     $params[] = "%$search%";
 }
 
-$sql .= " ORDER BY created_at DESC";
+// Phân loại sắp xếp
+switch ($sort) {
+    case 'price_asc':
+        $sql .= " ORDER BY price ASC";
+        break;
+    case 'price_desc':
+        $sql .= " ORDER BY price DESC";
+        break;
+    default:
+        $sql .= " ORDER BY created_at DESC";
+        break;
+}
 
 // Chuẩn bị và thực thi truy vấn an toàn (tránh SQL Injection)
 $stmt = $pdo->prepare($sql);
@@ -44,18 +60,39 @@ include 'includes/header.php';
         <section class="py-huge mt-5">
             <div class="container px-xl-5">
                 <!-- Phần tiêu đề trang -->
-                <header class="mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 animate-fade-in">
-                    <div>
-                        <h1 class="display-3 fw-800 mb-0 tracking-tight">
-                            <?php echo $search ? "Kết quả cho <span class='text-primary'>'$search'</span>" : ($category ? $category : "Tất cả sản phẩm."); ?>
-                        </h1>
-                        <p class="text-secondary h5 fw-light mt-3">Khám phá <?php echo count($products); ?> siêu phẩm công nghệ bậc nhất.</p>
+                <header class="mb-5 d-flex flex-column gap-4 animate-fade-in">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+                        <div>
+                            <h1 class="display-3 fw-800 mb-0 tracking-tight">
+                                <?php echo $search ? "Kết quả cho <span class='text-primary'>'$search'</span>" : ($category ? $category : "Tất cả sản phẩm."); ?>
+                            </h1>
+                            <p class="text-secondary h5 fw-light mt-3">Tìm thấy <?php echo count($products); ?> siêu phẩm công nghệ.</p>
+                        </div>
+                        
+                        <!-- Bộ chọn sắp xếp -->
+                        <div class="sort-wrapper">
+                             <form action="product.php" method="GET" id="sortForm" class="d-flex align-items-center gap-2">
+                                  <?php if($category): ?><input type="hidden" name="category" value="<?php echo $category; ?>"><?php endif; ?>
+                                  <?php if($search): ?><input type="hidden" name="q" value="<?php echo $search; ?>"><?php endif; ?>
+                                  <span class="text-secondary small fw-bold text-uppercase">Sắp xếp:</span>
+                                  <select name="sort" class="form-select form-select-sm border-0 bg-white shadow-sm rounded-pill px-3 py-2 cursor-pointer" onchange="this.form.submit()">
+                                       <option value="newest" <?php echo $sort == 'newest' ? 'selected' : ''; ?>>Mới nhất</option>
+                                       <option value="price_asc" <?php echo $sort == 'price_asc' ? 'selected' : ''; ?>>Giá: Thấp đến Cao</option>
+                                       <option value="price_desc" <?php echo $sort == 'price_desc' ? 'selected' : ''; ?>>Giá: Cao đến Thấp</option>
+                                  </select>
+                             </form>
+                        </div>
                     </div>
-                    <!-- Bộ lọc nhanh danh mục -->
-                    <div class="d-flex gap-2">
-                        <a href="product.php" class="btn btn-premium-glass <?php echo !$category ? 'active' : ''; ?> px-4 text-dark border-dark">Tất cả</a>
-                        <a href="product.php?category=Apple" class="btn btn-premium-glass <?php echo $category == 'Apple' ? 'active' : ''; ?> px-4 text-dark border-dark">Apple</a>
-                        <a href="product.php?category=Samsung" class="btn btn-premium-glass <?php echo $category == 'Samsung' ? 'active' : ''; ?> px-4 text-dark border-dark">Samsung</a>
+
+                    <!-- Bộ lọc hãng động -->
+                    <div class="filter-brands-scroll d-flex gap-2 overflow-auto pb-2 scrollbar-hide">
+                        <a href="product.php" class="btn btn-premium-glass <?php echo !$category ? 'active' : ''; ?> px-4 text-nowrap">Tất cả</a>
+                        <?php foreach($categories as $cat): ?>
+                             <a href="product.php?category=<?php echo urlencode($cat); ?>" 
+                                class="btn btn-premium-glass <?php echo $category == $cat ? 'active' : ''; ?> px-4 text-nowrap">
+                                <?php echo $cat; ?>
+                             </a>
+                        <?php endforeach; ?>
                     </div>
                 </header>
 

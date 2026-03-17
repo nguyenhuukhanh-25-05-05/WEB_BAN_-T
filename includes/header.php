@@ -26,7 +26,7 @@
                 <div class="d-none d-md-flex navbar-nav-centered">
                     <a class="nav-link" href="<?php echo $basePath; ?>product.php">Điện thoại</a>
                     <a class="nav-link" href="<?php echo $basePath; ?>warranty.php">Bảo hành</a>
-                    <a class="nav-link" href="#">Tin tức</a>
+                    <a class="nav-link" href="<?php echo $basePath; ?>news.php">Tin tức</a>
                 </div>
 
                 <div class="navbar-icons-group gap-3">

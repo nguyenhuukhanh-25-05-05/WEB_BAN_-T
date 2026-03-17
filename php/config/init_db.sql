@@ -65,6 +65,16 @@ CREATE TABLE IF NOT EXISTS admins (
 
 -- Cập nhật cấu trúc Orders (Thêm user_id để theo dõi lịch sử)
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
+-- Tạo bảng news để lưu bài viết công nghệ
+CREATE TABLE IF NOT EXISTS news (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    excerpt TEXT,
+    content TEXT,
+    image VARCHAR(255),
+    category VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Cập nhật cấu trúc Cart Items (Cho phép liên kết với user_id thay vì chỉ session_id)
 ALTER TABLE cart_items ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
@@ -102,3 +112,12 @@ INSERT INTO products (name, category, price, stock, image, description) VALUES
 ('Nubia RedMagic 15', 'Nubia', 21900000, 10, 'nubia_magic15.png', 'Chiến thần gaming với quạt tản nhiệt tích hợp.'),
 ('Nubia V1000', 'Nubia', 7500000, 50, 'nubia_v1000.png', 'Điện thoại tầm trung pin trâu 6000mAh.'),
 ('Nubia V90', 'Nubia', 5900000, 80, 'nubia_v90.png', 'Sự lựa chọn ổn định cho các tác vụ cơ bản.');
+
+-- Dữ liệu mẫu Tin tức (Tech News)
+INSERT INTO news (title, excerpt, content, image, category) VALUES 
+('iPhone 17 Pro: Bước nhảy vọt về AI', 'Apple dự kiến sẽ ra mắt dòng iPhone 17 với chip A19 Pro tập trung hoàn toàn vào xử lý trí tuệ nhân tạo.', 'Apple đang chuẩn bị cho một cuộc cách mạng tiếp theo với iPhone 17 Pro. Nguồn tin cho biết chip A19 Pro sẽ có Neural Engine thế hệ mới mạnh gấp 2 lần hiện tại, cho phép xử lý các tác vụ AI phức tạp ngay trên thiết bị mà không cần internet.', 'ai_ip17_pm.png', 'Apple'),
+('Samsung S25 Ultra và màn hình Dynamic AMOLED 3X', 'Màn hình mới của Samsung hứa hẹn độ sáng vượt ngưỡng 3000 nits và tiết kiệm pin hơn 20%.', 'Hãng điện tử Hàn Quốc vừa hé lộ công nghệ màn hình Dynamic AMOLED 3X trên S25 Ultra. Điểm nhấn là công nghệ chống chói mới giúp hiển thị rõ nét ngay dưới ánh nắng gắt, đồng thời giảm lượng điện tiêu thụ đáng kể.', 'ai_s25_ultra.png', 'Samsung'),
+('Xiaomi Mix Flip: Định nghĩa lại dòng Flip', 'Xiaomi Mix Flip sở hữu màn hình ngoài lớn nhất thị trường kèm hiệu năng cực đỉnh.', 'Không chỉ là một món đồ thời trang, Mix Flip của Xiaomi mang đến sức mạnh của Snapdragon 8 Gen 4. Màn hình ngoài 4 inch cho phép người dùng sử dụng hầu hết các ứng dụng mà không cần mở máy.', 'ai_mi_flip.png', 'Xiaomi'),
+('OnePlus 15: Sạc nhanh 150W trở lại', 'OnePlus tiếp tục dẫn đầu cuộc đua tốc độ với công nghệ sạc SuperVOOC thế hệ mới.', 'OnePlus 15 không chỉ mượt ở phần mềm mà còn thần tốc ở phần cứng. Viên pin 5500mAh chỉ mất 15 phút để sạc đầy 100%, một con số kỷ lục trong làng smartphone cao cấp hiện nay.', 'oneplus15.png', 'OnePlus'),
+('Kỷ nguyên AI trên di động năm 2026', 'Mọi hãng điện thoại lớn đều đang dồn toàn lực vào AI để thay đổi cách chúng ta sử dụng smartphone.', 'Năm 2026 được coi là bản lề của AI di động. Các trợ lý ảo không còn chỉ trả lời câu hỏi mà đã có thể hiểu ngữ cảnh, tự động sắp xếp lịch trình và chỉnh sửa hình ảnh chuyên nghiệp theo ý muốn của người dùng.', 'ai_ip16e.png', 'Technology'),
+('Top 5 smartphone đáng mua nhất quý 1/2026', 'Cùng NHK Mobile điểm danh những mẫu flagship hot nhất đầu năm nay.', 'Thị trường đầu năm 2026 vô cùng sôi động với sự góp mặt của iPhone 17 series và S25 series. Nếu bạn cần camera đỉnh cao, S25 Ultra là lựa chọn số 1, còn nếu yêu thích sự ổn định và AI mượt mà, iPhone 17 Pro Max là cái tên không thể bỏ qua.', 'ai_ip16_pro.png', 'Review');
