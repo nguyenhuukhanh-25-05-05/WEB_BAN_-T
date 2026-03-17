@@ -98,8 +98,8 @@ $basePath = "../";
                     <tbody>
                         <!-- Vòng lặp PHP Duyệt danh sách đơn hàng -->
                         <?php foreach($orders as $o): 
-                            // Lấy chi tiết các sản phẩm trong đơn này
-                            $stmtItems = $pdo->prepare("SELECT * FROM order_items WHERE order_id = ?");
+                            // Lấy chi tiết các sản phẩm trong đơn này kèm theo ảnh từ bảng products
+                            $stmtItems = $pdo->prepare("SELECT order_items.*, products.image FROM order_items LEFT JOIN products ON order_items.product_id = products.id WHERE order_id = ?");
                             $stmtItems->execute([$o['id']]);
                             $items = $stmtItems->fetchAll();
                         ?>
@@ -108,10 +108,11 @@ $basePath = "../";
                             <td>
                                  <div class="fw-bold"><?php echo $o['customer_name']; ?></div>
                                  <div class="small text-secondary"><i class="bi bi-phone"></i> <?php echo $o['customer_phone']; ?></div>
-                                 <!-- Hiển thị danh sách sản phẩm -->
+                                 <!-- Hiển thị danh sách sản phẩm có kèm ảnh -->
                                  <div class="mt-2">
                                      <?php foreach($items as $item): ?>
-                                         <div class="small bg-light rounded px-2 py-1 mb-1 border" style="font-size: 0.75rem;">
+                                         <div class="d-flex align-items-center gap-2 bg-light rounded px-2 py-1 mb-1 border" style="font-size: 0.75rem;">
+                                             <img src="../assets/images/<?php echo $item['image']; ?>" class="rounded" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.src='https://placehold.co/24'">
                                              <span class="fw-bold text-dark"><?php echo $item['product_name']; ?></span> 
                                              <span class="text-secondary">x<?php echo $item['quantity']; ?></span>
                                          </div>
