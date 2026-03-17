@@ -50,6 +50,18 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
+// B.1 XÓA NHIỀU SẢN PHẨM (Bulk Delete)
+if (isset($_POST['bulk_delete']) && !empty($_POST['selected_ids'])) {
+    $ids = $_POST['selected_ids'];
+    // Chuyển mảng IDs thành chuỗi để dùng trong câu lệnh SQL IN (?, ?, ...)
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $sql = "DELETE FROM products WHERE id IN ($placeholders)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($ids);
+    header("Location: products.php?msg=deleted");
+    exit;
+}
+
 // C. TOGGLE SẢN PHẨM NỔI BẬT
 if (isset($_GET['toggle_featured'])) {
     $id = $_GET['toggle_featured'];
@@ -115,10 +127,16 @@ if (isset($_GET['edit'])) {
                  <h2 class="fw-bold mb-1">Kho sản phẩm</h2>
                  <p class="text-secondary small mb-0">Quản lý kho hàng bằng PHP PDO & PostgreSQL.</p>
             </div>
-            <!-- Nút bật Modal thêm mới -->
-            <button class="btn btn-primary shadow-sm px-4 py-2 rounded-3" data-bs-toggle="modal" data-bs-target="#productModal">
-                <i class="bi bi-plus-lg me-2"></i> Thêm máy mới
-            </button>
+            <div class="d-flex gap-2">
+                <!-- Nút Xóa nhiều (ẩn mặc định, hiện khi chọn checkbox) -->
+                <button type="submit" form="bulkDeleteForm" name="bulk_delete" id="bulkDeleteBtn" class="btn btn-outline-danger shadow-sm px-4 py-2 rounded-3 d-none" onclick="return confirm('Bạn có chắc chắn muốn xóa các sản phẩm đã chọn?')">
+                    <i class="bi bi-trash me-2"></i> Xóa mục đã chọn
+                </button>
+                <!-- Nút bật Modal thêm mới -->
+                <button class="btn btn-primary shadow-sm px-4 py-2 rounded-3" data-bs-toggle="modal" data-bs-target="#productModal">
+                    <i class="bi bi-plus-lg me-2"></i> Thêm máy mới
+                </button>
+            </div>
         </header>
 
         <div class="content-card shadow-sm border-0 rounded-4 p-4">
@@ -126,30 +144,37 @@ if (isset($_GET['edit'])) {
             <?php if (isset($_GET['msg'])): ?>
                 <div class="alert alert-success alert-dismissible fade show mb-4 rounded-3 border-0 shadow-sm" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i>
-                    <?php echo $_GET['msg'] == 'success' ? 'Dữ liệu đã được cập nhật thành công!' : 'Sản phẩm đã được xóa khỏi hệ thống!'; ?>
+                    <?php echo $_GET['msg'] == 'success' ? 'Dữ liệu đã được cập nhật thành công!' : ($_GET['msg'] == 'deleted' ? 'Sản phẩm đã được xóa khỏi hệ thống!' : 'Thao tác thành công!'); ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr class="small text-uppercase text-secondary">
-                            <th>Hình ảnh</th>
-                            <th>Tên máy</th>
-                            <th>Hãng</th>
-                            <th>Giá niêm yết</th>
-                            <th>Tồn kho</th>
-                            <th class="text-end">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Vòng lặp PHP Duyệt mảng sản phẩm lấy từ DB -->
-                        <?php foreach($products as $p): ?>
-                        <tr>
-                            <td>
-                                <img src="../assets/images/<?php echo $p['image']; ?>" class="product-img-admin rounded-3" onerror="this.src='https://placehold.co/60'">
-                            </td>
+            <form id="bulkDeleteForm" action="products.php" method="POST">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr class="small text-uppercase text-secondary">
+                                <th style="width: 40px;">
+                                    <input type="checkbox" id="selectAll" class="form-check-input">
+                                </th>
+                                <th>Hình ảnh</th>
+                                <th>Tên máy</th>
+                                <th>Hãng</th>
+                                <th>Giá niêm yết</th>
+                                <th>Tồn kho</th>
+                                <th class="text-end">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Vòng lặp PHP Duyệt mảng sản phẩm lấy từ DB -->
+                            <?php foreach($products as $p): ?>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="selected_ids[]" value="<?php echo $p['id']; ?>" class="form-check-input select-item">
+                                </td>
+                                <td>
+                                    <img src="../assets/images/<?php echo $p['image']; ?>" class="product-img-admin rounded-3" onerror="this.src='https://placehold.co/60'">
+                                </td>
                             <td>
                                 <div class="fw-bold d-flex align-items-center gap-2">
                                     <?php echo $p['name']; ?>
@@ -176,6 +201,7 @@ if (isset($_GET['edit'])) {
                     </tbody>
                 </table>
             </div>
+            </form>
         </div>
     </main>
 
@@ -236,5 +262,41 @@ if (isset($_GET['edit'])) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Xử lý chọn tất cả checkbox
+        const selectAll = document.getElementById('selectAll');
+        const selectItems = document.querySelectorAll('.select-item');
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+        function toggleBulkDeleteBtn() {
+            const checkedCount = document.querySelectorAll('.select-item:checked').length;
+            if (checkedCount > 0) {
+                bulkDeleteBtn.classList.remove('d-none');
+            } else {
+                bulkDeleteBtn.classList.add('d-none');
+            }
+        }
+
+        selectAll.addEventListener('change', function() {
+            selectItems.forEach(item => {
+                item.checked = this.checked;
+            });
+            toggleBulkDeleteBtn();
+        });
+
+        selectItems.forEach(item => {
+            item.addEventListener('change', function() {
+                // Nếu có 1 item không được chọn thì bỏ check selectAll
+                if (!this.checked) {
+                    selectAll.checked = false;
+                } else {
+                    // Nếu tất cả item đều được chọn thì check selectAll
+                    const allChecked = Array.from(selectItems).every(i => i.checked);
+                    selectAll.checked = allChecked;
+                }
+                toggleBulkDeleteBtn();
+            });
+        });
+    </script>
 </body>
 </html>
