@@ -1,0 +1,7 @@
+{
+    "name": "nhk-mobile/web-ban-dien-thoai",
+    "description": "Website bán diện thoại PHP thuần sử dụng PostgreSQL",
+    "require": {
+        "php": ">=7.4"
+    }
+}
