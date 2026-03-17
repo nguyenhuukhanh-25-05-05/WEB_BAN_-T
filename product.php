@@ -52,7 +52,7 @@ $products = $stmt->fetchAll();
 $pageTitle = $search ? "Kết quả tìm kiếm: $search" : ($category ? "Điện thoại $category" : "Tất cả điện thoại");
 $basePath = "";
 
-<?php include 'includes/header.php'; ?>
+include 'includes/header.php';
 
 <style>
 .scrollbar-hide::-webkit-scrollbar { display: none; }
