@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = "Đăng ký tài khoản | NHK Mobile";
+$basePath = "";
 include 'includes/header.php';
 ?>
 

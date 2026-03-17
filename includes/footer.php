@@ -74,5 +74,9 @@
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Search Overlay -->
+    <?php include __DIR__ . '/search_overlay.php'; ?>
+    <script src="<?php echo isset($basePath) ? $basePath : ''; ?>assets/js/search-overlay.js"></script>
 </body>
 </html>

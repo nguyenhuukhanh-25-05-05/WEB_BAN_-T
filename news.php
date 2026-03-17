@@ -2,9 +2,15 @@
 session_start();
 require_once 'includes/db.php';
 
-// Fetch all news articles
-$stmt = $pdo->query("SELECT * FROM news ORDER BY created_at DESC");
-$articles = $stmt->fetchAll();
+// Fetch all news articles (with graceful error handling)
+$articles = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM news ORDER BY created_at DESC");
+    $articles = $stmt->fetchAll();
+} catch (PDOException $e) {
+    // Table doesn't exist yet — will show "no articles" message
+    $articles = [];
+}
 
 $pageTitle = "Tin tức Công nghệ | NHK Mobile";
 $basePath = "";

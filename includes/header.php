@@ -72,9 +72,3 @@
             </button>
         </div>
     </nav>
-
-    <!-- Search Overlay -->
-    <?php include 'search_overlay.php'; ?>
-    
-    <!-- Scripts specific to search -->
-    <script src="<?php echo $basePath; ?>assets/js/search-overlay.js"></script>
