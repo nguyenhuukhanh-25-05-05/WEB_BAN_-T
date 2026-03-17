@@ -1,20 +1,22 @@
-<?php
-$databaseUrl = $_ENV['DATABASE_URL'] ?? $_SERVER['DATABASE_URL'] ?? getenv('DATABASE_URL');
+// 1. Tìm DATABASE_URL (Cách phổ biến nhất trên Render/Heroku)
+$databaseUrl = getenv('DATABASE_URL');
+if (!$databaseUrl) $databaseUrl = $_ENV['DATABASE_URL'] ?? $_SERVER['DATABASE_URL'] ?? null;
 
 if ($databaseUrl) {
-  
+    // Nếu có URL, bóc tách thông tin
     $dbParts = parse_url($databaseUrl);
-    $host = $dbParts['host'];
+    $host = $dbParts['host'] ?? 'localhost';
     $port = $dbParts['port'] ?? '5432';
-    $db   = ltrim($dbParts['path'], '/');
-    $user = $dbParts['user'];
-    $pass = $dbParts['pass'];
+    $db   = isset($dbParts['path']) ? ltrim($dbParts['path'], '/') : '';
+    $user = $dbParts['user'] ?? '';
+    $pass = $dbParts['pass'] ?? '';
 } else {
-    $host = $_ENV['DB_HOST'] ?? $_SERVER['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost';
-    $port = $_ENV['DB_PORT'] ?? $_SERVER['DB_PORT'] ?? getenv('DB_PORT') ?: '5432';
-    $db   = $_ENV['DB_NAME'] ?? $_SERVER['DB_NAME'] ?? getenv('DB_NAME') ?: 'web_ban_dien_thoai';
-    $user = $_ENV['DB_USER'] ?? $_SERVER['DB_USER'] ?? getenv('DB_USER') ?: 'postgres';
-    $pass = $_ENV['DB_PASS'] ?? $_SERVER['DB_PASS'] ?? getenv('DB_PASS') ?: '123456';
+    // 2. Dự phòng các biến lẻ (DB_HOST, DB_USER...)
+    $host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? $_SERVER['DB_HOST'] ?? 'localhost');
+    $port = getenv('DB_PORT') ?: ($_ENV['DB_PORT'] ?? $_SERVER['DB_PORT'] ?? '5432');
+    $db   = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? $_SERVER['DB_NAME'] ?? 'web_ban_dien_thoai');
+    $user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? $_SERVER['DB_USER'] ?? 'postgres');
+    $pass = getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? $_SERVER['DB_PASS'] ?? '123456');
 }
 
 $dsn = "pgsql:host=$host;port=$port;dbname=$db";
