@@ -108,7 +108,7 @@ img {
 }
 
 .navbar-brand img {
-    height: 18px;
+    height: 28px;
     display: block;
 }
 
@@ -129,6 +129,9 @@ img {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
 }
 
 /* Responsive Navbar */
@@ -137,16 +140,17 @@ img {
         height: 54px;
     }
     .navbar-centered-wrapper {
-        gap: 15px; /* Giảm gap trên mobile để không bị tràn */
-        justify-content: center; /* Vẫn căn giữa trên mobile */
-        padding: 0 10px;
+        gap: 0; 
+        justify-content: space-between; /* Đẩy logo và icon ra 2 đầu hoặc giãn đều */
+        padding: 0 15px;
+        width: 100%;
     }
     .navbar-centered-wrapper i {
         font-size: 18px;
         padding: 5px;
     }
     .navbar-brand img {
-        height: 14px; /* Giảm nhẹ logo trên mobile */
+        height: 22px; /* Logo mobile vừa phải */
     }
     .navbar-toggler {
         display: block !important;

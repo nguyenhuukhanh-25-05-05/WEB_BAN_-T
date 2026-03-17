@@ -21,7 +21,7 @@
             <div class="navbar-centered-wrapper">
                 <!-- 1. Logo (Leftmost of the center block) -->
                 <a class="navbar-brand" href="<?php echo $basePath; ?>index.php">
-                    <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="18" alt="Logo">
+                    <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="28" alt="Logo">
                 </a>
 
                 <!-- 2. Main Menu Links (Direct children for even spacing) -->
@@ -44,7 +44,7 @@
                 </a>
 
                 <div class="dropdown">
-                    <a href="#" class="dropdown-toggle no-caret" data-bs-toggle="dropdown">
+                    <a href="#" class="dropdown-toggle no-caret" data-bs-toggle="dropdown" role="button" aria-expanded="false">
                         <i class="bi bi-person fs-5"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end glass-card border-light shadow-lg rounded-4 p-2 mt-3">
