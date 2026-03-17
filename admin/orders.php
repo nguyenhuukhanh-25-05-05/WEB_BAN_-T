@@ -102,12 +102,26 @@ $basePath = "../";
                     </thead>
                     <tbody>
                         <!-- Vòng lặp PHP Duyệt danh sách đơn hàng -->
-                        <?php foreach($orders as $o): ?>
+                        <?php foreach($orders as $o): 
+                            // Lấy chi tiết các sản phẩm trong đơn này
+                            $stmtItems = $pdo->prepare("SELECT * FROM order_items WHERE order_id = ?");
+                            $stmtItems->execute([$o['id']]);
+                            $items = $stmtItems->fetchAll();
+                        ?>
                         <tr>
                             <td class="text-secondary fw-bold small">#ORD-<?php echo $o['id']; ?></td>
                             <td>
                                  <div class="fw-bold"><?php echo $o['customer_name']; ?></div>
                                  <div class="small text-secondary"><i class="bi bi-phone"></i> <?php echo $o['customer_phone']; ?></div>
+                                 <!-- Hiển thị danh sách sản phẩm -->
+                                 <div class="mt-2">
+                                     <?php foreach($items as $item): ?>
+                                         <div class="small bg-light rounded px-2 py-1 mb-1 border" style="font-size: 0.75rem;">
+                                             <span class="fw-bold text-dark"><?php echo $item['product_name']; ?></span> 
+                                             <span class="text-secondary">x<?php echo $item['quantity']; ?></span>
+                                         </div>
+                                     <?php endforeach; ?>
+                                 </div>
                             </td>
                             <td class="fw-bold text-primary"><?php echo number_format($o['total_price'], 0, ',', '.'); ?>₫</td>
                             <td><span class="badge bg-light text-dark border fw-normal px-2"><?php echo $o['payment_method']; ?></span></td>

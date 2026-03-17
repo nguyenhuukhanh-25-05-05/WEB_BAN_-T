@@ -1,9 +1,8 @@
-<?php
-// Bắt đầu phiên làm việc (Session) để lưu trữ giỏ hàng
-session_start();
-
-// Nhúng file kết nối CSDL
 require_once 'includes/db.php';
+require_once 'includes/cart_functions.php';
+
+// Thực hiện đồng bộ giỏ hàng ngay khi bắt đầu
+syncCartWithDatabase($pdo);
 
 /**
  * 1. XỬ LÝ THÊM SẢN PHẨM VÀO GIỎ HÀNG

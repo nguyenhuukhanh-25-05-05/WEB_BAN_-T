@@ -23,7 +23,27 @@ CREATE TABLE IF NOT EXISTS orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. Bảng Admin (Lưu trữ tài khoản quản trị - Dự phòng phát triển sau này)
+-- 3. Bảng Chi tiết đơn hàng (Lưu trữ danh sách máy trong mỗi đơn)
+CREATE TABLE IF NOT EXISTS order_items (
+    id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES orders(id) ON DELETE CASCADE,
+    product_id INT REFERENCES products(id),
+    product_name VARCHAR(255),
+    price DECIMAL(15, 2),
+    quantity INT
+);
+
+-- 4. Bảng Giỏ hàng bền vững (Lưu giỏ hàng theo session_id)
+CREATE TABLE IF NOT EXISTS cart_items (
+    id SERIAL PRIMARY KEY,
+    session_id VARCHAR(255) NOT NULL,
+    product_id INT REFERENCES products(id),
+    quantity INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(session_id, product_id)
+);
+
+-- 5. Bảng Admin (Lưu trữ tài khoản quản trị)
 CREATE TABLE IF NOT EXISTS admins (
     id SERIAL PRIMARY KEY,
     username VARCHAR(100) UNIQUE NOT NULL,

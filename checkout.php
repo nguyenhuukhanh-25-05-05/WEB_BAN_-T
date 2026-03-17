@@ -4,6 +4,10 @@ session_start();
 
 // Nhúng file kết nối CSDL
 require_once 'includes/db.php';
+require_once 'includes/cart_functions.php';
+
+// Đồng bộ trước khi kiểm tra
+syncCartWithDatabase($pdo);
 
 // Kiểm tra giỏ hàng có đồ không, nếu không quay lại trang chủ
 $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
@@ -28,12 +32,23 @@ if (isset($_POST['place_order'])) {
     $payment = $_POST['payment_method'];
 
     // Thực hiện chèn đơn hàng vào bảng orders trong Postgres
-    $sql = "INSERT INTO orders (customer_name, customer_phone, total_price, status, payment_method) VALUES (?, ?, ?, 'Pending', ?)";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$name, $phone, $total, $payment]);
+    $sqlOrder = "INSERT INTO orders (customer_name, customer_phone, total_price, status, payment_method) VALUES (?, ?, ?, 'Pending', ?) RETURNING id";
+    $stmtOrder = $pdo->prepare($sqlOrder);
+    $stmtOrder->execute([$name, $phone, $total, $payment]);
+    $orderId = $stmtOrder->fetchColumn(); // Lấy ID vừa chèn (Postgres dùng RETURNING)
+
+    // Lưu từng sản phẩm trong giỏ vào bảng order_items
+    $sqlItem = "INSERT INTO order_items (order_id, product_id, product_name, price, quantity) VALUES (?, ?, ?, ?, ?)";
+    $stmtItem = $pdo->prepare($sqlItem);
+    foreach ($cartItems as $pid => $item) {
+        $stmtItem->execute([$orderId, $pid, $item['name'], $item['price'], $item['qty']]);
+    }
     
-    // Sau khi lưu đơn thành công, xóa sạch giỏ hàng trong Session
+    // Sau khi lưu đơn thành công, xóa sạch giỏ hàng trong Session và Database
     unset($_SESSION['cart']);
+    
+    $stmtClearCart = $pdo->prepare("DELETE FROM cart_items WHERE session_id = ?");
+    $stmtClearCart->execute([session_id()]);
     
     // Chuyển hướng sang trang thông báo thành công
     header("Location: checkout.php?order=success");
