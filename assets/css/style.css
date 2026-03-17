@@ -1,0 +1,629 @@
+/* 
+   TOKENS & BIẾN SỐ CHÍNH
+   Định nghĩa các màu sắc và font chữ chuẩn theo phong cách Apple
+*/
+:root {
+    --bs-body-font-family: 'Inter', sans-serif;
+    --primary-black: #1d1d1f;
+    --apple-gray: #f5f5f7;
+    --apple-blue: #0071e3;
+    --apple-silver: #d2d2d7;
+}
+
+body {
+    background-color: #fff; /* Đổi nền sang trắng cho các trang con */
+    color: var(--primary-black);
+    overflow-x: hidden;
+}
+
+/* 
+   NAVBAR - THANH ĐIỀU HƯỚNG CAO CẤP 
+*/
+.navbar-premium {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    height: 60px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+/* Nhóm thống nhất để căn giữa toàn bộ (Logo + Menu + Icons) */
+.navbar-unified-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px; /* Khoảng cách đều giữa tất cả các thành phần */
+    width: 100%;
+}
+
+.navbar-nav-centered {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 30px; 
+}
+
+.navbar-brand img {
+    height: 28px; /* Tăng kích thước logo theo yêu cầu */
+    width: auto;
+}
+
+.nav-link {
+    font-size: 12px; /* Thu bé lại theo yêu cầu */
+    font-weight: 500;
+    color: #1d1d1f !important;
+    padding: 0 10px !important;
+    transition: opacity 0.2s;
+}
+
+.nav-link:hover {
+    opacity: 0.7;
+}
+
+.navbar-icons-group {
+    display: flex;
+    align-items: center;
+    gap: 30px; /* Cùng khoảng cách 30px cho đồng bộ */
+}
+
+.navbar-icons-group a {
+    color: #1d1d1f;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.2s;
+}
+
+.navbar-icons-group svg, .navbar-icons-group i {
+    width: 18px; /* Thu bé icon lại cho tinh tế hơn */
+    height: 18px;
+    display: block;
+}
+
+.navbar-icons-group i {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.navbar-icons-group a:hover {
+    opacity: 0.7;
+}
+
+.navbar-toggler {
+    padding: 0;
+    margin-right: 15px;
+}
+
+/* 
+   HERO SECTION - PHẦN ĐẦU TRANG CHỦ (GIAO DIỆN CHIA ĐÔI)
+*/
+.hero-split {
+    padding: 120px 0;
+    background-image: url('../images/hero.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
+
+/* Lớp phủ để làm chữ dễ đọc hơn nếu ảnh quá sáng/tối */
+.hero-split::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 255, 255, 0.1); /* Lớp phủ nhẹ */
+    pointer-events: none;
+}
+
+.hero-product-info {
+    max-width: 400px;
+    z-index: 2;
+}
+
+.hero-title-split {
+    font-size: 4rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+}
+
+.hero-price-split {
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+}
+
+.hero-desc-split {
+    font-size: 1rem;
+    color: #1d1d1f;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    max-width: 300px;
+}
+
+.hero-center-image {
+    max-width: 100%;
+    height: auto;
+    z-index: 1;
+    transform: scale(1.1);
+}
+
+/* Tùy chỉnh nút trong Hero */
+.btn-hero-black {
+    background: #000;
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 980px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-hero-black:hover {
+    background: #333;
+    color: #fff;
+}
+
+.btn-hero-link {
+    color: #0066cc;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.btn-hero-link:hover {
+    text-decoration: underline;
+}
+
+/* 
+   NÚT BẤM PHONG CÁCH APPLE 
+*/
+.btn-apple {
+    background-color: var(--apple-blue);
+    color: white;
+    padding: 10px 22px;
+    border-radius: 980px;
+    font-weight: 400;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-apple:hover {
+    background-color: #0077ed;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+}
+
+.btn-link-apple {
+    color: #0066cc;
+    text-decoration: none;
+    font-size: 1.25rem;
+}
+
+.btn-link-apple:hover {
+    text-decoration: underline;
+}
+
+/* 
+   CHIPS LỌC (FILTER CHIPS)
+*/
+.filter-chip {
+    padding: 8px 18px;
+    border-radius: 980px;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: #f5f5f7;
+    color: #1d1d1f;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.filter-chip:hover, .filter-chip.active {
+    background-color: #000;
+    color: #fff;
+}
+
+/* 
+   CARD SẢN PHẨM CAO CẤP 
+*/
+.card-premium, .card-product {
+    border: none;
+    border-radius: 28px;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    background: #fff;
+    height: 100%;
+}
+
+.card-premium:hover, .card-product:hover {
+    transform: scale(1.02);
+}
+
+.product-img-wrapper, .img-container {
+    padding: 40px;
+    background: var(--apple-gray);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    transition: background 0.3s;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.product-img {
+    max-height: 220px;
+    width: auto;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.group:hover .product-img {
+    transform: scale(1.1);
+}
+
+.product-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.product-price {
+    font-weight: 600;
+    color: #424245;
+}
+
+/* 
+   TRANG SẢN PHẨM (PRODUCT DISCOVERY)
+*/
+.discovery-header {
+    text-align: center;
+    padding: 80px 0 40px;
+}
+
+.discovery-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+    letter-spacing: -0.02em;
+}
+
+.filter-wrapper {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    padding-bottom: 20px;
+    gap: 12px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.filter-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-chip-modern {
+    padding: 6px 20px;
+    background: #f5f5f7;
+    border-radius: 980px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1d1d1f;
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.filter-chip-modern.active, .filter-chip-modern:hover {
+    background: #000;
+    color: #fff;
+}
+
+.sort-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 60px;
+}
+
+.sort-select-minimal {
+    border: 1px solid #d2d2d7;
+    background: transparent;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1d1d1f;
+    outline: none;
+}
+
+/* Kiểu dáng Card sản phẩm mới (Theo ảnh mẫu) */
+.product-card-modern {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.p-img-box {
+    background: #fbfbfb;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.p-img-box img {
+    max-height: 200px;
+    width: auto;
+    transition: transform 0.3s;
+}
+
+.product-card-modern:hover .p-img-box img {
+    transform: scale(1.05);
+}
+
+.p-brand {
+    font-size: 12px;
+    color: #86868b;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.p-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #1d1d1f;
+}
+
+.p-price {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.p-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-p-buy {
+    background: #000;
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 980px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.btn-p-view {
+    background: #fff;
+    color: #000;
+    border: 1px solid #d2d2d7;
+    padding: 8px 20px;
+    border-radius: 980px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+/* Footer mới (Newsletter + Multi-column) */
+.footer-newsletter {
+    background: #fbfbfb;
+    padding: 40px 0;
+    border-top: 1px solid #f2f2f2;
+    margin-top: 80px;
+}
+
+.newsletter-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.newsletter-text h4 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.newsletter-text p {
+    font-size: 13px;
+    color: #86868b;
+    margin: 0;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 10px;
+}
+
+.newsletter-input {
+    padding: 8px 15px;
+    border-radius: 6px;
+    border: 1px solid #d2d2d7;
+    width: 250px;
+    font-size: 13px;
+}
+
+.btn-newsletter {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+/* Premium Footer */
+.footer {
+    background-color: #f5f5f7; /* Distinct light gray */
+    padding-top: 60px;
+    border-top: 1px solid #d2d2d7;
+    box-shadow: inset 0 1px 0 rgba(0,0,0,0.02);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.footer-trust-badges {
+    display: flex;
+    justify-content: center; /* Center the badges */
+    padding-bottom: 50px;
+    border-bottom: 1px solid #d2d2d7;
+    margin-bottom: 50px;
+    flex-wrap: wrap;
+    gap: 40px; /* More breathing room */
+}
+
+.trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-align: left;
+}
+
+.trust-badge i {
+    font-size: 24px;
+    color: #424245;
+}
+
+.trust-badge-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.trust-badge-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d1d1f;
+}
+
+.trust-badge-desc {
+    font-size: 12px;
+    color: #6e6e73;
+}
+
+.footer-links-grid {
+    margin-bottom: 50px;
+}
+
+.footer-col h6 {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    color: #1d1d1f;
+    letter-spacing: -0.01em;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-col ul li {
+    margin-bottom: 10px;
+}
+
+.footer-col ul li a {
+    font-size: 12px;
+    color: #424245;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-col ul li a:hover {
+    color: #0066cc;
+    text-decoration: underline;
+}
+
+.footer-bottom {
+    padding: 30px 0;
+    border-top: 1px solid #d2d2d7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: #6e6e73;
+}
+
+.footer-bottom-info {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.footer-bottom-links {
+    display: flex;
+    gap: 15px;
+}
+
+.footer-bottom-links a {
+    color: #424245;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-bottom-links a:hover {
+    color: #1d1d1f;
+    text-decoration: underline;
+}
+
+.footer-socials {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-socials a {
+    color: #424245;
+    font-size: 16px;
+    transition: color 0.2s;
+}
+
+.footer-socials a:hover {
+    color: #1d1d1f;
+}
+
+@media (max-width: 768px) {
+    .footer-trust-badges {
+        justify-content: flex-start;
+    }
+    .footer-bottom {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    .footer-bottom-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+.footer-bottom-links a:hover {
+    text-decoration: underline;
+}
+
+.footer-socials {
+    display: flex;
+    gap: 20px;
+    font-size: 20px;
+}
+
+.footer-socials a {
+    color: #1d1d1f;
+    transition: opacity 0.2s;
+}
+
+.footer-socials a:hover {
+    opacity: 0.7;
+}
+
+/* 
+   TRANG CHI TIẾT SẢN PHẨM (PRODUCT DETAIL)
+*/
