@@ -59,18 +59,93 @@ include 'includes/header.php';
                 </div>
 
                 <div class="col-lg-4 animate-reveal" style="animation-delay: 0.2s">
-                    <div class="glass-card p-5 rounded-5 bg-dark text-white shadow-2xl sticky-top" style="top: 120px;">
-                        <h4 class="fw-bold mb-4">Tra cứu nhanh</h4>
-                        <p class="small text-secondary-light mb-4">Nhập mã IMEI để kiểm tra thời hạn và lịch sử sửa chữa của máy.</p>
+                    <div class="glass-card p-5 rounded-5 shadow-2xl sticky-top" style="top: 120px; background: linear-gradient(145deg, #1d1d1f 0%, #3a3a40 100%); border: 1px solid rgba(255,255,255,0.1);">
+                        <h4 class="fw-bold mb-4" style="color: #ffffff !important;">Tra cứu nhanh</h4>
+                        <p class="small mb-4" style="color: rgba(255,255,255,0.7) !important;">Nhập mã IMEI (15 số) để kiểm tra thời hạn và lịch sử sửa chữa của máy.</p>
                         <div class="mb-4">
-                             <input type="text" class="form-control form-control-lg rounded-pill px-4 bg-white bg-opacity-10 border-light text-white" placeholder="Tìm số IMEI...">
+                             <input type="text" id="imeiInput" class="form-control form-control-lg rounded-pill px-4" style="background: rgba(255,255,255,0.95); border: none; color: #1d1d1f !important; font-size: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);" placeholder="Ví dụ: 3584820912...">
                         </div>
-                        <button class="btn btn-premium-light w-100 rounded-pill py-3 fw-bold shadow-lg">Kiểm tra ngay</button>
+                        <button id="btnCheckImei" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-lg d-flex justify-content-center align-items-center gap-2 transition-all">
+                            <span id="btnText">Kiểm tra ngay</span>
+                            <div id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></div>
+                        </button>
+
+                        <!-- Result Display Area -->
+                        <div id="imeiResult" class="mt-4 animate-fade-in" style="display: none;"></div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 </main>
+
+<script>
+document.getElementById('btnCheckImei').addEventListener('click', function() {
+    const input = document.getElementById('imeiInput').value.trim();
+    const resultDiv = document.getElementById('imeiResult');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    
+    // Reset
+    resultDiv.style.display = 'none';
+    resultDiv.innerHTML = '';
+    
+    // Validation
+    if(input.length < 5) {
+        resultDiv.innerHTML = `<div class="p-3 rounded-4" style="background: rgba(255,60,48,0.1); border: 1px solid rgba(255,60,48,0.3); color: #ff3b30 !important; font-size: 14px;"><i class="bi bi-exclamation-triangle-fill me-2"></i>Vui lòng nhập số IMEI hợp lệ.</div>`;
+        resultDiv.style.display = 'block';
+        return;
+    }
+
+    // Loading State
+    this.disabled = true;
+    btnText.textContent = 'Đang tra cứu...';
+    btnSpinner.classList.remove('d-none');
+    
+    // Fake API call (Timeout 1.5s for realistic feeling)
+    setTimeout(() => {
+        this.disabled = false;
+        btnText.textContent = 'Kiểm tra ngay';
+        btnSpinner.classList.add('d-none');
+        
+        // Randomly succeed or expire based on input length just to show different states
+        const isExpired = Math.random() > 0.6;
+        const purchaseDate = new Date(Date.now() - Math.floor(Math.random() * 10000000000) - 10000000000); // 1-2 years ago randomly
+        const formattedDate = purchaseDate.toLocaleDateString('vi-VN');
+        
+        let htmlContent = '';
+        if (isExpired) {
+            htmlContent = `
+                <div class="p-4 rounded-4" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(255,149,0,0.15); color: #ff9500;">
+                            <i class="bi bi-shield-exclamation fs-5"></i>
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-bold" style="color: #fff !important;">Hết hạn bảo hành</h6>
+                    </div>
+                    <p class="small mb-1" style="color: rgba(255,255,255,0.6) !important;">IMEI: <strong style="color: #fff !important;">${input}</strong></p>
+                    <p class="small mb-0" style="color: rgba(255,255,255,0.6) !important;">Hết hạn: <strong style="color: #fff !important;">${formattedDate}</strong></p>
+                </div>
+            `;
+        } else {
+            htmlContent = `
+                <div class="p-4 rounded-4" style="background: rgba(52,199,89,0.1); border: 1px solid rgba(52,199,89,0.3);">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(52,199,89,0.2); color: #32d74b;">
+                            <i class="bi bi-shield-check fs-5"></i>
+                        </div>
+                        <h6 class="mb-0 ms-3 fw-bold" style="color: #fff !important;">Đang được bảo hành</h6>
+                    </div>
+                    <p class="small mb-1" style="color: rgba(255,255,255,0.6) !important;">IMEI: <strong style="color: #fff !important;">${input}</strong></p>
+                    <p class="small mb-0" style="color: rgba(255,255,255,0.6) !important;">Dịch vụ: <strong style="color: #fff !important;">Bảo hành Toàn diện VIP</strong></p>
+                </div>
+            `;
+        }
+        
+        resultDiv.innerHTML = htmlContent;
+        resultDiv.style.display = 'block';
+    }, 1200);
+});
+</script>
 
 <?php include 'includes/footer.php'; ?>
