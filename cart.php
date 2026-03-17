@@ -25,17 +25,19 @@ if (isset($_GET['add'])) {
         if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
         
         // Nếu sản phẩm đã có trong giỏ, tăng số lượng
-        if (isset($_SESSION['cart'][$id])) {
-            $_SESSION['cart'][$id]['qty']++;
+        if (isset($_SESSION['cart'][$productId])) {
+            $_SESSION['cart'][$productId]['qty']++;
         } else {
             // Nếu chưa có, thêm mới với số lượng là 1
-            $_SESSION['cart'][$id] = [
+            $_SESSION['cart'][$productId] = [
                 'name' => $product['name'],
                 'price' => $product['price'],
                 'image' => $product['image'],
                 'qty' => 1
             ];
         }
+        // Gọi hàm đồng bộ ngay lập tức để lưu DB
+        syncCartWithDatabase($pdo);
     }
     // Quay lại trang giỏ hàng để hiển thị
     header("Location: cart.php");
@@ -48,6 +50,7 @@ if (isset($_GET['add'])) {
 if (isset($_GET['remove'])) {
     $id = $_GET['remove'];
     unset($_SESSION['cart'][$id]);
+    removeFromCartDB($pdo, $id); // Xóa khỏi DB
     header("Location: cart.php");
     exit;
 }
@@ -57,9 +60,14 @@ if (isset($_GET['remove'])) {
  */
 if (isset($_POST['update_cart'])) {
     foreach ($_POST['qty'] as $id => $qty) {
-        if ($qty <= 0) unset($_SESSION['cart'][$id]); // Nếu số lượng <= 0 thì xóa luôn
-        else $_SESSION['cart'][$id]['qty'] = $qty;    // Ngược lại cập nhật số lượng mới
+        if ($qty <= 0) {
+            unset($_SESSION['cart'][$id]); // Nếu số <= 0 thì xóa luôn
+            removeFromCartDB($pdo, $id);
+        } else {
+            $_SESSION['cart'][$id]['qty'] = $qty;    // Ngược lại cập nhật số lượng mới
+        }
     }
+    syncCartWithDatabase($pdo); // Đồng bộ lại toàn bộ sau update
     header("Location: cart.php");
     exit;
 }

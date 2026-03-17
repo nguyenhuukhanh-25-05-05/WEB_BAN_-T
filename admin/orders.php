@@ -119,7 +119,12 @@ $basePath = "../";
                             <td><span class="badge bg-light text-dark border fw-normal px-2"><?php echo $o['payment_method']; ?></span></td>
                             <td>
                                 <!-- Màu sắc hiển thị badge theo trạng thái -->
-                                <span class="badge bg-<?php echo $o['status'] == 'Completed' ? 'success' : ($o['status'] == 'Cancelled' ? 'danger' : 'warning'); ?>-subtle text-dark border fw-normal px-3 py-2 rounded-pill">
+                                <?php 
+                                    $badgeClass = 'warning';
+                                    if ($o['status'] == 'Đã duyệt' || $o['status'] == 'Completed') $badgeClass = 'success';
+                                    if ($o['status'] == 'Đã hủy' || $o['status'] == 'Cancelled') $badgeClass = 'danger';
+                                ?>
+                                <span class="badge bg-<?php echo $badgeClass; ?>-subtle text-dark border fw-normal px-3 py-2 rounded-pill">
                                     <?php echo $o['status']; ?>
                                 </span>
                             </td>
@@ -127,15 +132,15 @@ $basePath = "../";
                                 <!-- FORM PHP: Gửi trạng thái mới lên server -->
                                 <form action="orders.php" method="POST" style="display: inline-block;">
                                     <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
-                                    <!-- Nút Hoàn thành -->
-                                    <button type="submit" name="update_status" value="1" class="btn btn-sm btn-light border p-2 text-success shadow-sm" title="Hoàn thành đơn">
+                                    <!-- Nút Duyệt / Hoàn thành -->
+                                    <button type="submit" name="update_status" value="1" class="btn btn-sm btn-light border p-2 text-success shadow-sm" title="Duyệt đơn hàng">
                                         <i class="bi bi-check-circle"></i>
-                                        <input type="hidden" name="status" value="Completed">
+                                        <input type="hidden" name="status" value="Đã duyệt">
                                     </button>
                                     <!-- Nút Hủy đơn -->
-                                    <button type="submit" name="update_status" value="1" class="btn btn-sm btn-light border p-2 text-danger shadow-sm ms-1" title="Hủy đơn hàng">
+                                    <button type="submit" name="update_status" value="1" class="btn btn-sm btn-light border p-2 text-danger shadow-sm ms-1" title="Hủy / Từ chối đơn">
                                         <i class="bi bi-x-circle"></i>
-                                        <input type="hidden" name="status" value="Cancelled">
+                                        <input type="hidden" name="status" value="Đã hủy">
                                     </button>
                                 </form>
                             </td>

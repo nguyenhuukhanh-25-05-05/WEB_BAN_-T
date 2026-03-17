@@ -37,7 +37,7 @@ if (isset($_POST['place_order'])) {
     $userId = get_logged_in_user_id(); // Lấy ID người dùng đang đăng nhập
 
     // Thực hiện chèn đơn hàng vào bảng orders trong Postgres
-    $sqlOrder = "INSERT INTO orders (customer_name, customer_phone, total_price, status, payment_method, user_id) VALUES (?, ?, ?, 'Pending', ?, ?) RETURNING id";
+    $sqlOrder = "INSERT INTO orders (customer_name, customer_phone, total_price, status, payment_method, user_id) VALUES (?, ?, ?, 'Chờ duyệt', ?, ?) RETURNING id";
     $stmtOrder = $pdo->prepare($sqlOrder);
     $stmtOrder->execute([$name, $phone, $total, $payment, $userId]);
     $orderId = $stmtOrder->fetchColumn(); // Lấy ID vừa chèn (Postgres dùng RETURNING)
@@ -72,9 +72,9 @@ include 'includes/header.php';
             <?php if (isset($_GET['order']) && $_GET['order'] == 'success'): ?>
                 <div class="text-center py-5">
                     <img src="assets/images/logo-k.svg" height="40" class="mb-4 d-block mx-auto opacity-25">
-                    <i class="bi bi-bag-check display-1 text-success mb-4 d-block"></i>
-                    <h2 class="fw-bold">Tuyệt vời! Đơn hàng đã được ghi nhận.</h2>
-                    <p class="text-secondary max-w-600 mx-auto">Cảm ơn bạn đã lựa chọn NHK Mobile. Đội ngũ tư vấn sẽ liên hệ với bạn trong vòng 15-30 phút để xác nhận lại thông tin giao hàng.</p>
+                    <i class="bi bi-send-check display-1 text-primary mb-4 d-block"></i>
+                    <h2 class="fw-bold">Đơn hàng đã được gửi đi!</h2>
+                    <p class="text-secondary max-w-600 mx-auto">Đơn đặt hàng của bạn đã được gửi đến ban quản trị để phê duyệt. Vui lòng chờ nhân viên kiểm tra tình trạng kho và xác nhận lại với bạn trong ít phút tới.</p>
                     <div class="mt-5">
                         <a href="index.php" class="btn btn-dark rounded-pill px-5 py-3 fw-bold">Về trang chủ</a>
                         <a href="#" class="btn btn-outline-dark rounded-pill px-5 py-3 fw-bold ms-3">Theo dõi đơn hàng</a>
