@@ -104,7 +104,7 @@ include 'includes/header.php';
         </section>
 
         <!-- PHẦN TRẢI NGHIỆM: Immersive Light Section -->
-        <section class="py-huge position-relative bg-premium-light">
+        <section class="py-huge position-relative bg-premium-light overflow-hidden">
              <div class="bg-blur-blob blob-1"></div>
              <div class="bg-blur-blob blob-2"></div>
              <div class="container position-relative z-1">
@@ -145,7 +145,6 @@ include 'includes/header.php';
                   </div>
              </div>
         </section>
-    </main>
     </main>
 
 <?php 

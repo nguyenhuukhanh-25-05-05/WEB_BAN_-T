@@ -10,10 +10,42 @@
     --apple-silver: #d2d2d7;
 }
 
-body {
-    background-color: #fff; /* Đổi nền sang trắng cho các trang con */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    background-color: #fff;
     color: var(--primary-black);
+    overflow-x: hidden !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative;
+    max-width: 100%;
+}
+
+/* Triệt tiêu hoàn toàn khả năng tràn lề ngang */
+main, section, div, header, footer {
+    max-width: 100%;
     overflow-x: hidden;
+}
+
+/* Reset Bootstrap negative margins on mobile to prevent overflow */
+@media (max-width: 576px) {
+    .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    .container, .container-fluid {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+}
+
+img {
+    max-width: 100%;
+    height: auto;
 }
 
 /* --- NAVBAR PREMIUM --- */
@@ -662,6 +694,7 @@ body {
     background-color: #000;
     color: #fff;
     min-height: 100vh;
+    overflow: hidden !important; /* Đảm bảo không tràn lề */
 }
 
 .hero-bg-gradient {
