@@ -87,11 +87,11 @@ include 'includes/header.php';
         <div class="container px-xl-5">
             <div class="glass-panel p-5 p-lg-8 rounded-5 text-center bg-dark text-white shadow-2xl overflow-hidden position-relative">
                 <div class="position-relative z-2">
-                    <h2 class="display-5 fw-bold mb-4">Đừng bỏ lỡ bất kỳ nhịp đập nào.</h2>
-                    <p class="h5 text-secondary-light mb-5 fw-light">Đăng ký để nhận tin tức công nghệ mới nhất qua Email hàng tuần.</p>
-                    <form class="newsletter-form-premium d-flex flex-column flex-md-row gap-3 max-w-500 mx-auto">
-                        <input type="email" class="form-control form-control-lg rounded-pill px-4 bg-white bg-opacity-10 border-light text-white" placeholder="Địa chỉ email của bạn...">
-                        <button type="button" class="btn btn-premium-light btn-lg px-5 rounded-pill shadow-lg">Đăng ký</button>
+                    <h2 class="display-5 fw-bold mb-4" style="color: #ffffff !important;">Đừng bỏ lỡ bất kỳ nhịp đập nào.</h2>
+                    <p class="h5 mb-5 fw-light" style="color: rgba(255,255,255,0.7) !important;">Đăng ký để nhận tin tức công nghệ mới nhất qua Email hàng tuần.</p>
+                    <form class="newsletter-form-premium d-flex flex-column flex-md-row gap-3 max-w-500 mx-auto" onsubmit="event.preventDefault(); alert('Cảm ơn bạn đã đăng ký! Tính năng nhận bản tin đang được hoàn thiện.');">
+                        <input type="email" class="form-control form-control-lg rounded-pill px-4" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff !important;" placeholder="Địa chỉ email của bạn..." required>
+                        <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-lg fw-bold" style="background: #0071e3; border: none; color: #fff !important;">Đăng ký</button>
                     </form>
                 </div>
             </div>
