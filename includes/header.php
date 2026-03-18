@@ -49,6 +49,7 @@
                     <?php endif; ?>
                 </a>
 
+                <?php if (isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
                 <div class="dropdown">
                     <a href="javascript:void(0)" class="dropdown-toggle no-caret p-0 m-0 border-0 shadow-none outline-none" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person fs-5"></i>
@@ -60,17 +61,19 @@
                             <li><a class="dropdown-item rounded-3 small" href="<?php echo $basePath; ?>order_history.php"><i class="bi bi-clock-history me-2"></i>Lịch sử mua hàng</a></li>
                             <li><hr class="dropdown-divider opacity-50"></li>
                             <li><a class="dropdown-item rounded-3 small text-danger" href="<?php echo $basePath; ?>logout.php"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
-                        <?php elseif (isset($_SESSION['admin_id'])): ?>
+                        <?php else: ?>
                             <li><div class="dropdown-header text-primary small fw-bold">Quản trị viên</div></li>
                             <li><a class="dropdown-item rounded-3 small" href="<?php echo $basePath; ?>admin/dashboard.php"><i class="bi bi-speedometer2 me-2"></i>Bảng điều khiển</a></li>
                             <li><hr class="dropdown-divider opacity-50"></li>
                             <li><a class="dropdown-item rounded-3 small text-danger" href="<?php echo $basePath; ?>logout.php"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
-                        <?php else: ?>
-                            <li><a class="dropdown-item rounded-3 small" href="<?php echo $basePath; ?>login.php"><i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập</a></li>
-                            <li><a class="dropdown-item rounded-3 small" href="<?php echo $basePath; ?>register.php"><i class="bi bi-person-plus me-2"></i>Đăng ký</a></li>
                         <?php endif; ?>
                     </ul>
                 </div>
+                <?php else: ?>
+                    <a href="<?php echo $basePath; ?>login.php" class="icon-link">
+                        <i class="bi bi-person fs-5"></i>
+                    </a>
+                <?php endif; ?>
 
                 <!-- Hamburger Button (Only Mobile) -->
                 <button class="navbar-toggler border-0 shadow-none d-md-none p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
