@@ -14,6 +14,12 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?php echo $basePath; ?>assets/css/style.css">
+
+    <script>
+        // Define global API paths for JS
+        const BASE_PATH = "<?php echo $basePath; ?>";
+        const SEARCH_API_URL = BASE_PATH + "api/search_suggestions.php";
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-light fixed-top navbar-premium">
@@ -44,7 +50,7 @@
                 </a>
 
                 <div class="dropdown">
-                    <a href="#" class="dropdown-toggle no-caret" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                    <a href="javascript:void(0)" class="dropdown-toggle no-caret p-0 m-0 border-0 shadow-none outline-none" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person fs-5"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end glass-card border-light shadow-lg rounded-4 p-2 mt-3">

@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         debounceTimer = setTimeout(() => {
-            fetch(`api/search_suggestions.php?q=${encodeURIComponent(query)}`)
+            fetch(`${SEARCH_API_URL}?q=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
                     renderResults(data);

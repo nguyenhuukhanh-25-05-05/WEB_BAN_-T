@@ -7,16 +7,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const aiChatSend = document.getElementById('aiChatSend');
 
     // Toggle Chat Window
-    aiChatToggle.addEventListener('click', () => {
-        aiChatWindow.classList.toggle('active');
-        if (aiChatWindow.classList.contains('active')) {
-            aiChatInput.focus();
-        }
-    });
+    if (aiChatToggle) {
+        aiChatToggle.addEventListener('click', () => {
+            aiChatWindow.classList.toggle('active');
+            if (aiChatWindow.classList.contains('active')) {
+                aiChatInput.focus();
+            }
+        });
+    }
 
-    aiChatClose.addEventListener('click', () => {
-        aiChatWindow.classList.remove('active');
-    });
+    if (aiChatClose) {
+        aiChatClose.addEventListener('click', () => {
+            aiChatWindow.classList.remove('active');
+        });
+    }
 
     // Send Message Function
     async function sendMessage() {

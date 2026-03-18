@@ -112,9 +112,10 @@ img {
     display: block;
 }
 
-/* Ẩn mũi tên mặc định của Bootstrap Dropdown */
+/* Ẩn mũi tên mặc định của Bootstrap Dropdown và các thành phần thừa */
 .no-caret::after,
-.dropdown-toggle.no-caret::after {
+.dropdown-toggle.no-caret::after,
+.dropdown-toggle::before {
     display: none !important;
     content: none !important;
 }
@@ -129,9 +130,20 @@ img {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    /* Xóa bỏ định dạng mặc định của trình duyệt */
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
+}
+
+/* Triệt tiêu tận gốc spinner/arrows nếu trình duyệt hiểu nhầm là input */
+.dropdown-toggle::-webkit-inner-spin-button,
+.dropdown-toggle::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
 }
 
 /* Responsive Navbar */
