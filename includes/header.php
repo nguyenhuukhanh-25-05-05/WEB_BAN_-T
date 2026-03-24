@@ -50,27 +50,11 @@
                 </a>
 
                 <?php if (isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
-                <div class="dropdown">
-                    <a href="javascript:void(0)" class="dropdown-toggle no-caret p-0 m-0 border-0 shadow-none outline-none" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a href="#accountOffcanvas" role="button" class="icon-link text-dark" data-bs-toggle="offcanvas" aria-controls="accountOffcanvas">
                         <i class="bi bi-person fs-5"></i>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end glass-card border-light shadow-lg rounded-4 p-2 mt-3">
-                        <?php if (isset($_SESSION['user_id'])): ?>
-                            <li><div class="dropdown-header text-dark small fw-bold">Chào, <?php echo $_SESSION['user_fullname']; ?></div></li>
-                            <li><a class="dropdown-item rounded-3 small" href="#"><i class="bi bi-person-badge me-2"></i>Tài khoản</a></li>
-                            <li><a class="dropdown-item rounded-3 small" href="<?php echo $basePath; ?>order_history.php"><i class="bi bi-clock-history me-2"></i>Lịch sử mua hàng</a></li>
-                            <li><hr class="dropdown-divider opacity-50"></li>
-                            <li><a class="dropdown-item rounded-3 small text-danger" href="<?php echo $basePath; ?>logout.php"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
-                        <?php else: ?>
-                            <li><div class="dropdown-header text-primary small fw-bold">Quản trị viên</div></li>
-                            <li><a class="dropdown-item rounded-3 small" href="<?php echo $basePath; ?>admin/dashboard.php"><i class="bi bi-speedometer2 me-2"></i>Bảng điều khiển</a></li>
-                            <li><hr class="dropdown-divider opacity-50"></li>
-                            <li><a class="dropdown-item rounded-3 small text-danger" href="<?php echo $basePath; ?>logout.php"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
                 <?php else: ?>
-                    <a href="<?php echo $basePath; ?>login.php" class="icon-link">
+                    <a href="<?php echo $basePath; ?>login.php" class="icon-link text-dark">
                         <i class="bi bi-person fs-5"></i>
                     </a>
                 <?php endif; ?>
@@ -110,3 +94,54 @@
             </div>
         </div>
     </nav>
+
+    <!-- Account Offcanvas Menu -->
+    <?php if (isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="accountOffcanvas" aria-labelledby="accountOffcanvasLabel" style="width: 350px;">
+        <div class="offcanvas-header bg-light border-bottom">
+            <h5 class="offcanvas-title fw-bold" id="accountOffcanvasLabel"><i class="bi bi-layout-sidebar-reverse me-2"></i>Tài khoản</h5>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0 d-flex flex-column">
+            <div class="p-4 bg-premium-light text-center border-bottom">
+                <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center mx-auto mb-3 shadow" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                    <i class="bi bi-person"></i>
+                </div>
+                
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <h5 class="fw-bold mb-1 text-dark"><?php echo htmlspecialchars($_SESSION['user_fullname'] ?? 'Khách hàng'); ?></h5>
+                    <p class="text-secondary small mb-0">Thành viên NHK Mobile</p>
+                <?php else: ?>
+                    <h5 class="fw-bold text-primary mb-1">Quản trị viên</h5>
+                    <p class="text-secondary small mb-0">Hệ thống QTV</p>
+                <?php endif; ?>
+            </div>
+            
+            <div class="list-group list-group-flush mt-2 flex-grow-1">
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="#" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center">
+                        <div class="bg-light rounded p-2 me-3"><i class="bi bi-person-badge fs-5 text-dark"></i></div>
+                        <span class="fw-medium text-dark">Thông tin cá nhân</span>
+                        <i class="bi bi-chevron-right ms-auto text-muted small"></i>
+                    </a>
+                    <a href="<?php echo $basePath; ?>order_history.php" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center">
+                        <div class="bg-light rounded p-2 me-3"><i class="bi bi-clock-history fs-5 text-dark"></i></div>
+                        <span class="fw-medium text-dark">Lịch sử mua hàng</span>
+                        <i class="bi bi-chevron-right ms-auto text-muted small"></i>
+                    </a>
+                <?php else: ?>
+                    <a href="<?php echo $basePath; ?>admin/dashboard.php" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center">
+                        <div class="bg-primary-subtle rounded p-2 me-3"><i class="bi bi-speedometer2 fs-5 text-primary"></i></div>
+                        <span class="fw-medium text-primary">Bảng điều khiển Admin</span>
+                        <i class="bi bi-chevron-right ms-auto text-primary small"></i>
+                    </a>
+                <?php endif; ?>
+            </div>
+        </div>
+        <div class="offcanvas-footer p-4 border-top bg-light">
+            <a href="<?php echo $basePath; ?>logout.php" class="btn btn-danger w-100 rounded-pill py-3 fw-bold shadow-sm d-flex justify-content-center align-items-center">
+                <i class="bi bi-box-arrow-right me-2 fs-5"></i> Đăng xuất
+            </a>
+        </div>
+    </div>
+    <?php endif; ?>

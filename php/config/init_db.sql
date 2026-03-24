@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS news (
 ALTER TABLE cart_items ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);
 
 -- Thêm bảng Bảo hành (Warranties)
-CREATE TABLE warranties (
+CREATE TABLE IF NOT EXISTS warranties (
     id SERIAL PRIMARY KEY,
     imei VARCHAR(50) UNIQUE NOT NULL,
     product_id INT REFERENCES products(id),
@@ -98,7 +98,7 @@ CREATE TABLE warranties (
 );
 
 -- Thêm bảng Đăng ký nhận tin (Subscribers)
-CREATE TABLE subscribers (
+CREATE TABLE IF NOT EXISTS subscribers (
     id SERIAL PRIMARY KEY,
     email VARCHAR(100) UNIQUE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -150,3 +150,21 @@ INSERT INTO news (title, excerpt, content, image, category) VALUES
 ('OnePlus 15: Sạc nhanh 150W trở lại', 'OnePlus tiếp tục dẫn đầu cuộc đua tốc độ với công nghệ sạc SuperVOOC thế hệ mới.', 'OnePlus 15 không chỉ mượt ở phần mềm mà còn thần tốc ở phần cứng. Viên pin 5500mAh chỉ mất 15 phút để sạc đầy 100%, một con số kỷ lục trong làng smartphone cao cấp hiện nay.', 'oneplus15.png', 'OnePlus'),
 ('Kỷ nguyên AI trên di động năm 2026', 'Mọi hãng điện thoại lớn đều đang dồn toàn lực vào AI để thay đổi cách chúng ta sử dụng smartphone.', 'Năm 2026 được coi là bản lề của AI di động. Các trợ lý ảo không còn chỉ trả lời câu hỏi mà đã có thể hiểu ngữ cảnh, tự động sắp xếp lịch trình và chỉnh sửa hình ảnh chuyên nghiệp theo ý muốn của người dùng.', 'ai_ip16e.png', 'Technology'),
 ('Top 5 smartphone đáng mua nhất quý 1/2026', 'Cùng NHK Mobile điểm danh những mẫu flagship hot nhất đầu năm nay.', 'Thị trường đầu năm 2026 vô cùng sôi động với sự góp mặt của iPhone 17 series và S25 series. Nếu bạn cần camera đỉnh cao, S25 Ultra là lựa chọn số 1, còn nếu yêu thích sự ổn định và AI mượt mà, iPhone 17 Pro Max là cái tên không thể bỏ qua.', 'ai_ip16_pro.png', 'Review');
+
+-- 11. Thêm bảng Đánh giá sản phẩm (Reviews) - Dành riêng PostgreSQL
+CREATE TABLE IF NOT EXISTS reviews (
+    id SERIAL PRIMARY KEY,
+    product_id INT REFERENCES products(id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
+    reviewer_name VARCHAR(255),
+    reviewer_email VARCHAR(255),
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    title VARCHAR(255),
+    content TEXT,
+    verified_purchase INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Cập nhật bảng products để lưu rating
+ALTER TABLE products ADD COLUMN IF NOT EXISTS rating DECIMAL(3,2) DEFAULT 0.00;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS review_count INT DEFAULT 0;
