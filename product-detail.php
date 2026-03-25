@@ -30,11 +30,12 @@ include 'includes/header.php';
                 </div>
                 <div class="col-lg-6">
                     <div class="ps-lg-5">
-                        <nav aria-label="breadcrumb" class="mb-4">
-                            <ol class="breadcrumb">
+                        <nav aria-label="breadcrumb" class="mb-4 d-flex justify-content-between align-items-center">
+                            <ol class="breadcrumb mb-0">
                                 <li class="breadcrumb-item"><a href="product.php" class="text-decoration-none">Sản phẩm</a></li>
                                 <li class="breadcrumb-item active"><?php echo $product['category']; ?></li>
                             </ol>
+                            <a href="javascript:history.back()" class="btn btn-link text-dark text-decoration-none small fw-bold"><i class="bi bi-arrow-left me-1"></i> Quay lại</a>
                         </nav>
                         
                         <h1 class="display-5 fw-bold mb-3"><?php echo $product['name']; ?></h1>

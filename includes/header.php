@@ -50,11 +50,11 @@
                 </a>
 
                 <?php if (isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
-                    <a href="#accountOffcanvas" role="button" class="icon-link text-dark" data-bs-toggle="offcanvas" aria-controls="accountOffcanvas">
+                    <a href="#accountOffcanvas" role="button" class="icon-link text-dark d-xs-none" data-bs-toggle="offcanvas" aria-controls="accountOffcanvas">
                         <i class="bi bi-person fs-5"></i>
                     </a>
                 <?php else: ?>
-                    <a href="<?php echo $basePath; ?>login.php" class="icon-link text-dark">
+                    <a href="<?php echo $basePath; ?>login.php" class="icon-link text-dark d-xs-none">
                         <i class="bi bi-person fs-5"></i>
                     </a>
                 <?php endif; ?>
@@ -84,10 +84,24 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link py-3 fs-6 fw-bold d-flex align-items-center justify-content-between" href="<?php echo $basePath; ?>news.php">
+                            <a class="nav-link py-3 fs-6 fw-bold border-bottom d-flex align-items-center justify-content-between" href="<?php echo $basePath; ?>news.php">
                                 <span><i class="bi bi-newspaper me-2"></i> Tin tức</span>
                                 <i class="bi bi-chevron-right small opacity-50"></i>
                             </a>
+                        </li>
+                        <!-- Added Account options in mobile menu for very small screens -->
+                        <li class="nav-item d-xs-block d-none">
+                             <?php if (isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
+                                 <a class="nav-link py-3 fs-6 fw-bold d-flex align-items-center justify-content-between" href="#accountOffcanvas" data-bs-toggle="offcanvas">
+                                     <span><i class="bi bi-person-circle me-2"></i> Tài khoản</span>
+                                     <i class="bi bi-chevron-right small opacity-50"></i>
+                                 </a>
+                             <?php else: ?>
+                                 <a class="nav-link py-3 fs-6 fw-bold d-flex align-items-center justify-content-between" href="<?php echo $basePath; ?>login.php">
+                                     <span><i class="bi bi-person-circle me-2"></i> Đăng nhập</span>
+                                     <i class="bi bi-chevron-right small opacity-50"></i>
+                                 </a>
+                             <?php endif; ?>
                         </li>
                     </ul>
                 </div>

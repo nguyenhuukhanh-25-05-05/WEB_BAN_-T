@@ -18,17 +18,17 @@ if (!XAI_API_KEY) {
     exit;
 }
 
-// 3. LẤY DỮ LIỆU SẢN PHẨM LÀM NGỮ CẢNH (Context)
+// 3. LẤY DỮ LIỆU SẢN PHẨM LÀM NGỮ CẢNH (Context) - Giới hạn 30 sản phẩm mới nhất
 try {
-    $stmt = $pdo->query("SELECT name, price, category, stock FROM products WHERE stock > 0");
+    $stmt = $pdo->query("SELECT name, price, category, stock FROM products WHERE stock > 0 ORDER BY created_at DESC LIMIT 30");
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    $productContext = "Danh sách sản phẩm hiện có tại cửa hàng NHK Mobile:\n";
+    $productContext = "Sản phẩm tại cửa hàng NHK Mobile:\n";
     foreach ($products as $p) {
-        $productContext .= "- " . $p['name'] . " (" . $p['category'] . "): " . number_format($p['price'], 0, ',', '.') . " VNĐ. Tình trạng: Còn hàng.\n";
+        $productContext .= "- " . $p['name'] . " (" . $p['category'] . "): " . number_format($p['price'], 0, ',', '.') . " VNĐ. Còn hàng.\n";
     }
 } catch (Exception $e) {
-    $productContext = "Không thể lấy danh sách sản phẩm hiện tại.";
+    $productContext = "Không thể lấy danh sách sản phẩm.";
 }
 
 // 4. XỬ LÝ DỮ LIỆU TỪ FRONTEND
@@ -46,19 +46,22 @@ $data = [
     'messages' => [
         [
             'role' => 'system',
-            'content' => "Bạn là nhân viên tư vấn ảo của cửa hàng điện thoại NHK Mobile. 
-                          Hãy trả lời khách hàng một cách lịch sự, thân thiện và chuyên nghiệp.
-                          Dưới đây là thông tin sản phẩm của cửa hàng để bạn tư vấn:
+            'content' => "Bạn là trợ lý ảo chính thức của NHK Mobile.
+                          Phong cách trả lời: Ngắn gọn, sang trọng, tập trung vào giá trị sản phẩm.
+                          Ngữ cảnh sản phẩm hiện có:
                           $productContext
-                          Nếu khách hỏi về sản phẩm không có trong danh sách, hãy khéo léo nói rằng hiện tại cửa hàng chưa có mã đó nhưng có những sản phẩm tương tự.
-                          Luôn khuyến khích khách hàng mua trả góp 0% vì cửa hàng đang có chương trình này."
+                          Nhiệm vụ:
+                          - Tư vấn các dòng iPhone, Samsung, Xiaomi mới nhất.
+                          - Nhắc về chương trình trả góp 0% ưu đãi.
+                          - Nếu khách hỏi sản phẩm không có, hãy gợi ý dòng tương đương.
+                          - Trả lời bằng tiếng Việt, thân thiện nhưng chuyên nghiệp."
         ],
         [
             'role' => 'user',
             'content' => $userMessage
         ]
     ],
-    'temperature' => 0.7
+    'temperature' => 0.6
 ];
 
 // 6. GỌI API BẰNG CURL
@@ -80,6 +83,7 @@ if ($httpCode === 200) {
     $reply = $result['choices'][0]['message']['content'] ?? 'Xin lỗi, tôi gặp chút trục trặc. Bạn thử lại nhé!';
     echo json_encode(['reply' => $reply]);
 } else {
-    echo json_encode(['error' => 'API Error', 'code' => $httpCode, 'details' => $response]);
+    // Không lộ response thô ra ngoài cho user
+    echo json_encode(['error' => 'Máy chủ AI đang bận, vui lòng thử lại sau.']);
 }
 ?>

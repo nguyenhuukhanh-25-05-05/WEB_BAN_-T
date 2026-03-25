@@ -10,6 +10,22 @@
     --apple-silver: #d2d2d7;
 }
 
+/* MODERN CUSTOM SCROLLBAR */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -54,7 +70,7 @@ img {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    height: 54px; /* Shorter, modern navbar like Apple */
+    min-height: 54px; /* Changed from height to min-height for flexibility */
     padding: 0;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
@@ -66,7 +82,7 @@ img {
     display: flex;
     align-items: center;
     justify-content: center; /* TẤT CẢ CĂN GIỮA */
-    gap: 40px; /* KHOẢNG CÁCH CÁCH ĐỀU NHAU GIỮA TẤT CẢ PHẦN TỬ */
+    gap: 30px; /* Reduced gap slightly for better spacing on various screens */
     width: 100%;
     max-width: none;
     margin: 0 auto;
@@ -257,7 +273,7 @@ img {
     text-decoration: none;
     font-weight: 500;
     font-size: 14px;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-hero-black:hover {
@@ -286,7 +302,7 @@ img {
     border-radius: 980px;
     font-weight: 400;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-apple:hover {
@@ -316,7 +332,7 @@ img {
     background-color: #f5f5f7;
     color: #1d1d1f;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid transparent;
 }
 
@@ -413,7 +429,7 @@ img {
     color: #1d1d1f;
     text-decoration: none !important;
     white-space: nowrap;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .filter-chip-modern.active, .filter-chip-modern:hover {
@@ -1073,12 +1089,12 @@ img {
         left: auto;
     }
     .navbar-centered-wrapper {
-        gap: 15px;
+        gap: 10px; /* Reduced gap on mobile */
         justify-content: space-between;
         padding: 0 15px;
     }
     .navbar-icons-group {
-        gap: 15px;
+        gap: 10px;
     }
     .navbar-icons-group i {
         font-size: 20px;
@@ -1103,6 +1119,8 @@ img {
         right: 0;
         background: #fff;
         z-index: 1000;
+        max-height: 80vh;
+        overflow-y: auto;
     }
     
     /* Hero Mobile */
@@ -1215,5 +1233,19 @@ img {
     .container {
         padding-left: 20px;
         padding-right: 20px;
+    }
+}
+
+/* Extra Small (XS) Specific Fixes for crowding icons */
+@media (max-width: 350px) {
+    .navbar-centered-wrapper {
+        gap: 5px;
+        padding: 0 10px;
+    }
+    .navbar-brand img {
+        height: 18px;
+    }
+    .d-xs-none {
+        display: none !important;
     }
 }

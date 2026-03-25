@@ -31,15 +31,14 @@ document.addEventListener('DOMContentLoaded', function() {
         appendMessage('user', message);
         aiChatInput.value = '';
 
-        // Add loading state
+        // Add loading state (Typing Indicator)
         const loadingDiv = document.createElement('div');
-        loadingDiv.className = 'ai-message bg-light p-2 rounded-3 mb-2 small opacity-50';
-        loadingDiv.innerText = 'Đang suy nghĩ...';
+        loadingDiv.className = 'ai-message bg-light p-3 rounded-4 mb-3 small typing-indicator';
+        loadingDiv.innerHTML = '<span></span><span></span><span></span>';
         aiChatBody.appendChild(loadingDiv);
         aiChatBody.scrollTop = aiChatBody.scrollHeight;
 
         try {
-            // Call Backend API
             const response = await fetch(AI_CHAT_API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -57,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 appendMessage('ai', 'Xin lỗi, có lỗi xảy ra khi kết nối với máy chủ AI.');
             }
         } catch (error) {
-            aiChatBody.removeChild(loadingDiv);
+            if (aiChatBody.contains(loadingDiv)) aiChatBody.removeChild(loadingDiv);
             appendMessage('ai', 'Lỗi kết nối mạng. Vui lòng thử lại sau.');
             console.error('Chat Error:', error);
         }
@@ -65,8 +64,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function appendMessage(role, text) {
         const msgDiv = document.createElement('div');
-        msgDiv.className = role === 'user' ? 'user-message p-2 rounded-3 mb-2 small' : 'ai-message bg-light p-2 rounded-3 mb-2 small';
-        msgDiv.innerText = text;
+        // Better classes for premium look
+        if (role === 'user') {
+            msgDiv.className = 'user-message p-3 rounded-4 mb-3 small shadow-sm animate-slide-in-right';
+        } else {
+            msgDiv.className = 'ai-message bg-light p-3 rounded-4 mb-3 small shadow-sm animate-slide-in-left';
+        }
+        
+        // Simple newline to <br> conversion and basic security
+        const safeText = text.replace(/&/g, "&amp;")
+                             .replace(/</g, "&lt;")
+                             .replace(/>/g, "&gt;")
+                             .replace(/"/g, "&quot;")
+                             .replace(/'/g, "&#039;")
+                             .replace(/\n/g, "<br>");
+        
+        msgDiv.innerHTML = safeText;
         aiChatBody.appendChild(msgDiv);
         aiChatBody.scrollTop = aiChatBody.scrollHeight;
     }

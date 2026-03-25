@@ -87,32 +87,41 @@ $basePath = "../";
 
         <!-- KHỐI THỐNG KÊ NHANH -->
         <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white">
+            <div class="col-md-3">
+                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white position-relative overflow-hidden">
                     <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Tổng doanh thu</h6>
                     <h3 class="fw-bold mb-0 text-primary h2"><?php echo number_format($totalRevenue, 0, ',', '.'); ?>₫</h3>
                     <div class="text-success small mt-2"><i class="bi bi-graph-up"></i> Tăng 12% tháng này</div>
+                    <!-- Mock Sparkline -->
+                    <div class="position-absolute bottom-0 start-0 end-0" style="height: 40px; opacity: 0.1;">
+                        <svg viewBox="0 0 100 20" preserveAspectRatio="none" style="width: 100%; height: 100%;">
+                            <path d="M0 20 L0 15 L10 12 L20 16 L30 10 L40 14 L50 8 L60 12 L70 5 L80 10 L90 3 L100 8 L100 20 Z" fill="var(--accent-color)"></path>
+                        </svg>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white">
                     <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Đơn hàng mới</h6>
                     <h3 class="fw-bold mb-0 h2"><?php echo $newOrdersCount; ?></h3>
                     <div class="text-secondary small mt-2">Cần duyệt ngay</div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white">
-                    <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Tổng khách hàng</h6>
+                    <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Khách hàng</h6>
                     <h3 class="fw-bold mb-0 h2"><?php echo $totalUsers; ?></h3>
                     <div class="text-secondary small mt-2">Thành viên hiện có</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white">
-                    <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Số lượng máy</h6>
-                    <h3 class="fw-bold mb-0 h2"><?php echo $totalProducts; ?></h3>
-                    <div class="text-secondary small mt-2">Sản phẩm hiện có</div>
+            <div class="col-md-3">
+                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white border-start border-4 border-success">
+                    <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Trạng thái hệ thống</h6>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="spinner-grow spinner-grow-sm text-success" role="status"></div>
+                        <h3 class="fw-bold mb-0 h4 text-success">Ổn định</h3>
+                    </div>
+                    <div class="text-secondary small mt-2">Uptime: 99.9%</div>
                 </div>
             </div>
         </div>
