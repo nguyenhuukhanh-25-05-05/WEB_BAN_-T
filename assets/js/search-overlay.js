@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderResults(data) {
         if (data.length === 0) {
-            searchResults.innerHTML = '<div class="col-12 text-center py-5 text-secondary-light">Không tìm thấy sản phẩm nào...</div>';
+            searchResults.innerHTML = '<div class="col-12 text-center py-5 text-secondary-light">Không tìm m thấy sản phẩm nào...</div>';
             searchResults.classList.remove('d-none');
             quickSuggestions.classList.add('d-none');
             return;

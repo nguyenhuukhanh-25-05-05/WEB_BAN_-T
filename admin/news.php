@@ -16,12 +16,25 @@ if (isset($_POST['save_news'])) {
     $category = $_POST['category'];
     $excerpt = $_POST['excerpt'];
     $content = $_POST['content'];
-    $image = "placeholder.png"; // Tạm thời dùng hình mặc định
+
+    // Xử lý upload ảnh
+    $uploadDir = '../assets/images/';
+    $image = $_POST['current_image'] ?: 'placeholder.png'; // Giữ ảnh cũ mặc định
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        if (in_array($ext, $allowed)) {
+            $newName = 'news_' . time() . '_' . uniqid() . '.' . $ext;
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $newName)) {
+                $image = $newName;
+            }
+        }
+    }
 
     if ($id) {
-        $sql = "UPDATE news SET title = ?, category = ?, excerpt = ?, content = ? WHERE id = ?";
+        $sql = "UPDATE news SET title = ?, category = ?, excerpt = ?, content = ?, image = ? WHERE id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$title, $category, $excerpt, $content, $id]);
+        $stmt->execute([$title, $category, $excerpt, $content, $image, $id]);
     } else {
         $sql = "INSERT INTO news (title, category, excerpt, content, image) VALUES (?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
@@ -150,13 +163,14 @@ if (isset($_GET['edit'])) {
     <div class="modal fade <?php echo $editData ? 'show' : ''; ?>" id="newsModal" tabindex="-1" <?php echo $editData ? 'style="display: block; background: rgba(0,0,0,0.5)"' : ''; ?>>
         <div class="modal-dialog modal-lg border-0">
             <div class="modal-content rounded-4 border-0 shadow-lg">
-                <form action="news.php" method="POST">
+                <form action="news.php" method="POST" enctype="multipart/form-data">
                     <div class="modal-header border-bottom-0 pb-0 px-4 pt-4">
                         <h5 class="fw-bold mb-0"><?php echo $editData ? 'Sửa bài viết' : 'Viết bài công nghệ mới'; ?></h5>
                         <a href="news.php" class="btn-close"></a>
                     </div>
                     <div class="modal-body px-4 py-4">
                         <input type="hidden" name="id" value="<?php echo $editData['id'] ?? ''; ?>">
+                        <input type="hidden" name="current_image" value="<?php echo $editData['image'] ?? 'placeholder.png'; ?>">
                         
                         <div class="row">
                             <div class="col-md-8 mb-3">
@@ -177,6 +191,18 @@ if (isset($_GET['edit'])) {
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Đoạn trích tóm tắt (Excerpt) *</label>
                             <textarea name="excerpt" class="form-control bg-light border-0" rows="2" required placeholder="Tóm tắt nội dung chính trong 1-2 câu..."><?php echo htmlspecialchars($editData['excerpt'] ?? ''); ?></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Ảnh bài viết</label>
+                            <?php if (!empty($editData['image'])): ?>
+                            <div class="mb-2 d-flex align-items-center gap-3">
+                                <img src="../assets/images/<?php echo $editData['image']; ?>" style="width:80px;height:60px;object-fit:cover;" class="rounded-3 border" onerror="this.src='https://placehold.co/80x60'">
+                                <span class="small text-secondary">Ảnh hiện tại. Chọn file mới để thay thế.</span>
+                            </div>
+                            <?php endif; ?>
+                            <input type="file" name="image" class="form-control bg-light border-0" accept="image/png, image/jpeg, image/webp, image/gif">
+                            <div class="form-text">Định dạng: JPG, PNG, WEBP. Để trống nếu không muốn thay ảnh.</div>
                         </div>
 
                         <div class="mb-3">

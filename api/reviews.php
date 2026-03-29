@@ -1,4 +1,6 @@
 <?php
+// Khởi động session trước khi include (auth_functions.php dùng session_status nên an toàn)
+if (session_status() === PHP_SESSION_NONE) session_start();
 require_once '../includes/db.php';
 require_once '../includes/auth_functions.php';
 
@@ -94,8 +96,9 @@ if ($method === 'POST') {
     $title         = trim($data['title'] ?? '');
     $content       = trim($data['content'] ?? '');
     
-    $logged_in_user_id = get_logged_in_user_id();
-    $reviewer_name = $logged_in_user_id ? get_logged_in_name() : trim($data['reviewer_name'] ?? '');
+    $logged_in_user_id = get_logged_in_user_id(); // Chỉ trả về id nếu là user thường
+    $is_logged_in = is_logged_in();               // Trả về true cho cả user lẫn admin
+    $reviewer_name = $is_logged_in ? get_logged_in_name() : trim($data['reviewer_name'] ?? '');
     $reviewer_email = trim($data['reviewer_email'] ?? '');
     
     if (!$product_id) {
@@ -110,14 +113,14 @@ if ($method === 'POST') {
         echo json_encode(['success' => false, 'error' => 'Nội dung đánh giá quá ngắn']);
         exit;
     }
-    if (!$logged_in_user_id && empty($reviewer_name)) {
+    if (!$is_logged_in && empty($reviewer_name)) {
         echo json_encode(['success' => false, 'error' => 'Vui lòng nhập tên']);
         exit;
     }
 
     try {
-        $verified = $logged_in_user_id ? 1 : 0;
-        $user_id_val = $logged_in_user_id ?: null;
+        $verified = $is_logged_in ? 1 : 0;     // Cả user và admin đều là verified
+        $user_id_val = $logged_in_user_id ?: null; // Chỉ lưu user_id nếu là user thường (admin = null)
 
         // POSTGRESQL CẦN RETURNING MỚI TRẢ VỀ ID ĐƯỢC
         $stmt = $pdo->prepare("

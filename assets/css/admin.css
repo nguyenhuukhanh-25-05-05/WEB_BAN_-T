@@ -148,7 +148,6 @@ body {
     }
     .sidebar.show {
         transform: translateX(0);
-        z-index: 1100; /* Higher than mobile-header (1010) */
     }
     .main-content {
         margin-left: 0;
@@ -185,11 +184,6 @@ body {
     display: none;
 }
 
-@keyframes pulse-success {
-    0% { transform: scale(0.95); opacity: 0.5; }
-    50% { transform: scale(1.05); opacity: 1; }
-    100% { transform: scale(0.95); opacity: 0.5; }
-}
 .sidebar-overlay.show {
     display: block;
 }

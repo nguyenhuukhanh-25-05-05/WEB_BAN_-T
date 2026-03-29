@@ -92,7 +92,7 @@ include 'includes/header.php';
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
                         <div>
                             <h1 class="display-3 fw-800 mb-0 tracking-tight">
-                                <?php echo $search ? "Kết quả cho <span class='text-primary'>'" . htmlspecialchars($search) . "'</span>" : ($category ? htmlspecialchars($category) : "Tất cả sản phẩm."); ?>
+                                <?php echo $search ? "Kết quả cho <span class='text-primary'>'$search'</span>" : ($category ? $category : "Tất cả sản phẩm."); ?>
                             </h1>
                             <p class="text-secondary h5 fw-light mt-3">Tìm thấy <?php echo count($products); ?> siêu phẩm công nghệ.</p>
                         </div>

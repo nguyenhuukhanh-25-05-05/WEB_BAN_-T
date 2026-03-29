@@ -72,16 +72,11 @@ include 'includes/header.php';
                         </div>
                         <div class="mb-4">
                             <label class="form-label text-white small fw-bold">Mật khẩu *</label>
-                            <div class="position-relative">
-                                <input type="password" id="password" name="password" class="form-control btn-premium-glass py-3 px-4 pe-5" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff !important; letter-spacing: 2px;" placeholder="••••••••" minlength="6" required>
-                                <button type="button" id="togglePassword" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-secondary me-2 p-0 border-0 shadow-none">
-                                    <i class="bi bi-eye fs-5" id="toggleIcon"></i>
-                                </button>
-                            </div>
+                            <input type="password" name="password" class="form-control btn-premium-glass py-3 px-4" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff !important; letter-spacing: 2px;" placeholder="••••••••" required>
                         </div>
                         <div class="mb-4">
                             <label class="form-label text-white small fw-bold">Số điện thoại</label>
-                            <input type="tel" name="phone" id="phone" class="form-control btn-premium-glass py-3 px-4" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff !important;" placeholder="09xx xxx xxx">
+                            <input type="text" name="phone" class="form-control btn-premium-glass py-3 px-4" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff !important;" placeholder="09xx xxx xxx">
                         </div>
                         <div class="mb-5">
                             <label class="form-label text-white small fw-bold">Địa chỉ giao hàng</label>
@@ -93,31 +88,6 @@ include 'includes/header.php';
                             <a href="login.php" class="text-white small fw-bold text-decoration-none border-bottom">Đăng nhập</a>
                         </div>
                     </form>
-
-                    <script>
-                        const togglePassword = document.querySelector('#togglePassword');
-                        const password = document.querySelector('#password');
-                        const toggleIcon = document.querySelector('#toggleIcon');
-
-                        togglePassword.addEventListener('click', function (e) {
-                            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-                            password.setAttribute('type', type);
-                            toggleIcon.classList.toggle('bi-eye');
-                            toggleIcon.classList.toggle('bi-eye-slash');
-                            
-                            if (type === 'text') {
-                                password.style.letterSpacing = 'normal';
-                            } else {
-                                password.style.letterSpacing = '2px';
-                            }
-                        });
-
-                        // Real-time phone validation (Basic)
-                        const phoneInput = document.querySelector('#phone');
-                        phoneInput.addEventListener('input', function(e) {
-                            this.value = this.value.replace(/[^0-9]/g, '');
-                        });
-                    </script>
                 </div>
             </div>
         </div>

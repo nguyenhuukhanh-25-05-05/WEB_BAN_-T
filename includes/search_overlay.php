@@ -41,7 +41,7 @@
 .search-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
     z-index: 9999;

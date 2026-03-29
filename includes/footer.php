@@ -165,61 +165,24 @@
         overflow-y: auto;
         display: flex;
         flex-direction: column;
-        scroll-behavior: smooth;
     }
     .ai-message {
         align-self: flex-start;
         max-width: 85%;
-        border-bottom-left-radius: 4px !important;
-        line-height: 1.5;
     }
     .user-message {
         align-self: flex-end;
-        background: linear-gradient(135deg, #0071e3, #00c7ff);
+        background: #0071e3;
         color: #fff;
         max-width: 85%;
-        border-bottom-right-radius: 4px !important;
-        line-height: 1.5;
     }
     .ai-chat-window.active {
         display: flex;
-        animation: chatReveal 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: slideUp 0.3s ease;
     }
-    
-    /* Animations */
-    @keyframes chatReveal {
-        from { transform: translateY(30px) scale(0.95); opacity: 0; }
-        to { transform: translateY(0) scale(1); opacity: 1; }
-    }
-    .animate-slide-in-left { animation: slideInLeft 0.3s ease-out; }
-    .animate-slide-in-right { animation: slideInRight 0.3s ease-out; }
-    
-    @keyframes slideInLeft {
-        from { transform: translateX(-10px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideInRight {
-        from { transform: translateX(10px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-
-    /* Typing Indicator */
-    .typing-indicator span {
-        height: 8px;
-        width: 8px;
-        float: left;
-        margin: 0 1px;
-        background-color: #9e9ea1;
-        display: block;
-        border-radius: 50%;
-        opacity: 0.4;
-    }
-    .typing-indicator span:nth-of-type(1) { animation: 1s blink infinite 0.3333s; }
-    .typing-indicator span:nth-of-type(2) { animation: 1s blink infinite 0.6666s; }
-    .typing-indicator span:nth-of-type(3) { animation: 1s blink infinite 0.9999s; }
-    
-    @keyframes blink {
-        50% { opacity: 1; }
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
     </style>
 
@@ -227,26 +190,6 @@
         const AI_CHAT_API_URL = "<?php echo isset($basePath) ? $basePath : ''; ?>php/api/ai-chat.php";
     </script>
     <script src="<?php echo isset($basePath) ? $basePath : ''; ?>assets/js/ai-chat.js"></script>
-
-    <!-- Back to Top Button -->
-    <button id="backToTop" class="btn btn-dark rounded-circle position-fixed shadow" style="bottom: 30px; right: 30px; width: 50px; height: 50px; z-index: 9998; display: none; transition: 0.3s;">
-        <i class="bi bi-arrow-up"></i>
-    </button>
-
-    <script>
-        // Back to Top Logic
-        const backToTopBtn = document.getElementById('backToTop');
-        window.onscroll = function() {
-            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-                backToTopBtn.style.display = "block";
-            } else {
-                backToTopBtn.style.display = "none";
-            }
-        };
-        backToTopBtn.onclick = function() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-    </script>
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

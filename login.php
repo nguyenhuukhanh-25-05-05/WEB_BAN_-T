@@ -2,11 +2,8 @@
 require_once 'includes/db.php';
 require_once 'includes/auth_functions.php';
 
+$error = '';
 $redirect = $_GET['redirect'] ?? 'index.php';
-// Bảo mật: Chỉ cho phép chuyển hướng nội bộ (không bắt đầu bằng http/https)
-if (preg_match('/^https?:\/\//i', $redirect) || empty($redirect)) {
-    $redirect = 'index.php';
-}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email_or_user = $_POST['email_or_user'] ?? '';
@@ -83,12 +80,7 @@ include 'includes/header.php';
                                 Mật khẩu *
                                 <a href="#" class="text-secondary-light x-small text-decoration-none">Quên mật khẩu?</a>
                             </label>
-                            <div class="position-relative">
-                                <input type="password" id="password" name="password" class="form-control btn-premium-glass py-3 px-4 pe-5" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff !important; letter-spacing: 2px;" placeholder="••••••••" required>
-                                <button type="button" id="togglePassword" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-secondary me-2 p-0 border-0 shadow-none">
-                                    <i class="bi bi-eye fs-5" id="toggleIcon"></i>
-                                </button>
-                            </div>
+                            <input type="password" name="password" class="form-control btn-premium-glass py-3 px-4" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff !important; letter-spacing: 2px;" placeholder="••••••••" required>
                         </div>
                         <button type="submit" class="btn btn-premium-dark w-100 py-3 fw-bold shadow-lg mb-4">Đăng nhập</button>
                         <div class="text-center">
@@ -96,28 +88,6 @@ include 'includes/header.php';
                             <a href="register.php" class="text-white small fw-bold text-decoration-none border-bottom">Tạo tài khoản</a>
                         </div>
                     </form>
-
-                    <script>
-                        const togglePassword = document.querySelector('#togglePassword');
-                        const password = document.querySelector('#password');
-                        const toggleIcon = document.querySelector('#toggleIcon');
-
-                        togglePassword.addEventListener('click', function (e) {
-                            // toggle the type attribute
-                            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-                            password.setAttribute('type', type);
-                            // toggle the eye / eye slash icon
-                            toggleIcon.classList.toggle('bi-eye');
-                            toggleIcon.classList.toggle('bi-eye-slash');
-                            
-                            // Adjust letter spacing for text mode
-                            if (type === 'text') {
-                                password.style.letterSpacing = 'normal';
-                            } else {
-                                password.style.letterSpacing = '2px';
-                            }
-                        });
-                    </script>
                 </div>
             </div>
         </div>

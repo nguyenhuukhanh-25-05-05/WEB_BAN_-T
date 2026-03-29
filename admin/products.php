@@ -21,16 +21,29 @@ if (isset($_POST['save_product'])) {
     $price = $_POST['price'];
     $stock = $_POST['stock'];
     $description = $_POST['description'];
-    $image = "placeholder.png"; // Tạm thời dùng hình mặc định, có thể nâng cấp upload file sau
+
+    // Xử lý upload ảnh
+    $uploadDir = '../assets/images/';
+    $image = $_POST['current_image'] ?: 'placeholder.png'; // Giữ ảnh cũ mặc định
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        if (in_array($ext, $allowed)) {
+            $newName = 'product_' . time() . '_' . uniqid() . '.' . $ext;
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $newName)) {
+                $image = $newName;
+            }
+        }
+    }
 
     if ($id) {
         // Nếu có ID -> CẬP NHẬT sản phẩm hiện tại
-        $sql = "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, description = ? WHERE id = ?";
+        $sql = "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, image = ?, description = ? WHERE id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$name, $category, $price, $stock, $description, $id]);
+        $stmt->execute([$name, $category, $price, $stock, $image, $description, $id]);
         $msg = "success";
     } else {
-        // Nếu không có ID -> THÊM MỚI sản phẩn vào bảng
+        // Nếu không có ID -> THÊM MỚI sản phẩm vào bảng
         $sql = "INSERT INTO products (name, category, price, stock, image, description) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$name, $category, $price, $stock, $image, $description]);
@@ -225,7 +238,7 @@ if (isset($_GET['edit'])) {
         <div class="modal-dialog modal-lg border-0">
             <div class="modal-content rounded-4 border-0 shadow-lg">
                 <!-- FORM PHP: Gửi dữ liệu về chính file products.php bằng phương thức POST -->
-                <form action="products.php" method="POST">
+                <form action="products.php" method="POST" enctype="multipart/form-data">
                     <div class="modal-header border-0 px-4 pt-4">
                         <h5 class="modal-title fw-bold"><?php echo $editProduct ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới'; ?></h5>
                         <!-- Nếu trong chế độ Sửa, nút X sẽ reload trang để thoát mode Sửa -->
@@ -234,6 +247,7 @@ if (isset($_GET['edit'])) {
                     <div class="modal-body p-4">
                         <!-- Input ẩn ID: Dùng để phân biệt Thêm (trống) hay Sửa (có ID) -->
                         <input type="hidden" name="id" value="<?php echo $editProduct ? $editProduct['id'] : ''; ?>">
+                        <input type="hidden" name="current_image" value="<?php echo $editProduct ? $editProduct['image'] : 'placeholder.png'; ?>">
                         
                         <div class="row g-3">
                             <div class="col-md-12">
@@ -256,6 +270,17 @@ if (isset($_GET['edit'])) {
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Số lượng tồn kho</label>
                                 <input type="number" name="stock" class="form-control rounded-3" value="<?php echo $editProduct ? $editProduct['stock'] : ''; ?>" placeholder="VD: 10" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label small fw-bold">Ảnh sản phẩm</label>
+                                <?php if ($editProduct && $editProduct['image']): ?>
+                                <div class="mb-2 d-flex align-items-center gap-3">
+                                    <img src="../assets/images/<?php echo $editProduct['image']; ?>" style="width:60px;height:60px;object-fit:cover;" class="rounded-3 border" onerror="this.src='https://placehold.co/60'">
+                                    <span class="small text-secondary">Ảnh hiện tại. Chọn file mới để thay thế.</span>
+                                </div>
+                                <?php endif; ?>
+                                <input type="file" name="image" class="form-control rounded-3" accept="image/png, image/jpeg, image/webp, image/gif">
+                                <div class="form-text">Định dạng: JPG, PNG, WEBP, GIF. Để trống nếu không muốn thay ảnh.</div>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold">Mô tả ngắn gọn</label>
