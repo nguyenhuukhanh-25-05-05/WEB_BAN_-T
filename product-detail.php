@@ -49,8 +49,12 @@ include 'includes/header.php';
                         </div>
 
                         <div class="d-grid gap-3">
-                            <a href="cart.php?add=<?php echo $product['id']; ?>" class="btn btn-dark btn-lg rounded-pill py-3 fw-bold text-center text-white">Thêm vào giỏ hàng</a>
-                            <a href="cart.php?add=<?php echo $product['id']; ?>&installment=1" class="btn btn-outline-dark btn-lg rounded-pill py-3 fw-bold text-center">Mua trả góp 0%</a>
+                            <?php if ($product['stock'] > 0): ?>
+                                <a href="cart.php?add=<?php echo $product['id']; ?>" class="btn btn-dark btn-lg rounded-pill py-3 fw-bold text-center text-white">Thêm vào giỏ hàng</a>
+                                <a href="cart.php?add=<?php echo $product['id']; ?>&installment=1" class="btn btn-outline-dark btn-lg rounded-pill py-3 fw-bold text-center">Mua trả góp 0%</a>
+                            <?php else: ?>
+                                <button class="btn btn-secondary btn-lg rounded-pill py-3 fw-bold text-center text-white" disabled>Hết hàng</button>
+                            <?php endif; ?>
                         </div>
                         </div>
                     </div>
@@ -102,6 +106,10 @@ include 'includes/header.php';
                                     </div>
                                     <div class="mb-3">
                                         <textarea class="form-control" id="review_content" rows="3" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm *" required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-secondary fw-semibold">Đính kèm ảnh minh hoạ (không bắt buộc)</label>
+                                        <input type="file" id="review_image" class="form-control rounded-3" accept="image/png, image/jpeg, image/webp, image/gif">
                                     </div>
                                     <button type="submit" class="btn btn-dark px-5 py-2 rounded-pill fw-medium">Gửi đánh giá</button>
                                     <div id="review-msg" class="mt-3 fw-medium"></div>
@@ -217,6 +225,7 @@ include 'includes/header.php';
                                     </div>
                                     ${r.title ? `<h6 class="fw-bold mb-2">${r.title}</h6>` : ''}
                                     <p class="mb-0 text-secondary" style="line-height: 1.6;">${r.content}</p>
+                                    ${r.image ? `<div class="mt-3"><img src="assets/images/reviews/${r.image}" alt="Hình ảnh đánh giá" class="img-fluid rounded border shadow-sm" style="max-height: 120px; object-fit: cover; cursor: pointer;" onclick="window.open(this.src, '_blank')"></div>` : ''}
                                 </div>
                             `;
                             list.insertAdjacentHTML('beforeend', html);
@@ -231,23 +240,26 @@ include 'includes/header.php';
                         btn.disabled = true;
                         msg.innerHTML = '<div class="spinner-border spinner-border-sm text-primary"></div> Đang gửi...';
                         
-                        const payload = {
-                            product_id: parseInt(productId),
-                            rating: parseInt(document.getElementById('rating_val').value),
-                            title: document.getElementById('review_title').value,
-                            content: document.getElementById('review_content').value
-                        };
+                        const formData = new FormData();
+                        formData.append('product_id', parseInt(productId));
+                        formData.append('rating', parseInt(document.getElementById('rating_val').value));
+                        formData.append('title', document.getElementById('review_title').value);
+                        formData.append('content', document.getElementById('review_content').value);
                         
                         const nameEl = document.getElementById('reviewer_name');
-                        if(nameEl) payload.reviewer_name = nameEl.value;
+                        if(nameEl) formData.append('reviewer_name', nameEl.value);
                         const emailEl = document.getElementById('reviewer_email');
-                        if(emailEl) payload.reviewer_email = emailEl.value;
+                        if(emailEl) formData.append('reviewer_email', emailEl.value);
+                        
+                        const fileInput = document.getElementById('review_image');
+                        if(fileInput && fileInput.files.length > 0) {
+                            formData.append('image', fileInput.files[0]);
+                        }
                         
                         try {
                             const res = await fetch('api/reviews.php', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload)
+                                body: formData
                             });
                             const data = await res.json();
                             if(data.success) {

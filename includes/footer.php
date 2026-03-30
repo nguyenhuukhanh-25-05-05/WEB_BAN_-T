@@ -196,6 +196,6 @@
 
     <!-- Search Overlay -->
     <?php include __DIR__ . '/search_overlay.php'; ?>
-    <script src="<?php echo isset($basePath) ? $basePath : ''; ?>assets/js/search-overlay.js"></script>
+    <script src="<?php echo isset($basePath) ? $basePath : ''; ?>assets/js/search-overlay.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

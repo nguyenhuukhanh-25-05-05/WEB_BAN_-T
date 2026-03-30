@@ -1,6 +1,7 @@
 <?php
 // Khởi động session trước khi include (auth_functions.php dùng session_status nên an toàn)
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE)
+    session_start();
 require_once '../includes/db.php';
 require_once '../includes/auth_functions.php';
 
@@ -19,7 +20,7 @@ if ($method === 'OPTIONS') {
 
 if ($method === 'GET') {
     $product_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-    $page  = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+    $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
     $limit = isset($_GET['limit']) ? min(50, max(1, intval($_GET['limit']))) : 10;
     $offset = ($page - 1) * $limit;
 
@@ -45,7 +46,7 @@ if ($method === 'GET') {
 
         $stmt = $pdo->prepare("
             SELECT r.id, r.rating, r.title, r.content, r.created_at,
-                   r.reviewer_name, r.reviewer_email, r.verified_purchase
+                   r.reviewer_name, r.reviewer_email, r.verified_purchase, r.image
             FROM reviews r
             WHERE r.product_id = ?
             ORDER BY r.created_at DESC
@@ -59,7 +60,8 @@ if ($method === 'GET') {
                 $parts = explode('@', $rev['reviewer_email']);
                 $rev['reviewer_email'] = mb_substr($parts[0], 0, 2) . '***@' . ($parts[1] ?? '');
             }
-            if (!$rev['reviewer_name']) $rev['reviewer_name'] = 'Khách hàng ẩn danh';
+            if (!$rev['reviewer_name'])
+                $rev['reviewer_name'] = 'Khách hàng ẩn danh';
             $rev['avatar_letter'] = mb_strtoupper(mb_substr($rev['reviewer_name'], 0, 1, 'UTF-8'), 'UTF-8');
             $rev['date_formatted'] = date('d/m/Y', strtotime($rev['created_at']));
         }
@@ -67,17 +69,17 @@ if ($method === 'GET') {
         echo json_encode([
             'success' => true,
             'meta' => [
-                'total'       => (int)$meta['total'],
-                'avg_rating'  => round((float)$meta['avg_rating'], 1),
-                'page'        => $page,
-                'limit'       => $limit,
+                'total' => (int) $meta['total'],
+                'avg_rating' => round((float) $meta['avg_rating'], 1),
+                'page' => $page,
+                'limit' => $limit,
                 'total_pages' => max(1, ceil($meta['total'] / $limit)),
-                'breakdown'   => [
-                    5 => (int)$meta['r5'],
-                    4 => (int)$meta['r4'],
-                    3 => (int)$meta['r3'],
-                    2 => (int)$meta['r2'],
-                    1 => (int)$meta['r1'],
+                'breakdown' => [
+                    5 => (int) $meta['r5'],
+                    4 => (int) $meta['r4'],
+                    3 => (int) $meta['r3'],
+                    2 => (int) $meta['r2'],
+                    1 => (int) $meta['r1'],
                 ]
             ],
             'reviews' => $reviews
@@ -90,17 +92,23 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $product_id    = isset($data['product_id']) ? intval($data['product_id']) : 0;
-    $rating        = isset($data['rating']) ? intval($data['rating']) : 0;
-    $title         = trim($data['title'] ?? '');
-    $content       = trim($data['content'] ?? '');
-    
+    // Hỗ trợ cả JSON và FormData
+    if (isset($_SERVER["CONTENT_TYPE"]) && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
+        $data = json_decode(file_get_contents('php://input'), true) ?? [];
+    } else {
+        $data = $_POST;
+    }
+
+    $product_id = isset($data['product_id']) ? intval($data['product_id']) : 0;
+    $rating = isset($data['rating']) ? intval($data['rating']) : 0;
+    $title = htmlspecialchars(trim($data['title'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $content = htmlspecialchars(trim($data['content'] ?? ''), ENT_QUOTES, 'UTF-8');
+
     $logged_in_user_id = get_logged_in_user_id(); // Chỉ trả về id nếu là user thường
     $is_logged_in = is_logged_in();               // Trả về true cho cả user lẫn admin
-    $reviewer_name = $is_logged_in ? get_logged_in_name() : trim($data['reviewer_name'] ?? '');
-    $reviewer_email = trim($data['reviewer_email'] ?? '');
-    
+    $reviewer_name = $is_logged_in ? get_logged_in_name() : htmlspecialchars(trim($data['reviewer_name'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $reviewer_email = htmlspecialchars(trim($data['reviewer_email'] ?? ''), ENT_QUOTES, 'UTF-8');
+
     if (!$product_id) {
         echo json_encode(['success' => false, 'error' => 'Thiếu product_id']);
         exit;
@@ -122,12 +130,29 @@ if ($method === 'POST') {
         $verified = $is_logged_in ? 1 : 0;     // Cả user và admin đều là verified
         $user_id_val = $logged_in_user_id ?: null; // Chỉ lưu user_id nếu là user thường (admin = null)
 
+        // Xử lý upload ảnh
+        $imageFilename = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = '../assets/images/reviews/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+            if (in_array($ext, $allowed)) {
+                $newName = 'review_' . time() . '_' . uniqid() . '.' . $ext;
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $newName)) {
+                    $imageFilename = $newName;
+                }
+            }
+        }
+
         // POSTGRESQL CẦN RETURNING MỚI TRẢ VỀ ID ĐƯỢC
         $stmt = $pdo->prepare("
-            INSERT INTO reviews (product_id, user_id, reviewer_name, reviewer_email, rating, title, content, verified_purchase)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
+            INSERT INTO reviews (product_id, user_id, reviewer_name, reviewer_email, rating, title, content, verified_purchase, image)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
         ");
-        $stmt->execute([$product_id, $user_id_val, $reviewer_name, $reviewer_email, $rating, $title, $content, $verified]);
+        $stmt->execute([$product_id, $user_id_val, $reviewer_name, $reviewer_email, $rating, $title, $content, $verified, $imageFilename]);
         $result = $stmt->fetch();
         $newId = $result['id'] ?? 0;
 

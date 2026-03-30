@@ -16,6 +16,7 @@ if (isset($_POST['save_news'])) {
     $category = $_POST['category'];
     $excerpt = $_POST['excerpt'];
     $content = $_POST['content'];
+    $tags = $_POST['tags'] ?? '';
 
     // Xử lý upload ảnh
     $uploadDir = '../assets/images/';
@@ -32,13 +33,13 @@ if (isset($_POST['save_news'])) {
     }
 
     if ($id) {
-        $sql = "UPDATE news SET title = ?, category = ?, excerpt = ?, content = ?, image = ? WHERE id = ?";
+        $sql = "UPDATE news SET title = ?, category = ?, excerpt = ?, content = ?, image = ?, tags = ? WHERE id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$title, $category, $excerpt, $content, $image, $id]);
+        $stmt->execute([$title, $category, $excerpt, $content, $image, $tags, $id]);
     } else {
-        $sql = "INSERT INTO news (title, category, excerpt, content, image) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO news (title, category, excerpt, content, image, tags) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$title, $category, $excerpt, $content, $image]);
+        $stmt->execute([$title, $category, $excerpt, $content, $image, $tags]);
     }
     header("Location: news.php?msg=success");
     exit;
@@ -186,6 +187,12 @@ if (isset($_GET['edit'])) {
                                     <option value="Tips" <?php echo (isset($editData['category']) && $editData['category'] == 'Tips') ? 'selected' : ''; ?>>Mẹo & Thủ thuật</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Từ khóa (Tags) tùy chọn</label>
+                            <input type="text" name="tags" class="form-control bg-light border-0" value="<?php echo htmlspecialchars($editData['tags'] ?? ''); ?>" placeholder="Công nghệ 2026, AI, Đánh giá...">
+                            <div class="form-text small text-secondary">Phân cách các thẻ tag bằng dấu phẩy ( , )</div>
                         </div>
 
                         <div class="mb-3">

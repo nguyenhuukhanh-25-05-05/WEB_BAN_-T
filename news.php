@@ -4,8 +4,19 @@ require_once 'includes/db.php';
 
 // Fetch all news articles (with graceful error handling)
 $articles = [];
+$tagFilter = $_GET['tag'] ?? '';
 try {
-    $stmt = $pdo->query("SELECT * FROM news ORDER BY created_at DESC");
+    $sql = "SELECT * FROM news";
+    $params = [];
+    if (!empty($tagFilter)) {
+        // Sử dụng ILIKE trong PostgreSQL để tìm kiếm không phân biệt chữ hoa/thường (Nếu xài MySQL thì đổi thành LIKE)
+        $sql .= " WHERE tags ILIKE ?";
+        $params[] = "%" . trim($tagFilter) . "%";
+    }
+    $sql .= " ORDER BY created_at DESC";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $articles = $stmt->fetchAll();
 } catch (PDOException $e) {
     // Table doesn't exist yet — will show "no articles" message
@@ -41,7 +52,11 @@ include 'includes/header.php';
             <div class="d-flex justify-content-between align-items-end mb-5 animate-reveal">
                 <div>
                     <h2 class="display-4 fw-bold text-dark mb-2">Tin mới nhất.</h2>
-                    <p class="text-secondary h5 fw-light">Những câu chuyện công nghệ đáng chú ý hôm nay.</p>
+                    <?php if (!empty($tagFilter)): ?>
+                        <p class="text-secondary h5 fw-light mb-0 d-flex align-items-center">Đang lọc theo từ khóa: <span class="badge bg-primary rounded-pill ms-2 px-3 fw-normal" style="padding-bottom: 5px;">#<?php echo htmlspecialchars($tagFilter); ?></span> <a href="news.php" class="text-secondary ms-3 small text-decoration-none hover-lift"><i class="bi bi-x-circle-fill"></i> Bỏ lọc</a></p>
+                    <?php else: ?>
+                        <p class="text-secondary h5 fw-light">Những câu chuyện công nghệ đáng chú ý hôm nay.</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -68,9 +83,22 @@ include 'includes/header.php';
                                 <div class="text-secondary small mb-2">
                                     <i class="bi bi-calendar3 me-1"></i> <?php echo date('d/m/Y', strtotime($a['created_at'])); ?>
                                 </div>
-                                <h4 class="fw-bold text-dark mb-3 line-clamp-2"><?php echo $a['title']; ?></h4>
-                                <p class="text-secondary small mb-4 line-clamp-3"><?php echo $a['excerpt']; ?></p>
-                                <a href="#" class="btn btn-link text-primary p-0 text-decoration-none fw-bold">
+                                <h4 class="fw-bold text-dark mb-2 line-clamp-2"><?php echo htmlspecialchars($a['title']); ?></h4>
+                                <?php if(!empty($a['tags'])): ?>
+                                <div class="mb-3">
+                                    <?php 
+                                    $tags = explode(',', $a['tags']);
+                                    foreach($tags as $t) {
+                                        $t = trim($t);
+                                        if($t) echo '<a href="news.php?tag=' . urlencode($t) . '" class="badge bg-light text-secondary border me-1 fw-normal text-decoration-none hover-lift" style="font-size: 11px;">#'.htmlspecialchars($t).'</a>';
+                                    }
+                                    ?>
+                                </div>
+                                <?php else: ?>
+                                <div class="mb-3"></div> <!-- padding thay thế -->
+                                <?php endif; ?>
+                                <p class="text-secondary small mb-4 line-clamp-3"><?php echo htmlspecialchars($a['excerpt']); ?></p>
+                                <a href="news-detail.php?id=<?php echo $a['id']; ?>" class="btn btn-link text-primary p-0 text-decoration-none fw-bold">
                                     Đọc tiếp <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
                             </div>

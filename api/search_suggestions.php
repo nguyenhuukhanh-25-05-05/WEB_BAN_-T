@@ -10,14 +10,33 @@ if (strlen($q) < 1) {
 }
 
 try {
-    // Tìm kiếm sản phẩm theo tên hoặc hãng
-    $stmt = $pdo->prepare("SELECT id, name, price, image, category FROM products WHERE name ILIKE ? OR category ILIKE ? LIMIT 6");
-    $stmt->execute(["%$q%", "%$q%"]);
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $results = [];
 
-    // Định dạng lại giá tiền
-    foreach ($results as &$item) {
+    // Lấy sản phẩm
+    $stmt = $pdo->prepare("SELECT id, name, price, image, category FROM products WHERE name ILIKE ? OR category ILIKE ? LIMIT 4");
+    $stmt->execute(["%$q%", "%$q%"]);
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($products as $item) {
         $item['formatted_price'] = number_format($item['price'], 0, ',', '.') . '₫';
+        $item['url'] = "product-detail.php?id=" . $item['id'];
+        $item['type'] = 'product';
+        $results[] = $item;
+    }
+
+    // Lấy tin tức
+    $stmt2 = $pdo->prepare("SELECT id, title as name, excerpt as formatted_price, image, category FROM news WHERE title ILIKE ? OR tags ILIKE ? LIMIT 4");
+    $stmt2->execute(["%$q%", "%$q%"]);
+    $news = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($news as $item) {
+        $item['category'] = 'Tin tức \u2022 ' . $item['category'];
+        $item['url'] = "news-detail.php?id=" . $item['id'];
+        $item['type'] = 'news';
+        if (mb_strlen($item['formatted_price']) > 50) {
+            $item['formatted_price'] = mb_substr($item['formatted_price'], 0, 50) . '...';
+        }
+        $results[] = $item;
     }
 
     echo json_encode($results);

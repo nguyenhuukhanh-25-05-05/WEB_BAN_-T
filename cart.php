@@ -22,7 +22,7 @@ if (isset($_GET['add'])) {
     $stmt->execute([$productId]);
     $product = $stmt->fetch();
 
-    if ($product) {
+    if ($product && $product['stock'] > 0) {
         // Nếu mua TRẢ GÓP: Xóa sạch giỏ cũ và bật flag trả góp
         if ($installment === 1) {
             $_SESSION['cart'] = [];

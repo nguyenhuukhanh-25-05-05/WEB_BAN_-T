@@ -16,11 +16,33 @@ $basePath = "../";
 // A. THÊM HOẶC CẬP NHẬT SẢN PHẨM (Xử lý khi nhấn nút Lưu)
 if (isset($_POST['save_product'])) {
     $id = $_POST['id'];
-    $name = $_POST['name'];
-    $category = $_POST['category'];
-    $price = $_POST['price'];
-    $stock = $_POST['stock'];
-    $description = $_POST['description'];
+    $name = trim($_POST['name'] ?? '');
+    $category = trim($_POST['category'] ?? '');
+    $price = $_POST['price'] ?? '';
+    $stock = $_POST['stock'] ?? '';
+    $description = trim($_POST['description'] ?? '');
+
+    // Xác thực dữ liệu cơ bản
+    if (empty($name) || empty($category) || $price === '' || $stock === '') {
+        header("Location: products.php?error=empty_fields" . ($id ? "&edit=$id" : ""));
+        exit;
+    }
+
+    if (!is_numeric($price) || $price < 0) {
+        header("Location: products.php?error=invalid_price" . ($id ? "&edit=$id" : ""));
+        exit;
+    }
+
+    if (!is_numeric($stock) || $stock < 0) {
+        header("Location: products.php?error=invalid_stock" . ($id ? "&edit=$id" : ""));
+        exit;
+    }
+
+    // Yêu cầu bắt buộc phải có ảnh khi thêm mới sản phẩm
+    if (empty($id) && (!isset($_FILES['image']) || $_FILES['image']['error'] === UPLOAD_ERR_NO_FILE)) {
+        header("Location: products.php?error=empty_image");
+        exit;
+    }
 
     // Xử lý upload ảnh
     $uploadDir = '../assets/images/';
@@ -176,6 +198,21 @@ if (isset($_GET['edit'])) {
                 </div>
             <?php endif; ?>
 
+            <!-- Hiển thị thông báo lỗi nếu có -->
+            <?php if (isset($_GET['error'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show mb-4 rounded-3 border-0 shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <?php 
+                        if ($_GET['error'] == 'empty_fields') echo 'Vui lòng điền đầy đủ các thông tin bắt buộc!';
+                        elseif ($_GET['error'] == 'invalid_price') echo 'Giá sản phẩm không hợp lệ! Vui lòng nhập số lớn hơn hoặc bằng 0.';
+                        elseif ($_GET['error'] == 'invalid_stock') echo 'Số lượng tồn kho không hợp lệ! Vui lòng nhập số lớn hơn hoặc bằng 0.';
+                        elseif ($_GET['error'] == 'empty_image') echo 'Vui lòng tải lên ảnh đại diện cho sản phẩm mới!';
+                        else echo 'Có lỗi xảy ra!';
+                    ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php endif; ?>
+
             <form id="bulkDeleteForm" action="products.php" method="POST">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
@@ -251,11 +288,11 @@ if (isset($_GET['edit'])) {
                         
                         <div class="row g-3">
                             <div class="col-md-12">
-                                <label class="form-label small fw-bold">Tên điện thoại</label>
+                                <label class="form-label small fw-bold">Tên điện thoại <span class="text-danger">*</span></label>
                                 <input type="text" name="name" class="form-control rounded-3" value="<?php echo $editProduct ? $editProduct['name'] : ''; ?>" placeholder="VD: iPhone 15 Pro Max" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold">Danh mục hãng</label>
+                                <label class="form-label small fw-bold">Danh mục hãng <span class="text-danger">*</span></label>
                                 <select name="category" class="form-select rounded-3">
                                     <option value="Apple" <?php echo ($editProduct && $editProduct['category'] == 'Apple') ? 'selected' : ''; ?>>Apple</option>
                                     <option value="Samsung" <?php echo ($editProduct && $editProduct['category'] == 'Samsung') ? 'selected' : ''; ?>>Samsung</option>
@@ -264,23 +301,23 @@ if (isset($_GET['edit'])) {
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold">Giá bán (VNĐ)</label>
-                                <input type="number" name="price" class="form-control rounded-3" value="<?php echo $editProduct ? $editProduct['price'] : ''; ?>" placeholder="VD: 30000000" required>
+                                <label class="form-label small fw-bold">Giá bán (VNĐ) <span class="text-danger">*</span></label>
+                                <input type="number" name="price" class="form-control rounded-3" value="<?php echo $editProduct ? $editProduct['price'] : ''; ?>" placeholder="VD: 30000000" min="0" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold">Số lượng tồn kho</label>
-                                <input type="number" name="stock" class="form-control rounded-3" value="<?php echo $editProduct ? $editProduct['stock'] : ''; ?>" placeholder="VD: 10" required>
+                                <label class="form-label small fw-bold">Số lượng tồn kho <span class="text-danger">*</span></label>
+                                <input type="number" name="stock" class="form-control rounded-3" value="<?php echo $editProduct ? $editProduct['stock'] : ''; ?>" placeholder="VD: 10" min="0" required>
                             </div>
                             <div class="col-md-12">
-                                <label class="form-label small fw-bold">Ảnh sản phẩm</label>
+                                <label class="form-label small fw-bold">Ảnh sản phẩm <?php echo !$editProduct ? '<span class="text-danger">*</span>' : ''; ?></label>
                                 <?php if ($editProduct && $editProduct['image']): ?>
                                 <div class="mb-2 d-flex align-items-center gap-3">
                                     <img src="../assets/images/<?php echo $editProduct['image']; ?>" style="width:60px;height:60px;object-fit:cover;" class="rounded-3 border" onerror="this.src='https://placehold.co/60'">
                                     <span class="small text-secondary">Ảnh hiện tại. Chọn file mới để thay thế.</span>
                                 </div>
                                 <?php endif; ?>
-                                <input type="file" name="image" class="form-control rounded-3" accept="image/png, image/jpeg, image/webp, image/gif">
-                                <div class="form-text">Định dạng: JPG, PNG, WEBP, GIF. Để trống nếu không muốn thay ảnh.</div>
+                                <input type="file" name="image" class="form-control rounded-3" accept="image/png, image/jpeg, image/webp, image/gif" <?php echo !$editProduct ? 'required' : ''; ?>>
+                                <div class="form-text">Định dạng: JPG, PNG, WEBP, GIF. <?php echo $editProduct ? 'Để trống nếu không muốn thay ảnh.' : 'Bắt buộc chọn ảnh cho sản phẩm mới.'; ?></div>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold">Mô tả ngắn gọn</label>
