@@ -24,13 +24,13 @@ if (isset($_POST['save_product'])) {
     $price = $_POST['price'];
     $stock = $_POST['stock'];
     $description = $_POST['description'];
-    $image = "placeholder.png"; 
+    $image = $_POST['image'] ? $_POST['image'] : "placeholder.png"; 
 
     if ($id) {
         // Nếu có ID -> CẬP NHẬT sản phẩm hiện tại
-        $sql = "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, description = ? WHERE id = ?";
+        $sql = "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, description = ?, image = ? WHERE id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$name, $category, $price, $stock, $description, $id]);
+        $stmt->execute([$name, $category, $price, $stock, $description, $image, $id]);
         $msg = "success";
     } else {
         // Nếu không có ID -> THÊM MỚI sản phẩn vào bảng
@@ -266,6 +266,11 @@ if (isset($_GET['edit'])) {
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Số lượng tồn kho</label>
                                 <input type="number" name="stock" class="form-control rounded-3" value="<?php echo $editProduct ? e($editProduct['stock']) : ''; ?>" placeholder="VD: 10" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Tên tệp hình ảnh</label>
+                                <input type="text" name="image" class="form-control rounded-3" value="<?php echo $editProduct ? e($editProduct['image']) : ''; ?>" placeholder="VD: iphone15.png">
+                                <div class="form-text x-small">Tên tệp trong folder assets/images/</div>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold">Mô tả ngắn gọn</label>

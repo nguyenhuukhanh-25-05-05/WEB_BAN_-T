@@ -44,8 +44,8 @@ include 'includes/header.php';
                             Sức mạnh vô song từ chip A19 Pro. Trải nghiệm kỷ nguyên AI toàn cầu ngay trong lòng bàn tay.
                         </p>
                         <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
-                            <a href="product.php" class="btn btn-dark btn-lg px-5 py-3 rounded-pill fw-bold">Mua ngay</a>
-                            <a href="product.php?category=Apple" class="btn btn-outline-dark btn-lg px-5 py-3 rounded-pill">Xem thêm</a>
+                            <a href="product.php" class="btn-apple btn-lg px-5 shadow-lg">Mua ngay</a>
+                            <a href="product.php?category=Apple" class="btn-outline-apple btn-lg px-5">Xem thêm</a>
                         </div>
                     </div>
                     <div class="col-lg-5 position-relative animate-float">

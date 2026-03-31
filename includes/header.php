@@ -1,3 +1,8 @@
+<?php
+// Đảm bảo các hàm cốt lõi luôn khả dụng trên mọi trang sử dụng Header
+require_once dirname(__FILE__) . '/auth_functions.php';
+require_once dirname(__FILE__) . '/db.php';
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -25,27 +30,18 @@
     </script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-md navbar-light fixed-top navbar-premium">
-        <div class="container-fluid">
-            <div class="navbar-centered-wrapper">
-                <!-- 1. Hamburger Button (Dành cho Mobile - Chuyển sang bên trái) -->
+    <nav class="navbar navbar-expand-md fixed-top navbar-premium">
+        <div class="navbar-centered-wrapper">
+            <div class="navbar-left">
+                <!-- 1. Hamburger Button (Dành cho Mobile) -->
                 <button class="navbar-toggler border-0 shadow-none d-md-none p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <!-- 2. Logo (Cố định ở giữa trên di động, bên trái trên desktop) -->
-                <a class="navbar-brand" href="<?php echo $basePath; ?>index.php">
+                <!-- 2. Logo -->
+                <a class="navbar-brand me-0" href="<?php echo $basePath; ?>index.php">
                     <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="28" alt="Logo">
                 </a>
-
-                <!-- 3. Link menu chính (Chỉ hiện trên PC) -->
-                <a class="nav-link d-none d-md-block" href="<?php echo $basePath; ?>product.php">Điện thoại</a>
-                <a class="nav-link d-none d-md-block" href="<?php echo $basePath; ?>warranty.php">Bảo hành</a>
-                <a class="nav-link d-none d-md-block" href="<?php echo $basePath; ?>news.php">Tin tức</a>
-
-                <!-- 4. Icon tìm kiếm (Ẩn trên di động) -->
-                <a href="#" id="searchTrigger" class="icon-link d-none d-md-flex">
-                    <i class="bi bi-search"></i>
                 </a>
                 
                 <!-- 5. Giỏ hàng (Luôn hiện) -->
@@ -72,10 +68,8 @@
                         <i class="bi bi-person fs-5"></i>
                     </a>
                 <?php endif; ?>
-            </div>
         </div>
-        
-        <!-- Mobile Menu Collapse (Only visible on mobile when toggled) -->
+    </nav>
         <div class="collapse navbar-collapse d-md-none" id="navbarNav">
             <div class="bg-white border-bottom w-100 shadow-sm">
                 <div class="container py-3">

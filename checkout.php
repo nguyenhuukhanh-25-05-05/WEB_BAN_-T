@@ -84,8 +84,8 @@ include 'includes/header.php';
                         Cảm ơn bạn đã tin tưởng NHK Mobile. Đơn hàng của bạn đang được xử lý và nhân viên sẽ liên hệ xác nhận trong giây lát.
                     </p>
                     <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                        <a href="index.php" class="btn btn-dark rounded-pill px-5 py-3 fw-bold shadow-lg">Về trang chủ</a>
-                        <a href="order_history.php" class="btn btn-outline-dark rounded-pill px-5 py-3 fw-bold">Theo dõi đơn hàng</a>
+                        <a href="index.php" class="btn-apple btn-lg px-5 shadow-lg">Về trang chủ</a>
+                        <a href="order_history.php" class="btn-outline-apple btn-lg px-5">Theo dõi đơn hàng</a>
                     </div>
                 </div>
             <?php else: ?>
@@ -148,7 +148,7 @@ include 'includes/header.php';
                                     <?php echo number_format($total, 0, ',', '.'); ?>₫
                                 </h4>
                             </div>
-                            <button type="submit" name="place_order" class="btn btn-dark w-100 rounded-pill py-3 fw-bold mt-5 shadow-lg">Xác nhận thanh toán</button>
+                            <button type="submit" name="place_order" class="btn-apple w-100 rounded-pill py-3 fw-bold mt-5 shadow-lg">Xác nhận thanh toán</button>
                         </form>
                         </div>
                     </div>

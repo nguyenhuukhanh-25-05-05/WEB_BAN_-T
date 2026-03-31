@@ -117,7 +117,7 @@ $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
                     </div>
                     <h3 class="fw-bold">Giỏ hàng còn trống.</h3>
                     <p class="text-secondary mb-4">Hãy chọn cho mình những siêu phẩm công nghệ mới nhất nhé!</p>
-                    <a href="product.php" class="btn btn-dark rounded-pill px-5 py-3 fw-bold">Tiếp tục mua sắm</a>
+                    <a href="product.php" class="btn-apple rounded-pill px-5 py-3 shadow-lg">Tiếp tục mua sắm</a>
                 </div>
             <?php else: ?>
                 <form action="cart.php" method="POST">
@@ -171,7 +171,7 @@ $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
                                         <?php echo number_format($total, 0, ',', '.'); ?>₫
                                     </h4>
                                 </div>
-                                <a href="checkout.php" class="btn btn-dark btn-lg w-100 rounded-pill py-3 fw-bold shadow-lg">Thanh toán ngay</a>
+                                <a href="checkout.php" class="btn-apple btn-lg w-100 py-3 shadow-xl">Thanh toán ngay</a>
                                 <p class="text-center mt-3 mb-0 small text-secondary">An toàn & Bảo mật 100%</p>
                             </div>
                         </div>

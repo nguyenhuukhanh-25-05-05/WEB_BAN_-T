@@ -48,8 +48,8 @@ include 'includes/header.php';
                         </div>
 
                         <div class="d-grid gap-3">
-                            <button class="btn btn-dark btn-lg rounded-pill py-3 fw-bold btn-add-to-cart-ajax" data-product-id="<?php echo e($product['id']); ?>">Thêm vào giỏ hàng</button>
-                            <button class="btn btn-outline-dark btn-lg rounded-pill py-3 fw-bold btn-add-to-cart-ajax" data-product-id="<?php echo e($product['id']); ?>" data-installment="1">Mua trả góp 0%</button>
+                            <button class="btn-apple btn-lg shadow-lg btn-add-to-cart-ajax" data-product-id="<?php echo e($product['id']); ?>">Thêm vào giỏ hàng</button>
+                            <button class="btn-outline-apple btn-lg btn-add-to-cart-ajax" data-product-id="<?php echo e($product['id']); ?>" data-installment="1">Mua trả góp 0%</button>
                         </div>
                         </div>
                     </div>

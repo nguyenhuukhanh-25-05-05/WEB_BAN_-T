@@ -74,9 +74,10 @@ include 'includes/header.php';
     color: #1d1d1f;
 }
 .btn-premium-glass.active, .btn-premium-glass.active:hover { 
-    background: #1d1d1f; 
-    color: #ffffff; 
-    border-color: #1d1d1f; 
+    background: var(--apple-blue); 
+    color: #ffffff !important; 
+    border-color: var(--apple-blue); 
+    box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);
 }
 .filter-brands-scroll {
     padding: 10px 0;
@@ -131,7 +132,7 @@ include 'includes/header.php';
                             <div class="glass-panel p-5 rounded-max border-dashed">
                                 <i class="bi bi-search display-1 mb-4 opacity-10"></i>
                                 <p class="text-secondary h5">Rất tiếc, không tìm thấy sản phẩm nào khớp với yêu cầu của bạn.</p>
-                                <a href="product.php" class="btn btn-dark rounded-pill px-5 py-2 mt-4">Quay lại cửa hàng</a>
+                                <a href="product.php" class="btn-apple rounded-pill px-5 py-2 mt-4 shadow-lg">Quay lại cửa hàng</a>
                             </div>
                         </div>
                     <?php else: ?>
