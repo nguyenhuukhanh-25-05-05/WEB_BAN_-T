@@ -268,9 +268,18 @@ if (isset($_GET['edit'])) {
                                 <input type="number" name="stock" class="form-control rounded-3" value="<?php echo $editProduct ? e($editProduct['stock']) : ''; ?>" placeholder="VD: 10" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold">Tên tệp hình ảnh</label>
-                                <input type="text" name="image" class="form-control rounded-3" value="<?php echo $editProduct ? e($editProduct['image']) : ''; ?>" placeholder="VD: iphone15.png">
-                                <div class="form-text x-small">Tên tệp trong folder assets/images/</div>
+                                <label class="form-label small fw-bold text-primary">Hình ảnh sản phẩm (filename)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-primary text-white border-primary"><i class="bi bi-image"></i></span>
+                                    <input type="text" name="image" class="form-control border-primary rounded-end-3" value="<?php echo $editProduct ? e($editProduct['image']) : ''; ?>" placeholder="VD: iphone15.png" required>
+                                </div>
+                                <div class="form-text x-small text-primary fw-medium">Nhập tên file trong folder assets/images/</div>
+                                <?php if($editProduct): ?>
+                                    <div class="mt-2 text-center border rounded-3 p-2 bg-light">
+                                        <p class="x-small mb-1 text-secondary">Ảnh hiện tại:</p>
+                                        <img src="../assets/images/<?php echo e($editProduct['image']); ?>" height="50" class="rounded shadow-sm">
+                                    </div>
+                                <?php endif; ?>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold">Mô tả ngắn gọn</label>

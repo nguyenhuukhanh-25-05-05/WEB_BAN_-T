@@ -12,13 +12,46 @@ require_once dirname(__FILE__) . '/db.php';
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?php echo $basePath; ?>assets/css/style.css">
+
+    <!-- Global Visual Hard-Fix V2.3 -->
+    <style>
+        .navbar-premium {
+            background: rgba(255, 255, 255, 0.5) !important;
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+            height: 48px !important;
+        }
+        .navbar-centered-wrapper {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            max-width: 1024px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .navbar-left, .navbar-right { flex: 1; display: flex; align-items: center; }
+        .navbar-right { justify-content: flex-end; }
+        .navbar-center { 
+            flex: 2; 
+            display: flex !important; 
+            justify-content: center !important; 
+            gap: 20px; 
+        }
+        .nav-link, .icon-link {
+            color: #1d1d1f !important;
+            opacity: 0.8 !important;
+            font-size: 13px !important;
+            text-decoration: none !important;
+        }
+        @media (max-width: 768px) {
+            .navbar-center { display: none !important; }
+            .navbar-left, .navbar-brand { flex: 1; display: flex; justify-content: flex-start; }
+            .navbar-right { flex: 1; justify-content: flex-end; }
+        }
+    </style>
 
     <!-- CSRF Token for AJAX -->
     <meta name="csrf-token" content="<?php echo get_csrf_token(); ?>">
