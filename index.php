@@ -1,8 +1,9 @@
 <?php
-// Bắt đầu phiên làm việc để sử dụng SESSION (Đăng nhập, Giỏ hàng)
-session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Nhúng file kết nối cơ sở dữ liệu Postgres (Sử dụng PDO)
+// Nhúng các tệp tin cốt lõi
+require_once 'includes/auth_functions.php';
 require_once 'includes/db.php';
 
 /**

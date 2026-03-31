@@ -1,4 +1,7 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // 1. Tìm DATABASE_URL (Cách phổ biến nhất trên Render/Heroku)
 $databaseUrl = getenv('DATABASE_URL');
 if (!$databaseUrl) $databaseUrl = $_ENV['DATABASE_URL'] ?? $_SERVER['DATABASE_URL'] ?? null;
@@ -44,15 +47,8 @@ try {
      }
 
 } catch (\PDOException $e) {
-     // Lưu log lỗi vào file (giả lập) hoặc hệ thống log chuyên dụng
-     // Đối với môi trường dev, có thể hiện lỗi chi tiết. Đối với prod, hiện thông báo chung.
-     $isDev = (getenv('APP_ENV') === 'development' || $host === 'localhost');
-     
-     if ($isDev) {
-         die("Lỗi kết nối CSDL (Dev Mode): " . $e->getMessage());
-     } else {
-         error_log("Database Connection Error: " . $e->getMessage());
-         die("Hệ thống đang bảo trì. Vui lòng quay lại sau.");
-     }
+     die("Lỗi kết nối CSDL: " . $e->getMessage() . " | DSN: " . $dsn);
+} catch (\Exception $e) {
+     die("Lỗi hệ thống: " . $e->getMessage());
 }
 ?>

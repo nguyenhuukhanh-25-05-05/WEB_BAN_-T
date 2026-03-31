@@ -4,6 +4,9 @@
  */
 
 if (session_status() === PHP_SESSION_NONE) {
+    // Cấu hình Session sống lâu hơn (7 ngày)
+    ini_set('session.gc_maxlifetime', 604800);
+    session_set_cookie_params(604800);
     session_start();
 }
 
@@ -33,20 +36,10 @@ function get_csrf_token() {
  * @return bool Trả về true nếu token hợp lệ
  */
 function verify_csrf_token() {
-    if (isset($_POST['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+    if (isset($_POST['csrf_token']) && hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
         return true;
     }
     return false;
-}
-/**
- * Tệp chứa các hàm hỗ trợ xác thực (Authentication)
- */
-
-if (session_status() === PHP_SESSION_NONE) {
-    // Cấu hình Session sống lâu hơn (7 ngày)
-    ini_set('session.gc_maxlifetime', 604800);
-    session_set_cookie_params(604800);
-    session_start();
 }
 
 /**
