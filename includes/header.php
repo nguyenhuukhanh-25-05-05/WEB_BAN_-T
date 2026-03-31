@@ -14,44 +14,8 @@ require_once dirname(__FILE__) . '/db.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?php echo $basePath; ?>assets/css/style.css">
-
-    <!-- Global Visual Hard-Fix V2.3 -->
-    <style>
-        .navbar-premium {
-            background: rgba(255, 255, 255, 0.5) !important;
-            backdrop-filter: blur(15px) !important;
-            -webkit-backdrop-filter: blur(15px) !important;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-            height: 48px !important;
-        }
-        .navbar-centered-wrapper {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            max-width: 1024px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        .navbar-left, .navbar-right { flex: 1; display: flex; align-items: center; }
-        .navbar-right { justify-content: flex-end; }
-        .navbar-center { 
-            flex: 2; 
-            display: flex !important; 
-            justify-content: center !important; 
-            gap: 20px; 
-        }
-        .nav-link, .icon-link {
-            color: #1d1d1f !important;
-            opacity: 0.8 !important;
-            font-size: 13px !important;
-            text-decoration: none !important;
-        }
-        @media (max-width: 768px) {
-            .navbar-center { display: none !important; }
-            .navbar-left, .navbar-brand { flex: 1; display: flex; justify-content: flex-start; }
-            .navbar-right { flex: 1; justify-content: flex-end; }
-        }
-    </style>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <!-- CSRF Token for AJAX -->
     <meta name="csrf-token" content="<?php echo get_csrf_token(); ?>">
@@ -63,22 +27,34 @@ require_once dirname(__FILE__) . '/db.php';
     </script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-md fixed-top navbar-premium">
-        <div class="navbar-centered-wrapper">
-            <div class="navbar-left">
-                <!-- 1. Hamburger Button (Dành cho Mobile) -->
-                <button class="navbar-toggler border-0 shadow-none d-md-none p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+    <nav class="navbar-modern">
+        <div class="nav-container">
+            <!-- Mobile Menu Toggle -->
+            <button class="nav-toggle d-lg-none" id="navToggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+            </button>
 
-                <!-- 2. Logo -->
-                <a class="navbar-brand me-0" href="<?php echo $basePath; ?>index.php">
-                    <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="28" alt="Logo">
+            <!-- Logo -->
+            <a class="nav-brand" href="<?php echo $basePath; ?>index.php">
+                <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" alt="Logo">
+            </a>
+
+            <!-- Navigation Links (Desktop) -->
+            <ul class="nav-menu d-none d-lg-flex">
+                <li><a href="<?php echo $basePath; ?>product.php">Điện thoại</a></li>
+                <li><a href="<?php echo $basePath; ?>product.php?category=Apple">Apple</a></li>
+                <li><a href="<?php echo $basePath; ?>product.php?category=Samsung">Samsung</a></li>
+                <li><a href="<?php echo $basePath; ?>warranty.php">Bảo hành</a></li>
+                <li><a href="<?php echo $basePath; ?>news.php">Tin tức</a></li>
+            </ul>
+
+            <!-- Navigation Icons -->
+            <div class="nav-icons">
+                <a href="#" class="icon-link search-trigger" title="Tìm kiếm">
+                    <i class="bi bi-search"></i>
                 </a>
-                </a>
-                
-                <!-- 5. Giỏ hàng (Luôn hiện) -->
-                <a href="<?php echo $basePath; ?>cart.php" class="icon-link position-relative">
+                <a href="<?php echo $basePath; ?>cart.php" class="icon-link position-relative" title="Giỏ hàng">
                     <i class="bi bi-bag"></i>
                     <?php 
                         $cartCount = 0;
@@ -86,47 +62,39 @@ require_once dirname(__FILE__) . '/db.php';
                             foreach($_SESSION['cart'] as $item) $cartCount += $item['qty'];
                         }
                     ?>
-                    <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm <?php echo $cartCount > 0 ? '' : 'd-none'; ?>" style="font-size: 0.6rem;">
+                    <span id="cart-count" class="cart-badge <?php echo $cartCount > 0 ? '' : 'd-none'; ?>">
                         <?php echo $cartCount; ?>
                     </span>
                 </a>
-
-                <!-- 6. Tài khoản (Ẩn trên di động, dùng menu Offcanvas trên PC) -->
                 <?php if (isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
-                    <a href="#accountOffcanvas" role="button" class="icon-link text-dark d-none d-md-flex" data-bs-toggle="offcanvas" aria-controls="accountOffcanvas">
-                        <i class="bi bi-person fs-5"></i>
+                    <a href="#accountOffcanvas" class="icon-link" data-bs-toggle="offcanvas" title="Tài khoản">
+                        <i class="bi bi-person"></i>
                     </a>
                 <?php else: ?>
-                    <a href="<?php echo $basePath; ?>login.php" class="icon-link text-dark d-none d-md-flex">
-                        <i class="bi bi-person fs-5"></i>
+                    <a href="<?php echo $basePath; ?>login.php" class="icon-link" title="Đăng nhập">
+                        <i class="bi bi-person"></i>
                     </a>
                 <?php endif; ?>
+            </div>
         </div>
-    </nav>
-        <div class="collapse navbar-collapse d-md-none" id="navbarNav">
-            <div class="bg-white border-bottom w-100 shadow-sm">
-                <div class="container py-3">
-                    <ul class="navbar-nav gap-2">
-                        <li class="nav-item">
-                            <a class="nav-link py-3 fs-6 fw-bold border-bottom d-flex align-items-center justify-content-between" href="<?php echo $basePath; ?>product.php">
-                                <span><i class="bi bi-phone me-2"></i> Điện thoại</span>
-                                <i class="bi bi-chevron-right small opacity-50"></i>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link py-3 fs-6 fw-bold border-bottom d-flex align-items-center justify-content-between" href="<?php echo $basePath; ?>warranty.php">
-                                <span><i class="bi bi-shield-check me-2"></i> Bảo hành</span>
-                                <i class="bi bi-chevron-right small opacity-50"></i>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link py-3 fs-6 fw-bold d-flex align-items-center justify-content-between" href="<?php echo $basePath; ?>news.php">
-                                <span><i class="bi bi-newspaper me-2"></i> Tin tức</span>
-                                <i class="bi bi-chevron-right small opacity-50"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+
+        <!-- Mobile Menu (Overlay) -->
+        <div class="nav-mobile-overlay" id="navMobileOverlay">
+            <div class="nav-mobile-menu">
+                <ul class="nav-mobile-links">
+                    <li><a href="<?php echo $basePath; ?>product.php">Tất cả điện thoại</a></li>
+                    <li><a href="<?php echo $basePath; ?>product.php?category=Apple">iPhone / Apple</a></li>
+                    <li><a href="<?php echo $basePath; ?>product.php?category=Samsung">Samsung Galaxy</a></li>
+                    <li><a href="<?php echo $basePath; ?>warranty.php">Tra cứu bảo hành</a></li>
+                    <li><a href="<?php echo $basePath; ?>news.php">Tin tức công nghệ</a></li>
+                    <li class="divider"></li>
+                    <?php if (isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
+                        <li><a href="<?php echo $basePath; ?>order_history.php">Đơn hàng của tôi</a></li>
+                        <li><a href="<?php echo $basePath; ?>logout.php" class="text-danger">Đăng xuất</a></li>
+                    <?php else: ?>
+                        <li><a href="<?php echo $basePath; ?>login.php">Đăng nhập / Đăng ký</a></li>
+                    <?php endif; ?>
+                </ul>
             </div>
         </div>
     </nav>

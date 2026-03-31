@@ -120,8 +120,37 @@ const ui = {
             console.error('Update cart error:', err);
             this.showToast('Lỗi', 'Không thể cập nhật giỏ hàng.', 'error');
         });
+    },
+
+    // Mobile Menu Toggle
+    initMobileMenu: function() {
+        const toggle = document.getElementById('navToggle');
+        const overlay = document.getElementById('navMobileOverlay');
+        const body = document.body;
+
+        if (toggle && overlay) {
+            toggle.addEventListener('click', () => {
+                toggle.classList.toggle('active');
+                overlay.classList.toggle('active');
+                body.style.overflow = overlay.classList.contains('active') ? 'hidden' : '';
+            });
+
+            // Close menu on link click
+            overlay.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    toggle.classList.remove('active');
+                    overlay.classList.remove('active');
+                    body.style.overflow = '';
+                });
+            });
+        }
     }
 };
+
+// Initialize UI
+document.addEventListener('DOMContentLoaded', function() {
+    ui.initMobileMenu();
+});
 
 // Initialize event listeners for dynamic add to cart buttons
 document.addEventListener('click', function(e) {
