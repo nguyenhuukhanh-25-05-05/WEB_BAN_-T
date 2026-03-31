@@ -4,8 +4,6 @@
                 <div class="footer-col">
                     <h4>Sản phẩm</h4>
                     <ul>
-                        <li><a href="<?php echo $basePath; ?>product.php?category=Apple">iPhone / Apple</a></li>
-                        <li><a href="<?php echo $basePath; ?>product.php?category=Samsung">Samsung Galaxy</a></li>
                         <li><a href="<?php echo $basePath; ?>product.php?category=Xiaomi">Xiaomi</a></li>
                         <li><a href="<?php echo $basePath; ?>product.php?category=Oppo">Oppo</a></li>
                     </ul>
@@ -96,6 +94,39 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo $basePath; ?>assets/js/ui.js"></script>
     <script src="<?php echo $basePath; ?>assets/js/ai-chat.js"></script>
+    <script src="<?php echo $basePath; ?>assets/js/search-overlay.js"></script>
+
+    <script>
+    // Premium reveal animations on scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-reveal, .animate-fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Navbar scroll effect
+        const navbar = document.querySelector('.navbar-modern');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    });
+    </script>
 
     <!-- Global Styles for Widgets (Kept minimal here, most in style.css) -->
     <style>

@@ -7,18 +7,19 @@
     --bg-light: #f5f5f7;
     --bg-white: #ffffff;
     --text-gray: #86868b;
-    --border-light: rgba(0, 0, 0, 0.1);
-    --glass-bg: rgba(255, 255, 255, 0.8);
-    --glass-blur: 20px;
+    --border-light: rgba(0, 0, 0, 0.08);
+    --glass-bg: rgba(255, 255, 255, 0.72);
+    --glass-blur: 30px;
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 20px;
-    --radius-xl: 30px;
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-    --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
-    --shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
+    --radius-xl: 32px;
+    --shadow-sm: 0 4px 12px rgba(0,0,0,0.03);
+    --shadow-md: 0 8px 30px rgba(0,0,0,0.06);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.1);
     --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-heading: 'Outfit', sans-serif;
+    --transition-smooth: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Base Styles */
@@ -65,6 +66,13 @@ ul {
     -webkit-backdrop-filter: blur(var(--glass-blur));
     z-index: 1000;
     border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.4s ease;
+}
+
+.navbar-modern.scrolled {
+    height: 48px;
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
 .nav-container {
@@ -461,23 +469,45 @@ ul {
     opacity: 1;
 }
 
-/* Responsive */
-@media (max-width: 991px) {
-    .nav-menu { display: none; }
+/* Reveal Animations */
+.animate-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: var(--transition-smooth);
 }
 
-@media (max-width: 768px) {
-    .hero-title { font-size: 48px; }
-    .hero-subtitle { font-size: 18px; }
-    .product-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
-    .product-card-modern { padding: 15px; }
-    .p-title { font-size: 15px; }
-    .p-price { font-size: 14px; }
-    .btn-p-buy, .btn-p-view { padding: 6px 15px; font-size: 12px; }
-    .footer-grid { grid-template-columns: 1fr 1fr; }
+.animate-reveal.active {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-@media (max-width: 480px) {
-    .product-grid { grid-template-columns: 1fr; }
-    .hero-actions { flex-direction: column; }
+.animate-fade-in {
+    opacity: 0;
+    transition: opacity 1s ease;
 }
+
+.animate-fade-in.active {
+    opacity: 1;
+}
+
+/* Glass Utilities */
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Gradients */
+.text-gradient {
+    background: linear-gradient(135deg, #1d1d1f 0%, #434343 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bg-premium-light {
+    background: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
+}
+
+.py-huge { padding: 120px 0; }

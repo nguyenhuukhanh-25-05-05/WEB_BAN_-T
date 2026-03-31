@@ -44,26 +44,26 @@ $basePath = "";
 include 'includes/header.php';
 ?>
 
-<main class="min-vh-100">
+<main class="min-vh-100 bg-premium-light">
     <section class="section-padding mt-5">
-        <div class="container">
+        <div class="container py-5">
             <!-- Page Header -->
             <div class="mb-5">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-4 mb-5">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-4 mb-5 animate-reveal">
                     <div>
-                        <h1 class="hero-title text-start mb-0" style="font-size: 48px;">
+                        <h1 class="display-3 fw-800 text-gradient mb-0">
                             <?php echo $search ? "Kết quả cho '" . e($search) . "'" : ($category ? e($category) : "Tất cả sản phẩm"); ?>
                         </h1>
-                        <p class="hero-subtitle text-start m-0 mt-2">Tìm thấy <?php echo count($products); ?> siêu phẩm công nghệ.</p>
+                        <p class="h5 text-secondary fw-light m-0 mt-3">Tìm thấy <?php echo count($products); ?> siêu phẩm công nghệ.</p>
                     </div>
                     
                     <!-- Sort -->
                     <div class="sort-wrapper">
-                        <form action="product.php" method="GET" class="d-flex align-items-center gap-2">
+                        <form action="product.php" method="GET" class="d-flex align-items-center gap-3">
                             <?php if($category): ?><input type="hidden" name="category" value="<?php echo e($category); ?>"><?php endif; ?>
                             <?php if($search): ?><input type="hidden" name="q" value="<?php echo e($search); ?>"><?php endif; ?>
-                            <span class="text-secondary small fw-bold">SẮP XẾP:</span>
-                            <select name="sort" class="form-select border-0 bg-light rounded-pill px-3 py-2" onchange="this.form.submit()">
+                            <span class="text-secondary small fw-bold tracking-widest text-uppercase">Sắp xếp:</span>
+                            <select name="sort" class="form-select border-0 bg-white rounded-pill px-4 py-2 shadow-sm" style="min-width: 180px;" onchange="this.form.submit()">
                                 <option value="newest" <?php echo $sort == 'newest' ? 'selected' : ''; ?>>Mới nhất</option>
                                 <option value="price_asc" <?php echo $sort == 'price_asc' ? 'selected' : ''; ?>>Giá: Thấp đến Cao</option>
                                 <option value="price_desc" <?php echo $sort == 'price_desc' ? 'selected' : ''; ?>>Giá: Cao đến Thấp</option>
@@ -73,12 +73,12 @@ include 'includes/header.php';
                 </div>
 
                 <!-- Brand Filter -->
-                <div class="d-flex gap-2 overflow-auto pb-3" style="scrollbar-width: none; -ms-overflow-style: none;">
+                <div class="d-flex gap-3 overflow-auto pb-4 animate-reveal" style="scrollbar-width: none; -ms-overflow-style: none;">
                     <style>.brand-pill::-webkit-scrollbar { display: none; }</style>
-                    <a href="product.php" class="btn btn-p-view rounded-pill px-4 <?php echo !$category ? 'bg-dark text-white' : ''; ?>">Tất cả</a>
+                    <a href="product.php" class="btn rounded-pill px-4 py-2 border shadow-sm transition-all <?php echo !$category ? 'bg-dark text-white border-dark' : 'bg-white text-dark'; ?>">Tất cả</a>
                     <?php foreach($categories as $cat): ?>
                         <a href="product.php?category=<?php echo urlencode($cat); ?>" 
-                            class="btn btn-p-view rounded-pill px-4 <?php echo $category == $cat ? 'bg-dark text-white' : ''; ?>">
+                            class="btn rounded-pill px-4 py-2 border shadow-sm transition-all <?php echo $category == $cat ? 'bg-dark text-white border-dark' : 'bg-white text-dark'; ?>">
                             <?php echo e($cat); ?>
                         </a>
                     <?php endforeach; ?>
@@ -88,14 +88,14 @@ include 'includes/header.php';
             <!-- Product Grid -->
             <div class="product-grid">
                 <?php if (empty($products)): ?>
-                    <div class="col-12 text-center py-5">
+                    <div class="col-12 text-center py-5 animate-reveal">
                         <i class="bi bi-search display-1 mb-4 opacity-10"></i>
-                        <p class="text-secondary h5">Rất tiếc, không tìm thấy sản phẩm nào khớp với yêu cầu của bạn.</p>
-                        <a href="product.php" class="btn-primary-apple mt-4">Quay lại cửa hàng</a>
+                        <p class="text-secondary h5 fw-light">Rất tiếc, không tìm thấy sản phẩm nào khớp với yêu cầu của bạn.</p>
+                        <a href="product.php" class="btn btn-primary rounded-pill px-5 py-3 mt-4">Quay lại cửa hàng</a>
                     </div>
                 <?php else: ?>
                     <?php foreach ($products as $p): ?>
-                    <div class="product-card-modern">
+                    <div class="product-card-modern animate-reveal">
                         <a href="product-detail.php?id=<?php echo e($p['id']); ?>" class="p-img-box">
                             <img src="assets/images/<?php echo e($p['image']); ?>" alt="<?php echo e($p['name']); ?>" onerror="this.src='https://placehold.co/300x400/f5f5f7/1d1d1f?text=Phone'">
                         </a>

@@ -51,4 +51,5 @@ try {
 } catch (\Exception $e) {
      die("Lỗi hệ thống: " . $e->getMessage());
 }
+require_once dirname(__FILE__) . '/auth_functions.php';
 ?>

@@ -1,6 +1,3 @@
-<?php
-// Đảm bảo các hàm cốt lõi luôn khả dụng trên mọi trang sử dụng Header
-require_once dirname(__FILE__) . '/auth_functions.php';
 require_once dirname(__FILE__) . '/db.php';
 ?>
 <!DOCTYPE html>
@@ -43,15 +40,13 @@ require_once dirname(__FILE__) . '/db.php';
             <!-- Navigation Links (Desktop) -->
             <ul class="nav-menu d-none d-lg-flex">
                 <li><a href="<?php echo $basePath; ?>product.php">Điện thoại</a></li>
-                <li><a href="<?php echo $basePath; ?>product.php?category=Apple">Apple</a></li>
-                <li><a href="<?php echo $basePath; ?>product.php?category=Samsung">Samsung</a></li>
                 <li><a href="<?php echo $basePath; ?>warranty.php">Bảo hành</a></li>
                 <li><a href="<?php echo $basePath; ?>news.php">Tin tức</a></li>
             </ul>
 
             <!-- Navigation Icons -->
             <div class="nav-icons">
-                <a href="#" class="icon-link search-trigger" title="Tìm kiếm">
+                <a href="#" class="icon-link search-trigger" id="searchTrigger" title="Tìm kiếm">
                     <i class="bi bi-search"></i>
                 </a>
                 <a href="<?php echo $basePath; ?>cart.php" class="icon-link position-relative" title="Giỏ hàng">
@@ -83,8 +78,6 @@ require_once dirname(__FILE__) . '/db.php';
             <div class="nav-mobile-menu">
                 <ul class="nav-mobile-links">
                     <li><a href="<?php echo $basePath; ?>product.php">Tất cả điện thoại</a></li>
-                    <li><a href="<?php echo $basePath; ?>product.php?category=Apple">iPhone / Apple</a></li>
-                    <li><a href="<?php echo $basePath; ?>product.php?category=Samsung">Samsung Galaxy</a></li>
                     <li><a href="<?php echo $basePath; ?>warranty.php">Tra cứu bảo hành</a></li>
                     <li><a href="<?php echo $basePath; ?>news.php">Tin tức công nghệ</a></li>
                     <li class="divider"></li>
@@ -148,4 +141,5 @@ require_once dirname(__FILE__) . '/db.php';
             </a>
         </div>
     </div>
+    <?php include dirname(__FILE__) . '/search_overlay.php'; ?>
     <?php endif; ?>
