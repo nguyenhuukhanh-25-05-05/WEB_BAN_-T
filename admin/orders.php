@@ -10,9 +10,6 @@ require_once '../includes/db.php';
  * Sử dụng Form với phương thức POST để thay đổi status (Completed / Cancelled)
  */
 if (isset($_POST['update_status'])) {
-    if (!verify_csrf_token()) {
-        die("Yêu cầu không hợp lệ (CSRF Token mismatch)");
-    }
     $id = $_POST['id'];
     $status = $_POST['status'];
     
@@ -107,24 +104,24 @@ $basePath = "../";
                             $items = $stmtItems->fetchAll();
                         ?>
                         <tr>
-                            <td class="text-secondary fw-bold small">#ORD-<?php echo e($o['id']); ?></td>
+                            <td class="text-secondary fw-bold small">#ORD-<?php echo $o['id']; ?></td>
                             <td>
-                                 <div class="fw-bold"><?php echo e($o['customer_name']); ?></div>
-                                 <div class="small text-secondary"><i class="bi bi-phone"></i> <?php echo e($o['customer_phone']); ?></div>
+                                 <div class="fw-bold"><?php echo $o['customer_name']; ?></div>
+                                 <div class="small text-secondary"><i class="bi bi-phone"></i> <?php echo $o['customer_phone']; ?></div>
                                  <!-- Hiển thị danh sách sản phẩm có kèm ảnh -->
                                  <div class="mt-2">
                                      <?php foreach($items as $item): ?>
                                          <div class="d-flex align-items-center gap-2 bg-light rounded px-2 py-1 mb-1 border" style="font-size: 0.75rem;">
-                                             <img src="../assets/images/<?php echo e($item['image']); ?>" class="rounded" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.src='https://placehold.co/24'">
-                                             <span class="fw-bold text-dark"><?php echo e($item['product_name']); ?></span> 
-                                             <span class="text-secondary">x<?php echo (int)$item['quantity']; ?></span>
+                                             <img src="../assets/images/<?php echo $item['image']; ?>" class="rounded" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.src='https://placehold.co/24'">
+                                             <span class="fw-bold text-dark"><?php echo $item['product_name']; ?></span> 
+                                             <span class="text-secondary">x<?php echo $item['quantity']; ?></span>
                                          </div>
                                      <?php endforeach; ?>
                                  </div>
                             </td>
-                             <td class="fw-bold text-primary"><?php echo number_format($o['total_price'], 0, ',', '.'); ?>₫</td>
+                            <td class="fw-bold text-primary"><?php echo number_format($o['total_price'], 0, ',', '.'); ?>₫</td>
                             <td>
-                                <span class="badge bg-light text-dark border fw-normal px-2"><?php echo e($o['payment_method']); ?></span>
+                                <span class="badge bg-light text-dark border fw-normal px-2"><?php echo $o['payment_method']; ?></span>
                                 <?php if(isset($o['is_installment']) && $o['is_installment']): ?>
                                     <div class="mt-1"><span class="badge bg-primary-subtle text-primary border-0 fw-bold px-2 py-1" style="font-size: 0.65rem;">TRẢ GÓP 0%</span></div>
                                 <?php endif; ?>
@@ -136,30 +133,30 @@ $basePath = "../";
                                     if ($o['status'] == 'Đã duyệt' || $o['status'] == 'Completed') $badgeClass = 'success';
                                     if ($o['status'] == 'Đã hủy' || $o['status'] == 'Cancelled') $badgeClass = 'danger';
                                 ?>
-                                 <span class="badge bg-<?php echo $badgeClass; ?>-subtle text-dark border fw-normal px-3 py-2 rounded-pill">
-                                    <?php echo e($o['status']); ?>
+                                <span class="badge bg-<?php echo $badgeClass; ?>-subtle text-dark border fw-normal px-3 py-2 rounded-pill">
+                                    <?php echo $o['status']; ?>
                                 </span>
                             </td>
                             <td class="text-end">
-                                 <!-- Nút In Hóa Đơn -->
-                                 <a href="invoice.php?order_id=<?php echo e($o['id']); ?>" target="_blank" class="btn btn-sm btn-light border p-2 text-primary shadow-sm me-1" title="In Hóa Đơn (PDF)">
-                                     <i class="bi bi-printer"></i>
-                                 </a>
-                                 
-                                 <!-- FORM PHP: Gửi trạng thái mới lên server -->
-                                 <form action="orders.php" method="POST" style="display: inline-block;">
-                                     <input type="hidden" name="id" value="<?php echo e($o['id']); ?>">
-                                     <input type="hidden" name="csrf_token" value="<?php echo get_csrf_token(); ?>">
-                                     <!-- Nút Duyệt / Hoàn thành -->
-                                     <button type="submit" name="status" value="Đã duyệt" class="btn btn-sm btn-light border p-2 text-success shadow-sm" title="Duyệt đơn hàng">
-                                         <i class="bi bi-check-circle"></i>
-                                     </button>
-                                     <!-- Nút Hủy đơn -->
-                                     <button type="submit" name="status" value="Đã hủy" class="btn btn-sm btn-light border p-2 text-danger shadow-sm ms-1" title="Hủy / Từ chối đơn">
-                                         <i class="bi bi-x-circle"></i>
-                                     </button>
-                                     <input type="hidden" name="update_status" value="1">
-                                 </form>
+                                <!-- Nút In Hóa Đơn -->
+                                <a href="invoice.php?order_id=<?php echo $o['id']; ?>" target="_blank" class="btn btn-sm btn-light border p-2 text-primary shadow-sm me-1" title="In Hóa Đơn (PDF)">
+                                    <i class="bi bi-printer"></i>
+                                </a>
+                                
+                                <!-- FORM PHP: Gửi trạng thái mới lên server -->
+                                <form action="orders.php" method="POST" style="display: inline-block;">
+                                    <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
+                                    <!-- Nút Duyệt / Hoàn thành -->
+                                    <button type="submit" name="update_status" value="1" class="btn btn-sm btn-light border p-2 text-success shadow-sm" title="Duyệt đơn hàng">
+                                        <i class="bi bi-check-circle"></i>
+                                        <input type="hidden" name="status" value="Đã duyệt">
+                                    </button>
+                                    <!-- Nút Hủy đơn -->
+                                    <button type="submit" name="update_status" value="1" class="btn btn-sm btn-light border p-2 text-danger shadow-sm ms-1" title="Hủy / Từ chối đơn">
+                                        <i class="bi bi-x-circle"></i>
+                                        <input type="hidden" name="status" value="Đã hủy">
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         <?php endforeach; ?>

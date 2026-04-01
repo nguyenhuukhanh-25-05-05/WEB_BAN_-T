@@ -1,5 +1,3 @@
-require_once dirname(__FILE__) . '/db.php';
-?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -9,13 +7,13 @@ require_once dirname(__FILE__) . '/db.php';
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="<?php echo $basePath; ?>assets/css/style.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- CSRF Token for AJAX -->
-    <meta name="csrf-token" content="<?php echo get_csrf_token(); ?>">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="<?php echo $basePath; ?>assets/css/style.css">
 
     <script>
         // Define global API paths for JS
@@ -24,70 +22,75 @@ require_once dirname(__FILE__) . '/db.php';
     </script>
 </head>
 <body>
-    <nav class="navbar-modern">
-        <div class="nav-container">
-            <!-- Mobile Menu Toggle -->
-            <button class="nav-toggle d-lg-none" id="navToggle" aria-label="Toggle menu">
-                <span></span>
-                <span></span>
-            </button>
+    <nav class="navbar navbar-expand-md navbar-light fixed-top navbar-premium">
+        <div class="container-fluid">
+            <div class="navbar-centered-wrapper">
+                <!-- 1. Logo (Leftmost of the center block) -->
+                <a class="navbar-brand" href="<?php echo $basePath; ?>index.php">
+                    <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="28" alt="Logo">
+                </a>
 
-            <!-- Logo -->
-            <a class="nav-brand" href="<?php echo $basePath; ?>index.php">
-                <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" alt="Logo">
-            </a>
+                <!-- 2. Main Menu Links (Direct children for even spacing) -->
+                <a class="nav-link d-none d-md-block" href="<?php echo $basePath; ?>product.php">Điện thoại</a>
+                <a class="nav-link d-none d-md-block" href="<?php echo $basePath; ?>warranty.php">Bảo hành</a>
+                <a class="nav-link d-none d-md-block" href="<?php echo $basePath; ?>news.php">Tin tức</a>
 
-            <!-- Navigation Links (Desktop) -->
-            <ul class="nav-menu d-none d-lg-flex">
-                <li><a href="<?php echo $basePath; ?>product.php">Điện thoại</a></li>
-                <li><a href="<?php echo $basePath; ?>warranty.php">Bảo hành</a></li>
-                <li><a href="<?php echo $basePath; ?>news.php">Tin tức</a></li>
-            </ul>
-
-            <!-- Navigation Icons -->
-            <div class="nav-icons">
-                <a href="#" class="icon-link search-trigger" id="searchTrigger" title="Tìm kiếm">
+                <!-- 3. Icon Actions (Direct children for even spacing) -->
+                <a href="#" id="searchTrigger" class="icon-link">
                     <i class="bi bi-search"></i>
                 </a>
-                <a href="<?php echo $basePath; ?>cart.php" class="icon-link position-relative" title="Giỏ hàng">
+                
+                <a href="<?php echo $basePath; ?>cart.php" class="icon-link position-relative">
                     <i class="bi bi-bag"></i>
-                    <?php 
-                        $cartCount = 0;
-                        if(isset($_SESSION['cart'])) {
-                            foreach($_SESSION['cart'] as $item) $cartCount += $item['qty'];
-                        }
-                    ?>
-                    <span id="cart-count" class="cart-badge <?php echo $cartCount > 0 ? '' : 'd-none'; ?>">
-                        <?php echo $cartCount; ?>
-                    </span>
+                    <?php if(isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm" style="font-size: 0.6rem;">
+                            <?php echo count($_SESSION['cart']); ?>
+                        </span>
+                    <?php endif; ?>
                 </a>
+
                 <?php if (isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
-                    <a href="#accountOffcanvas" class="icon-link" data-bs-toggle="offcanvas" title="Tài khoản">
-                        <i class="bi bi-person"></i>
+                    <a href="#accountOffcanvas" role="button" class="icon-link text-dark" data-bs-toggle="offcanvas" aria-controls="accountOffcanvas">
+                        <i class="bi bi-person fs-5"></i>
                     </a>
                 <?php else: ?>
-                    <a href="<?php echo $basePath; ?>login.php" class="icon-link" title="Đăng nhập">
-                        <i class="bi bi-person"></i>
+                    <a href="<?php echo $basePath; ?>login.php" class="icon-link text-dark">
+                        <i class="bi bi-person fs-5"></i>
                     </a>
                 <?php endif; ?>
+
+                <!-- Hamburger Button (Only Mobile) -->
+                <button class="navbar-toggler border-0 shadow-none d-md-none p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
             </div>
         </div>
-
-        <!-- Mobile Menu (Overlay) -->
-        <div class="nav-mobile-overlay" id="navMobileOverlay">
-            <div class="nav-mobile-menu">
-                <ul class="nav-mobile-links">
-                    <li><a href="<?php echo $basePath; ?>product.php">Tất cả điện thoại</a></li>
-                    <li><a href="<?php echo $basePath; ?>warranty.php">Tra cứu bảo hành</a></li>
-                    <li><a href="<?php echo $basePath; ?>news.php">Tin tức công nghệ</a></li>
-                    <li class="divider"></li>
-                    <?php if (isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
-                        <li><a href="<?php echo $basePath; ?>order_history.php">Đơn hàng của tôi</a></li>
-                        <li><a href="<?php echo $basePath; ?>logout.php" class="text-danger">Đăng xuất</a></li>
-                    <?php else: ?>
-                        <li><a href="<?php echo $basePath; ?>login.php">Đăng nhập / Đăng ký</a></li>
-                    <?php endif; ?>
-                </ul>
+        
+        <!-- Mobile Menu Collapse (Only visible on mobile when toggled) -->
+        <div class="collapse navbar-collapse d-md-none" id="navbarNav">
+            <div class="bg-white border-bottom w-100 shadow-sm">
+                <div class="container py-3">
+                    <ul class="navbar-nav gap-2">
+                        <li class="nav-item">
+                            <a class="nav-link py-3 fs-6 fw-bold border-bottom d-flex align-items-center justify-content-between" href="<?php echo $basePath; ?>product.php">
+                                <span><i class="bi bi-phone me-2"></i> Điện thoại</span>
+                                <i class="bi bi-chevron-right small opacity-50"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link py-3 fs-6 fw-bold border-bottom d-flex align-items-center justify-content-between" href="<?php echo $basePath; ?>warranty.php">
+                                <span><i class="bi bi-shield-check me-2"></i> Bảo hành</span>
+                                <i class="bi bi-chevron-right small opacity-50"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link py-3 fs-6 fw-bold d-flex align-items-center justify-content-between" href="<?php echo $basePath; ?>news.php">
+                                <span><i class="bi bi-newspaper me-2"></i> Tin tức</span>
+                                <i class="bi bi-chevron-right small opacity-50"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
@@ -141,5 +144,4 @@ require_once dirname(__FILE__) . '/db.php';
             </a>
         </div>
     </div>
-    <?php include dirname(__FILE__) . '/search_overlay.php'; ?>
     <?php endif; ?>

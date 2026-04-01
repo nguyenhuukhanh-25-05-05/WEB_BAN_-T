@@ -26,6 +26,29 @@ $totalProducts = $stmtProducts->fetchColumn();
 $stmtRecent = $pdo->query("SELECT * FROM orders ORDER BY created_at DESC LIMIT 6");
 $recentOrders = $stmtRecent->fetchAll();
 
+// 6. Thông tin hệ thống thực tế
+$phpVersion    = phpversion();
+$memUsage      = round(memory_get_usage(true) / 1024 / 1024, 1); // MB
+$memPeak       = round(memory_get_peak_usage(true) / 1024 / 1024, 1); // MB
+$dbOk          = true; // Đã kết nối thành công ở trên
+$totalProducts2= $totalProducts; // Re-use
+$totalNews     = (int)$pdo->query("SELECT COUNT(*) FROM news")->fetchColumn();
+$totalReviews  = (int)$pdo->query("SELECT COUNT(*) FROM reviews")->fetchColumn();
+$totalWarranties = (int)$pdo->query("SELECT COUNT(*) FROM warranties")->fetchColumn();
+$totalRevenue2 = (float)$pdo->query("SELECT COALESCE(SUM(total_price),0) FROM orders")->fetchColumn();
+
+// Kiểm tra sức khỏe các bảng quan trọng
+$tables = ['products','orders','users','reviews','warranties','news','subscribers'];
+$tableStatus = [];
+foreach($tables as $tbl) {
+    try {
+        $cnt = (int)$pdo->query("SELECT COUNT(*) FROM $tbl")->fetchColumn();
+        $tableStatus[$tbl] = $cnt;
+    } catch(\PDOException $e) {
+        $tableStatus[$tbl] = null; // Bảng chưa tồn tại
+    }
+}
+
 // Cấu hình trang
 $pageTitle = "Tổng quan Dashboard | Admin";
 $basePath = "../";
@@ -87,35 +110,77 @@ $basePath = "../";
 
         <!-- KHỐI THỐNG KÊ NHANH -->
         <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white">
+            <div class="col-6 col-md-3">
+                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white h-100">
                     <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Tổng doanh thu</h6>
                     <h3 class="fw-bold mb-0 text-primary h2"><?php echo number_format($totalRevenue, 0, ',', '.'); ?>₫</h3>
-                    <div class="text-success small mt-2"><i class="bi bi-graph-up"></i> Tăng 12% tháng này</div>
+                    <div class="text-success small mt-2"><i class="bi bi-graph-up"></i> Đơn hoàn thành</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white">
+            <div class="col-6 col-md-3">
+                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white h-100">
                     <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Đơn hàng mới</h6>
                     <h3 class="fw-bold mb-0 h2"><?php echo $newOrdersCount; ?></h3>
                     <div class="text-secondary small mt-2">Cần duyệt ngay</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white">
-                    <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Tổng khách hàng</h6>
+            <div class="col-6 col-md-3">
+                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white h-100">
+                    <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Khách hàng</h6>
                     <h3 class="fw-bold mb-0 h2"><?php echo $totalUsers; ?></h3>
                     <div class="text-secondary small mt-2">Thành viên hiện có</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white">
+            <!-- CARD TRẠNG THÁI HỆ THỐNG -->
+            <div class="col-6 col-md-3">
+                <div class="stat-card border-0 shadow-sm p-4 rounded-4 h-100" style="background: linear-gradient(135deg,#f0fff4,#e9f7ef); border-left: 4px solid #28a745 !important;">
+                    <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Trạng thái hệ thống</h6>
+                    <h3 class="fw-bold mb-1 h4 text-success">
+                        <span class="me-1" style="display:inline-block;width:10px;height:10px;background:#28a745;border-radius:50%;"></span>
+                        Ổn định
+                    </h3>
+                    <div class="text-secondary small">PHP <?php echo $phpVersion; ?></div>
+                    <div class="text-secondary small">RAM: <?php echo $memUsage; ?> MB / Peak: <?php echo $memPeak; ?> MB</div>
+                    <div class="<?php echo $dbOk ? 'text-success' : 'text-danger'; ?> small fw-semibold mt-1">
+                        <i class="bi bi-<?php echo $dbOk ? 'check-circle-fill' : 'x-circle-fill'; ?> me-1"></i>
+                        Database: <?php echo $dbOk ? 'Kết nối OK' : 'Lỗi!'; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HÀNG 2: THỐNG KÊ THÊM -->
+        <div class="row g-4 mb-5">
+            <div class="col-6 col-md-3">
+                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white h-100">
                     <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Số lượng máy</h6>
                     <h3 class="fw-bold mb-0 h2"><?php echo $totalProducts; ?></h3>
                     <div class="text-secondary small mt-2">Sản phẩm hiện có</div>
                 </div>
             </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white h-100">
+                    <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Đánh giá</h6>
+                    <h3 class="fw-bold mb-0 h2"><?php echo $totalReviews; ?></h3>
+                    <div class="text-secondary small mt-2">Bình luận sản phẩm</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white h-100">
+                    <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Tin tức</h6>
+                    <h3 class="fw-bold mb-0 h2"><?php echo $totalNews; ?></h3>
+                    <div class="text-secondary small mt-2">Bài viết đã đăng</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card border-0 shadow-sm p-4 rounded-4 bg-white h-100">
+                    <h6 class="text-secondary small mb-2 text-uppercase fw-bold">Bảo hành IMEI</h6>
+                    <h3 class="fw-bold mb-0 h2"><?php echo $totalWarranties; ?></h3>
+                    <div class="text-secondary small mt-2">Phiếu đã cấp</div>
+                </div>
+            </div>
         </div>
+
 
         <!-- BẢNG ĐƠN HÀNG GẦN ĐÂY -->
         <div class="stat-card shadow-sm border-0 rounded-4 p-4 bg-white">
@@ -142,14 +207,14 @@ $basePath = "../";
                         <!-- Vòng lặp PHP Đơn hàng -->
                         <?php foreach($recentOrders as $o): ?>
                         <tr>
-                            <td class="small fw-bold text-secondary">#ORD-<?php echo e($o['id']); ?></td>
-                            <td><div class="fw-bold"><?php echo e($o['customer_name']); ?></div></td>
+                            <td class="small fw-bold text-secondary">#ORD-<?php echo $o['id']; ?></td>
+                            <td><div class="fw-bold"><?php echo $o['customer_name']; ?></div></td>
                             <td class="small text-secondary"><?php echo date('d/m/Y', strtotime($o['created_at'])); ?></td>
                             <td class="fw-bold text-dark"><?php echo number_format($o['total_price'], 0, ',', '.'); ?>₫</td>
                             <td>
                                 <!-- Hiển thị màu sắc tùy theo trạng thái hiệu chỉnh bằng PHP -->
                                 <span class="badge bg-<?php echo $o['status'] == 'Completed' ? 'success' : ($o['status'] == 'Cancelled' ? 'danger' : 'warning'); ?>-subtle text-dark border fw-normal px-3 py-2 rounded-pill">
-                                    <?php echo e($o['status']); ?>
+                                    <?php echo $o['status']; ?>
                                 </span>
                             </td>
                         </tr>

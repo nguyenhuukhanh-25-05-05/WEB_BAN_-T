@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderResults(data) {
         if (data.length === 0) {
-            searchResults.innerHTML = '<div class="col-12 text-center py-5 text-secondary-light">Không tìm m thấy sản phẩm nào...</div>';
+            searchResults.innerHTML = '<div class="col-12 text-center py-5 text-secondary-light">Không tìm thấy kết quả nào...</div>';
             searchResults.classList.remove('d-none');
             quickSuggestions.classList.add('d-none');
             return;
@@ -66,14 +66,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let html = '';
         data.forEach(item => {
+            let priceClass = item.type === 'news' ? 'text-secondary small mt-1' : 'suggestion-price';
+            
             html += `
                 <div class="col-md-6 col-lg-4 animate-reveal">
-                    <a href="product-detail.php?id=${item.id}" class="suggestion-card">
-                        <img src="assets/images/${item.image}" class="suggestion-img" onerror="this.src='https://placehold.co/100x100?text=Phone'">
-                        <div class="suggestion-info">
-                            <div class="suggestion-name">${item.name}</div>
-                            <div class="small text-secondary mb-1">${item.category}</div>
-                            <div class="suggestion-price">${item.formatted_price}</div>
+                    <a href="${item.url}" class="suggestion-card">
+                        <img src="assets/images/${item.image}" class="suggestion-img" style="${item.type === 'news' ? 'object-fit: cover;' : 'object-fit: contain;'}" onerror="this.src='https://placehold.co/100x100?text=Result'">
+                        <div class="suggestion-info" style="overflow: hidden;">
+                            <div class="suggestion-name text-truncate">${item.name}</div>
+                            <div class="small ${item.type === 'news' ? 'text-primary fw-medium' : 'text-secondary'} mb-1">${item.category}</div>
+                            <div class="${priceClass} text-truncate">${item.formatted_price}</div>
                         </div>
                     </a>
                 </div>

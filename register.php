@@ -6,9 +6,6 @@ $error = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf_token()) {
-        die("Yêu cầu không hợp lệ (CSRF Token mismatch)");
-    }
     $fullname = $_POST['fullname'] ?? '';
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
@@ -54,18 +51,17 @@ include 'includes/header.php';
                     </div>
 
                     <?php if ($error): ?>
-                        <div class="alert alert-danger glass-badge border-danger text-danger mb-4"><?php echo e($error); ?></div>
+                        <div class="alert alert-danger glass-badge border-danger text-danger mb-4"><?php echo $error; ?></div>
                     <?php endif; ?>
 
                     <?php if ($success): ?>
                         <div class="alert alert-success glass-badge border-success text-success mb-4">
-                            <?php echo e($success); ?>
+                            <?php echo $success; ?>
                             <br><a href="login.php" class="fw-bold text-white text-decoration-underline">Đăng nhập ngay</a>
                         </div>
                     <?php endif; ?>
 
                     <form action="register.php" method="POST">
-                        <input type="hidden" name="csrf_token" value="<?php echo get_csrf_token(); ?>">
                         <div class="mb-4">
                             <label class="form-label text-white small fw-bold">Họ và tên *</label>
                             <input type="text" name="fullname" class="form-control btn-premium-glass py-3 px-4" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff !important;" placeholder="Nguyễn Văn A" required>

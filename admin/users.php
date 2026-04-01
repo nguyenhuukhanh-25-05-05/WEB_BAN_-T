@@ -9,9 +9,6 @@ require_once '../includes/db.php';
  * 1. XỬ LÝ CẬP NHẬT TRẠNG THÁI USER (Ban / Unban)
  */
 if (isset($_POST['update_status'])) {
-    if (!verify_csrf_token()) {
-        die("Yêu cầu không hợp lệ (CSRF Token mismatch)");
-    }
     $id = $_POST['id'];
     $status = $_POST['status'];
     
@@ -79,7 +76,7 @@ $basePath = "../";
             <!-- Hiển thị thông báo khi cập nhật thành công -->
             <?php if (isset($_GET['msg'])): ?>
                 <div class="alert alert-primary alert-dismissible fade show mb-4 border-0 rounded-3" role="alert">
-                    <i class="bi bi-info-circle-fill me-2"></i> <?php echo e($_GET['msg']); ?>
+                    <i class="bi bi-info-circle-fill me-2"></i> <?php echo htmlspecialchars($_GET['msg']); ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
@@ -100,16 +97,16 @@ $basePath = "../";
                         <!-- Vòng lặp PHP Duyệt danh sách User -->
                         <?php foreach($users as $u): ?>
                         <tr>
-                            <td class="text-secondary fw-bold small">#USR-<?php echo e($u['id']); ?></td>
+                            <td class="text-secondary fw-bold small">#USR-<?php echo $u['id']; ?></td>
                             <td>
-                                 <div class="fw-bold"><?php echo e($u['fullname']); ?></div>
-                                 <div class="small text-secondary" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?php echo e($u['address']); ?>">
-                                    <i class="bi bi-geo-alt"></i> <?php echo e($u['address']); ?>
+                                 <div class="fw-bold"><?php echo htmlspecialchars($u['fullname']); ?></div>
+                                 <div class="small text-secondary" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?php echo htmlspecialchars($u['address']); ?>">
+                                    <i class="bi bi-geo-alt"></i> <?php echo htmlspecialchars($u['address']); ?>
                                  </div>
                             </td>
                             <td>
-                                <div class="small"><i class="bi bi-envelope"></i> <?php echo e($u['email']); ?></div>
-                                <div class="small"><i class="bi bi-telephone"></i> <?php echo e($u['phone']); ?></div>
+                                <div class="small"><i class="bi bi-envelope"></i> <?php echo htmlspecialchars($u['email']); ?></div>
+                                <div class="small"><i class="bi bi-telephone"></i> <?php echo htmlspecialchars($u['phone']); ?></div>
                             </td>
                             <td class="small text-secondary"><?php echo date('d/m/Y H:i', strtotime($u['created_at'])); ?></td>
                             <td>
@@ -121,19 +118,19 @@ $basePath = "../";
                             </td>
                             <td class="text-end">
                                 <form action="users.php" method="POST" style="display: inline-block;">
-                                    <input type="hidden" name="id" value="<?php echo e($u['id']); ?>">
-                                    <input type="hidden" name="csrf_token" value="<?php echo get_csrf_token(); ?>">
+                                    <input type="hidden" name="id" value="<?php echo $u['id']; ?>">
                                     
                                     <?php if ($u['status'] === 'active' || empty($u['status'])): ?>
-                                        <button type="submit" name="status" value="banned" class="btn btn-sm btn-outline-danger shadow-sm" title="Khóa tài khoản này">
+                                        <button type="submit" name="update_status" value="1" class="btn btn-sm btn-outline-danger shadow-sm" title="Khóa tài khoản này">
                                             <i class="bi bi-lock"></i> Khóa
+                                            <input type="hidden" name="status" value="banned">
                                         </button>
                                     <?php else: ?>
-                                        <button type="submit" name="status" value="active" class="btn btn-sm btn-outline-success shadow-sm" title="Mở khóa tài khoản">
+                                        <button type="submit" name="update_status" value="1" class="btn btn-sm btn-outline-success shadow-sm" title="Mở khóa tài khoản">
                                             <i class="bi bi-unlock"></i> Mở khóa
+                                            <input type="hidden" name="status" value="active">
                                         </button>
                                     <?php endif; ?>
-                                    <input type="hidden" name="update_status" value="1">
                                 </form>
                             </td>
                         </tr>

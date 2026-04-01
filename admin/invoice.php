@@ -131,14 +131,14 @@ $pageTitle = "In Hóa Đơn #" . $order['id'];
             <div class="col-6 text-end">
                 <div class="invoice-title">HÓA ĐƠN BÁN HÀNG</div>
                 <div class="text-secondary mt-2">
-                    Mã đơn: <strong>#ORD-<?php echo str_pad(e($order['id']), 5, "0", STR_PAD_LEFT); ?></strong><br>
+                    Mã đơn: <strong>#ORD-<?php echo str_pad($order['id'], 5, "0", STR_PAD_LEFT); ?></strong><br>
                     Ngày lập: <?php echo date('d/m/Y H:i', strtotime($order['created_at'])); ?>
                 </div>
                 <!-- Giả lập in mã vạch (Barcode bằng font chữ đơn giản hoặc layout CSS) -->
                 <div class="mt-3" style="font-family: monospace; font-size: 24px; letter-spacing: -2px;">
                     |||| || || | || | || |
                 </div>
-                <div class="small text-secondary">ORD-<?php echo e($order['id']); ?></div>
+                <div class="small text-secondary">ORD-<?php echo $order['id']; ?></div>
             </div>
         </div>
 
@@ -149,11 +149,11 @@ $pageTitle = "In Hóa Đơn #" . $order['id'];
                 <table class="table table-borderless table-sm mb-0">
                     <tr>
                         <td width="150" class="text-secondary">Họ và tên:</td>
-                        <td class="fw-bold fs-5"><?php echo e($order['customer_name']); ?></td>
+                        <td class="fw-bold fs-5"><?php echo htmlspecialchars($order['customer_name']); ?></td>
                     </tr>
                     <tr>
                         <td class="text-secondary">Số điện thoại:</td>
-                        <td><?php echo e($order['customer_phone']); ?></td>
+                        <td><?php echo htmlspecialchars($order['customer_phone']); ?></td>
                     </tr>
                     <tr>
                         <td class="text-secondary">Địa chỉ:</td>
@@ -161,7 +161,7 @@ $pageTitle = "In Hóa Đơn #" . $order['id'];
                     </tr>
                     <tr>
                         <td class="text-secondary">Phương thức TT:</td>
-                        <td>Thanh toán khi nhận hàng (<?php echo e($order['payment_method']); ?>)</td>
+                        <td>Thanh toán khi nhận hàng (<?php echo htmlspecialchars($order['payment_method']); ?>)</td>
                     </tr>
                 </table>
             </div>
@@ -188,8 +188,8 @@ $pageTitle = "In Hóa Đơn #" . $order['id'];
                 ?>
                 <tr>
                     <td><?php echo $stt++; ?></td>
-                    <td class="fw-bold"><?php echo e($item['product_name']); ?></td>
-                    <td class="text-center"><?php echo (int)$item['quantity']; ?></td>
+                    <td class="fw-bold"><?php echo htmlspecialchars($item['product_name']); ?></td>
+                    <td class="text-center"><?php echo $item['quantity']; ?></td>
                     <td class="text-end"><?php echo number_format($item['price'], 0, ',', '.'); ?>₫</td>
                     <td class="text-end"><?php echo number_format($lineTotal, 0, ',', '.'); ?>₫</td>
                 </tr>

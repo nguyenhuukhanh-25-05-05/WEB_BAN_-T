@@ -6,9 +6,6 @@ $error = '';
 $redirect = $_GET['redirect'] ?? 'index.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!verify_csrf_token()) {
-        die("Yêu cầu không hợp lệ (CSRF Token mismatch)");
-    }
     $email_or_user = $_POST['email_or_user'] ?? '';
     $password = $_POST['password'] ?? '';
 
@@ -66,7 +63,7 @@ include 'includes/header.php';
                     </div>
 
                     <?php if ($error): ?>
-                        <div class="alert alert-danger glass-badge border-danger text-danger mb-4"><?php echo e($error); ?></div>
+                        <div class="alert alert-danger glass-badge border-danger text-danger mb-4"><?php echo $error; ?></div>
                     <?php endif; ?>
 
                     <?php if (isset($_GET['error']) && $_GET['error'] == 'no_admin'): ?>
@@ -74,7 +71,6 @@ include 'includes/header.php';
                     <?php endif; ?>
 
                     <form action="login.php?redirect=<?php echo urlencode($redirect); ?>" method="POST">
-                        <input type="hidden" name="csrf_token" value="<?php echo get_csrf_token(); ?>">
                         <div class="mb-4">
                             <label class="form-label text-white small fw-bold">Email hoặc Username *</label>
                             <input type="text" name="email_or_user" class="form-control btn-premium-glass py-3 px-4" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff !important;" placeholder="Nhập email hoặc admin" required>

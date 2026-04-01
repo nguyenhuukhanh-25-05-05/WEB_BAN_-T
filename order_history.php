@@ -46,7 +46,7 @@ include 'includes/header.php';
                         <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
                             <i class="bi bi-person"></i>
                         </div>
-                        <h4 class="fw-bold mb-1"><?php echo e($_SESSION['user_fullname']); ?></h4>
+                        <h4 class="fw-bold mb-1"><?php echo htmlspecialchars($_SESSION['user_fullname']); ?></h4>
                         <p class="text-secondary small mb-4">Thành viên NHK Mobile</p>
                         <div class="list-group list-group-flush text-start border-0">
                             <a href="#" class="list-group-item list-group-item-action border-0 py-3 rounded-3 mb-1"><i class="bi bi-person-badge me-2"></i> Thông tin tài khoản</a>
@@ -77,7 +77,7 @@ include 'includes/header.php';
                                 // Chuyển đổi trạng thái sang nhãn đẹp mắt
                                 $statusClass = 'bg-secondary text-white';
                                 $statusValue = $order['status'];
-                                $statusText = e($statusValue);
+                                $statusText = htmlspecialchars($statusValue);
                                 
                                 // Dùng mảng map để linh hoạt hơn (hỗ trợ cả tiếng Việt hoa/thường)
                                 $statusLower = mb_strtolower($statusValue, 'UTF-8');
@@ -120,7 +120,7 @@ include 'includes/header.php';
                                 <div class="card order-card overflow-hidden">
                                     <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4 d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 class="mb-0 fw-bold">Đơn hàng #<?php echo e($order['id']); ?></h6>
+                                            <h6 class="mb-0 fw-bold">Đơn hàng #<?php echo $order['id']; ?></h6>
                                             <small class="text-secondary"><?php echo date('d/m/Y H:i', strtotime($order['created_at'])); ?></small>
                                         </div>
                                         <span class="status-badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
@@ -129,12 +129,12 @@ include 'includes/header.php';
                                         <div class="row border-bottom pb-3 mb-3">
                                             <div class="col-md-6">
                                                 <small class="text-muted d-block">Người nhận:</small>
-                                                <strong><?php echo e($order['customer_name']); ?></strong> 
-                                                <span class="text-secondary">(<?php echo e($order['customer_phone']); ?>)</span>
+                                                <strong><?php echo htmlspecialchars($order['customer_name']); ?></strong> 
+                                                <span class="text-secondary">(<?php echo htmlspecialchars($order['customer_phone']); ?>)</span>
                                             </div>
                                             <div class="col-md-6 text-md-end mt-2 mt-md-0">
                                                 <small class="text-muted d-block">Phương thức:</small>
-                                                <span class="badge bg-light text-dark border"><?php echo e($order['payment_method'] ?? 'Thanh toán trực tiếp'); ?></span>
+                                                <span class="badge bg-light text-dark border"><?php echo htmlspecialchars($order['payment_method'] ?? 'Thanh toán trực tiếp'); ?></span>
                                                 <?php if(isset($order['is_installment']) && $order['is_installment']): ?>
                                                     <span class="badge bg-primary text-white border-0 fw-bold px-2 py-1 ms-1" style="font-size: 0.75rem;">TRẢ GÓP 0%</span>
                                                 <?php endif; ?>
@@ -145,10 +145,10 @@ include 'includes/header.php';
                                         <div class="order-items-list mb-3">
                                             <?php foreach ($items as $item): ?>
                                             <div class="d-flex align-items-center mb-2">
-                                                <img src="assets/images/<?php echo e($item['image']); ?>" class="rounded-3 border me-3" style="width: 50px; height: 50px; object-fit: contain; padding: 2px;" onerror="this.src='https://placehold.co/100x100?text=SP'">
+                                                <img src="assets/images/<?php echo $item['image']; ?>" class="rounded-3 border me-3" style="width: 50px; height: 50px; object-fit: contain; padding: 2px;" onerror="this.src='https://placehold.co/100x100?text=SP'">
                                                 <div class="flex-grow-1">
-                                                    <h6 class="mb-0 fs-6"><?php echo e($item['product_name']); ?></h6>
-                                                    <small class="text-secondary">x<?php echo (int)$item['quantity']; ?></small>
+                                                    <h6 class="mb-0 fs-6"><?php echo htmlspecialchars($item['product_name']); ?></h6>
+                                                    <small class="text-secondary">x<?php echo $item['quantity']; ?></small>
                                                 </div>
                                                 <div class="text-end fw-bold text-danger">
                                                     <?php echo number_format($item['price'], 0, ',', '.'); ?>đ

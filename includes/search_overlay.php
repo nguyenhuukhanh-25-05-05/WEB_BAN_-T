@@ -41,10 +41,10 @@
 .search-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    z-index: 10000;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    z-index: 9999;
     overflow-y: auto;
 }
 
@@ -56,25 +56,20 @@
 
 .btn-close-search {
     position: absolute;
-    top: 40px;
+    top: 30px;
     right: 40px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.1);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: none;
+    border: none;
+    color: #86868b;
+    font-size: 2rem;
     cursor: pointer;
-    transition: var(--transition-smooth);
-    z-index: 10001;
+    transition: all 0.3s;
+    z-index: 10000;
 }
 
 .btn-close-search:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: rotate(90deg) scale(1.1);
+    color: #fff;
+    transform: rotate(90deg);
 }
 
 .form-control-minimal {
@@ -101,32 +96,32 @@
     width: 100%;
 }
 
+/* Suggestion Cards */
 .suggestion-card {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-lg);
-    padding: 20px;
+    border-radius: 20px;
+    padding: 15px;
     display: flex;
     align-items: center;
     gap: 20px;
     text-decoration: none !important;
-    transition: var(--transition-smooth);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .suggestion-card:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    transform: translateY(-5px);
 }
 
 .suggestion-img {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     object-fit: contain;
-    background: #fff;
-    padding: 10px;
-    border-radius: var(--radius-md);
+    background: #000;
+    padding: 8px;
+    border-radius: 12px;
 }
 
 .suggestion-info {
@@ -135,30 +130,15 @@
 
 .suggestion-name {
     color: #fff;
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 4px;
+    font-weight: 600;
+    margin-bottom: 2px;
 }
 
 .suggestion-price {
     color: var(--apple-blue);
-    font-weight: 600;
-    font-size: 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
 }
 
-.tracking-widest { letter-spacing: 0.25em; }
-
-.btn-premium-glass {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.8);
-    transition: var(--transition-smooth);
-}
-
-.btn-premium-glass:hover {
-    background: var(--apple-blue);
-    color: #fff;
-    border-color: var(--apple-blue);
-    transform: translateY(-3px);
-}
+.tracking-widest { letter-spacing: 0.2em; }
 </style>
