@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="<?php echo $basePath; ?>assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo $basePath; ?>assets/css/style.css?v=<?php echo time(); ?>">
 
     <script>
         const BASE_PATH = "<?php echo $basePath; ?>";
@@ -24,8 +24,10 @@
     <nav class="navbar-minimal">
         <div class="container-wide nav-content">
             <a href="<?php echo $basePath; ?>index.php" class="nav-brand d-flex align-items-center">
-                <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="32" alt="Logo" class="me-2">
-                <span class="fw-800 fs-4 tracking-tight text-main d-none d-sm-block">NHK MOBILE</span>
+                <div class="logo-box me-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; border: 2px solid var(--text-main); border-radius: 8px;">
+                    <span class="fw-900 fs-6">NHK</span>
+                </div>
+                <span class="fw-800 fs-6 tracking-tight text-main d-none d-sm-block">MOBILE</span>
             </a>
 
             <ul class="nav-links mb-0">

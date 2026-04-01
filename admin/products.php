@@ -237,7 +237,7 @@ if (isset($_GET['edit'])) {
                                     <input type="checkbox" name="selected_ids[]" value="<?php echo $p['id']; ?>" class="form-check-input select-item">
                                 </td>
                                 <td>
-                                    <img src="../assets/images/<?php echo $p['image']; ?>" class="product-img-admin rounded-3" onerror="this.src='https://placehold.co/60'">
+                                    <img src="../assets/images/<?php echo $p['image']; ?>" class="product-img-admin rounded-2 shadow-sm" style="width: 44px; height: 44px; object-fit: contain; background: #fff;" onerror="this.src='https://placehold.co/44'">
                                 </td>
                             <td>
                                 <div class="fw-bold d-flex align-items-center gap-2">
