@@ -23,11 +23,12 @@
 <body>
     <nav class="navbar-minimal">
         <div class="container-wide nav-content">
-            <a href="<?php echo $basePath; ?>index.php" class="nav-brand">
-                <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="28" alt="Logo">
+            <a href="<?php echo $basePath; ?>index.php" class="nav-brand d-flex align-items-center">
+                <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="32" alt="Logo" class="me-2">
+                <span class="fw-800 fs-4 tracking-tight text-main d-none d-sm-block">NHK MOBILE</span>
             </a>
 
-            <ul class="nav-links">
+            <ul class="nav-links mb-0">
                 <li><a href="<?php echo $basePath; ?>product.php" class="nav-link">Điện thoại</a></li>
                 <li><a href="<?php echo $basePath; ?>warranty.php" class="nav-link">Bảo hành</a></li>
                 <li><a href="<?php echo $basePath; ?>news.php" class="nav-link">Tin tức</a></li>
@@ -36,16 +37,16 @@
             <div class="nav-actions">
                 <a href="#" id="searchTrigger" class="nav-icon"><i class="bi bi-search"></i></a>
                 <a href="<?php echo $basePath; ?>cart.php" class="nav-icon position-relative">
-                    <i class="bi bi-bag"></i>
+                    <i class="bi bi-bag-heart"></i>
                     <?php if(isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" style="font-size: 0.6rem;">
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" style="font-size: 0.65rem; padding: 0.35em 0.5em;">
                             <?php echo count($_SESSION['cart']); ?>
                         </span>
                     <?php endif; ?>
                 </a>
                 
                 <?php if (isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
-                    <a href="#accountOffcanvas" role="button" class="nav-icon" data-bs-toggle="offcanvas"><i class="bi bi-person"></i></a>
+                    <a href="#accountOffcanvas" role="button" class="nav-icon" data-bs-toggle="offcanvas"><i class="bi bi-person-circle"></i></a>
                 <?php else: ?>
                     <a href="<?php echo $basePath; ?>login.php" class="nav-icon"><i class="bi bi-person"></i></a>
                 <?php endif; ?>

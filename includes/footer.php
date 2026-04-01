@@ -2,60 +2,74 @@
         <div class="container-wide">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="32" alt="Logo">
-                    <p>NHK Mobile là đại lý ủy quyền chính thức của Apple tại Việt Nam, mang đến những trải nghiệm công nghệ đỉnh cao và dịch vụ hậu mãi chuẩn 5 sao.</p>
+                    <div class="d-flex align-items-center mb-4">
+                        <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="32" alt="Logo" class="me-2 brightness-0 invert">
+                        <span class="fw-800 fs-4 tracking-tight text-white">NHK MOBILE</span>
+                    </div>
+                    <p>Đại lý ủy quyền chính thức của Apple tại Việt Nam. Chúng tôi cam kết mang đến những siêu phẩm công nghệ với dịch vụ hậu mãi chuẩn 5 sao.</p>
                     <div class="d-flex gap-3 mt-4">
-                        <a href="#" class="nav-icon"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="nav-icon"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="nav-icon"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="nav-icon bg-dark border border-secondary"><i class="bi bi-facebook text-white"></i></a>
+                        <a href="#" class="nav-icon bg-dark border border-secondary"><i class="bi bi-instagram text-white"></i></a>
+                        <a href="#" class="nav-icon bg-dark border border-secondary"><i class="bi bi-youtube text-white"></i></a>
                     </div>
                 </div>
                 
                 <div class="footer-col">
-                    <h4 class="footer-title">Sản phẩm</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">iPhone</a></li>
-                        <li><a href="#">iPad</a></li>
-                        <li><a href="#">MacBook</a></li>
-                        <li><a href="#">Phụ kiện</a></li>
+                    <h4 class="footer-title">Khám phá</h4>
+                    <ul class="footer-links p-0">
+                        <li><a href="product.php?category=Apple">iPhone</a></li>
+                        <li><a href="product.php?category=Samsung">Samsung</a></li>
+                        <li><a href="product.php">Tất cả điện thoại</a></li>
+                        <li><a href="news.php">Tin tức công nghệ</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-col">
-                    <h4 class="footer-title">Hỗ trợ</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">Bảo hành</a></li>
-                        <li><a href="#">Vận chuyển</a></li>
-                        <li><a href="#">Thanh toán</a></li>
+                    <h4 class="footer-title">Dịch vụ</h4>
+                    <ul class="footer-links p-0">
+                        <li><a href="warranty.php">Chính sách bảo hành</a></li>
+                        <li><a href="#">Vận chuyển & Giao hàng</a></li>
+                        <li><a href="#">Hình thức thanh toán</a></li>
                         <li><a href="#">Câu hỏi thường gặp</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-col">
-                    <h4 class="footer-title">Liên hệ</h4>
-                    <ul class="footer-links">
-                        <li><a href="#"><i class="bi bi-geo-alt me-2"></i> 123 Đường ABC, Hà Nội</a></li>
-                        <li><a href="#"><i class="bi bi-telephone me-2"></i> 1800 1234</a></li>
-                        <li><a href="#"><i class="bi bi-envelope me-2"></i> support@nhkmobile.vn</a></li>
+                    <h4 class="footer-title">Kết nối</h4>
+                    <ul class="footer-links p-0">
+                        <li class="text-muted small mb-3"><i class="bi bi-geo-alt me-2 text-primary"></i> 123 Đường Công Nghệ, Quận 1, TP.HCM</li>
+                        <li class="text-muted small mb-3"><i class="bi bi-telephone me-2 text-primary"></i> 1800 1234 (Miễn phí)</li>
+                        <li class="text-muted small mb-3"><i class="bi bi-envelope me-2 text-primary"></i> contact@nhkmobile.vn</li>
                     </ul>
                 </div>
             </div>
             
             <div class="footer-bottom-new">
-                <p>&copy; 2026 NHK Mobile. All rights reserved.</p>
+                <p class="mb-0">&copy; 2026 NHK Mobile. Thiết kế bởi NHK Team.</p>
                 <div class="d-flex gap-4">
-                    <a href="#">Chính sách bảo mật</a>
-                    <a href="#">Điều khoản sử dụng</a>
+                    <a href="#" class="text-decoration-none">Quyền riêng tư</a>
+                    <a href="#" class="text-decoration-none">Điều khoản</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Search Overlay (Logic vẫn giữ nguyên) -->
+    <!-- Search Overlay -->
     <?php include 'includes/search_overlay.php'; ?>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo $basePath; ?>assets/js/search-overlay.js"></script>
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('.navbar-minimal');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+    </script>
 </body>
 </html>
