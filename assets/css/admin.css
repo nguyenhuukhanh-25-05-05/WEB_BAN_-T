@@ -1,189 +1,170 @@
 /* 
-   PREMIUM ADMIN DESIGN SYSTEM
-   Inspired by modern SaaS dashboards with a clean, minimalist aesthetic.
+   NHK MOBILE - ADMIN LUXURY DASHBOARD 2026
+   Style: Clean, Modern, Professional, High Performance
 */
+
 :root {
-    --bs-body-font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    --admin-bg: #f5f5f7;
-    --sidebar-bg: #1d1d1f;
-    --accent-color: #0071e3;
-    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    --border-color: #d2d2d7;
+    --admin-primary: #007AFF;
+    --admin-bg: #F8F9FA;
+    --admin-sidebar: #FFFFFF;
+    --admin-card: #FFFFFF;
+    --admin-text: #1D1D1F;
+    --admin-secondary: #86868B;
+    --admin-border: rgba(0, 0, 0, 0.08);
 }
 
 body {
     background-color: var(--admin-bg);
-    color: #1d1d1f;
-    -webkit-font-smoothing: antialiased;
+    color: var(--admin-text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    overflow-x: hidden;
 }
 
-/* 
-   SIDEBAR - SLEEK DARK DESIGN
-*/
+/* --- Sidebar Upgrade --- */
 .sidebar {
-    width: 260px;
-    background: var(--sidebar-bg);
-    min-height: 100vh;
+    width: 280px;
+    height: 100vh;
     position: fixed;
-    left: 0;
     top: 0;
-    padding: 30px 20px;
-    z-index: 1000;
-}
-
-.main-content {
-    margin-left: 260px;
-    padding: 40px;
+    left: 0;
+    background: var(--admin-sidebar);
+    border-right: 1px solid var(--admin-border);
+    padding: 32px 20px;
+    z-index: 1001;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-link-admin {
-    color: #a1a1a6;
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 14px 20px;
+    color: var(--admin-secondary);
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: 14px;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+    text-decoration: none !important;
 }
 
 .nav-link-admin i {
-    font-size: 18px;
+    font-size: 20px;
+    margin-right: 14px;
 }
 
 .nav-link-admin:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
+    background: #F2F2F7;
+    color: var(--admin-primary);
+    transform: translateX(4px);
 }
 
 .nav-link-admin.active {
-    background: var(--accent-color);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+    background: var(--admin-primary);
+    color: #FFFFFF;
+    box-shadow: 0 8px 20px rgba(0, 122, 255, 0.2);
 }
 
-/* 
-   STAT CARDS - SOFT SHADOWS & ROUNDED
-*/
-.stat-card, .content-card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 30px;
-    border: 1px solid rgba(0, 0, 0, 0.02);
-    box-shadow: var(--card-shadow);
-    height: 100%;
-    transition: transform 0.2s;
+/* --- Main Content --- */
+.main-content {
+    margin-left: 280px;
+    padding: 48px;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+@media (max-width: 992px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.show { transform: translateX(0); }
+    .main-content { margin-left: 0; padding: 32px 20px; }
+}
+
+/* --- Stat Cards --- */
+.stat-card {
+    background: var(--admin-card);
+    border-radius: 24px;
+    padding: 32px;
+    border: 1px solid var(--admin-border);
+    transition: all 0.3s;
 }
 
 .stat-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
 }
 
-.icon-box {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
+.stat-label {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--admin-secondary);
+    margin-bottom: 12px;
 }
 
-/* 
-   TABLES & CONTENT
-*/
-.table {
-    --bs-table-hover-bg: rgba(0, 113, 227, 0.02);
+.stat-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--admin-text);
+}
+
+/* --- Data Table Premium --- */
+.table-container {
+    background: #FFFFFF;
+    border-radius: 24px;
+    padding: 32px;
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 }
 
 .table thead th {
-    background-color: #f5f5f7;
-    border-bottom: 2px solid #f2f2f2;
-    color: #86868b;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    padding: 15px;
+    background: #FBFBFD;
+    padding: 18px 24px;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--admin-secondary);
+    border-bottom: 1px solid var(--admin-border);
 }
 
 .table tbody td {
-    padding: 18px 15px;
-    border-bottom: 1px solid #f2f2f2;
-    font-size: 14px;
+    padding: 20px 24px;
+    font-size: 15px;
+    border-bottom: 1px solid var(--admin-border);
+    vertical-align: middle;
 }
 
-.product-img-admin {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 10px;
-    background: #fbfbfd;
-    border: 1px solid #f2f2f2;
+/* --- Badges --- */
+.badge-status {
+    padding: 8px 16px;
+    border-radius: 980px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
-/* CUSTOM BUTTONS */
-.btn-primary {
-    background-color: var(--accent-color);
-    border: none;
-    border-radius: 10px;
-    padding: 10px 24px;
-    font-weight: 600;
-}
+.badge-completed { background: #E1F8EB; color: #1DB954; }
+.badge-pending { background: #FFF4E5; color: #FF9500; }
+.badge-cancelled { background: #FFE5E5; color: #FF3B30; }
 
-.btn-light {
-    background-color: #f5f5f7;
-    border: 1px solid #d2d2d7;
-    border-radius: 10px;
-}
-
-/* RESPONSIVE */
-@media (max-width: 991.98px) {
-    .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        box-shadow: 10px 0 30px rgba(0,0,0,0.1);
-    }
-    .sidebar.show {
-        transform: translateX(0);
-    }
-    .main-content {
-        margin-left: 0;
-        padding: 20px;
-        padding-top: 80px;
-    }
-    .mobile-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 60px;
-        background: #fff;
-        display: flex !important;
-        align-items: center;
-        padding: 0 20px;
-        z-index: 1010;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-}
-
+/* --- Mobile Elements --- */
 .mobile-header {
-    display: none;
+    height: 64px;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--admin-border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .sidebar-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 999;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
     display: none;
 }
 
-.sidebar-overlay.show {
-    display: block;
-}
+.sidebar-overlay.show { display: block; }
