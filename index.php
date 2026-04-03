@@ -18,9 +18,9 @@ include 'includes/header.php';
         <div class="container-wide">
             <div class="hero-grid">
                 <div class="hero-text">
-                    <span class="hero-badge">Thế hệ mới 2026</span>
+                    <span class="hero-badge">Thế hệ AI 2026</span>
                     <h1 class="display-large">iPhone 17 Pro.<br><span class="text-gradient">Đỉnh cao trí tuệ.</span></h1>
-                    <p class="hero-desc">Sức mạnh vượt bậc từ chip A19 Pro. Trải nghiệm hệ sinh thái AI toàn cầu ngay trên tay bạn với thiết kế titan siêu bền.</p>
+                    <p class="hero-desc">Sức mạnh vượt bậc từ chip A19 Pro. Trải nghiệm hệ sinh thái AI toàn cầu ngay trên tay bạn với thiết kế titan siêu nhẹ và camera AI đột phá.</p>
                     <div class="d-flex gap-3">
                         <a href="product.php" class="btn-main btn-primary">Mua ngay</a>
                         <a href="product.php?category=Apple" class="btn-main btn-outline">Tìm hiểu thêm</a>
@@ -47,6 +47,9 @@ include 'includes/header.php';
                     <div class="product-card-new">
                         <a href="product-detail.php?id=<?php echo $p['id']; ?>">
                             <div class="product-img-box">
+                                <?php if($p['is_featured']): ?>
+                                    <span class="badge-hot">Hot Deal</span>
+                                <?php endif; ?>
                                 <img src="assets/images/<?php echo $p['image']; ?>" alt="<?php echo $p['name']; ?>"
                                     onerror="this.src='https://placehold.co/300x400/f5f5f7/1d1d1f?text=Phone'">
                             </div>
