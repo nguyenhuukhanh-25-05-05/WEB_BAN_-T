@@ -83,6 +83,13 @@ include 'includes/header.php';
 
                         <!-- Result Display Area -->
                         <div id="imeiResult" class="mt-4 animate-fade-in" style="display: none;"></div>
+
+                        <div class="mt-5 text-center pt-3 border-top border-secondary border-opacity-25">
+                            <p class="small mb-2" style="color: rgba(255,255,255,0.5) !important;">Bạn đang tìm kiếm đơn hàng?</p>
+                            <a href="track_order.php" class="text-primary-gradient small fw-bold text-decoration-none">
+                                <i class="bi bi-box-seam me-1"></i> Tra cứu Đơn hàng tại đây
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

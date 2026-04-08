@@ -91,7 +91,7 @@ include 'includes/header.php';
                                     case 'đã duyệt':
                                     case 'approved':
                                         $statusClass = 'bg-info text-white';
-                                        $statusText = '📦 Đang lấy hàng';
+                                        $statusText = '📦 Đã duyệt';
                                         break;
                                     case 'đang giao':
                                     case 'shipping':
@@ -101,7 +101,7 @@ include 'includes/header.php';
                                     case 'hoàn thành':
                                     case 'completed':
                                         $statusClass = 'bg-success text-white';
-                                        $statusText = '✅ Thành công';
+                                        $statusText = '✅ Hoàn thành';
                                         break;
                                     case 'hủy':
                                     case 'đã hủy':

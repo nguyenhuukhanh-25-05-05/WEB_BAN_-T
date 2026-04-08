@@ -84,6 +84,9 @@
                     <a href="<?php echo $basePath; ?>warranty.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
                         <i class="bi bi-shield-check me-3 fs-5"></i> Tra cứu Bảo hành
                     </a>
+                    <a href="<?php echo $basePath; ?>track_order.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
+                        <i class="bi bi-box-seam me-3 fs-5"></i> Tra cứu Đơn hàng
+                    </a>
                     <a href="<?php echo $basePath; ?>news.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
                         <i class="bi bi-newspaper me-3 fs-5"></i> Tin tức Công nghệ
                     </a>

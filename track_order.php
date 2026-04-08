@@ -134,8 +134,91 @@ include 'includes/header.php';
                                 elseif (str_contains($s, 'hủy') || str_contains($s, 'cancelled')) { $statusClass = 'bg-danger text-white'; $statusText = '❌ Đã hủy'; }
                             ?>
                             <span class="status-pill <?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
+                    </div>
+
+                    <!-- Order Timeline (Premium UI) -->
+                    <div class="px-4 pb-4">
+                        <div class="order-timeline d-flex justify-content-between position-relative mt-4 mb-5">
+                            <div class="timeline-line"></div>
+                            <?php
+                                $steps = [
+                                    ['label' => 'Đã đặt', 'icon' => 'bi-cart-check', 'match' => 'chờ'],
+                                    ['label' => 'Đã duyệt', 'icon' => 'bi-file-earmark-check', 'match' => 'đã duyệt'],
+                                    ['label' => 'Đang giao', 'icon' => 'bi-truck', 'match' => 'đang giao'],
+                                    ['label' => 'Hoàn thành', 'icon' => 'bi-house-check', 'match' => 'hoàn thành']
+                                ];
+                                
+                                $currentStep = 0;
+                                $s = mb_strtolower($order['status'], 'UTF-8');
+                                if (str_contains($s, 'hoàn thành')) $currentStep = 3;
+                                elseif (str_contains($s, 'đang giao')) $currentStep = 2;
+                                elseif (str_contains($s, 'đã duyệt')) $currentStep = 1;
+                                
+                                // Nếu bị hủy thì không hiện timeline bình thường
+                                $isCancelled = str_contains($s, 'hủy');
+                            ?>
+
+                            <?php if (!$isCancelled): ?>
+                                <?php foreach ($steps as $index => $step): ?>
+                                    <div class="timeline-step <?php echo $index <= $currentStep ? 'active' : ''; ?> text-center position-relative z-1" style="width: 25%;">
+                                        <div class="step-icon mx-auto mb-2 d-flex align-items-center justify-content-center">
+                                            <i class="bi <?php echo $step['icon']; ?>"></i>
+                                        </div>
+                                        <span class="step-label d-block fw-bold small"><?php echo $step['label']; ?></span>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="w-100 text-center py-3 bg-danger bg-opacity-10 rounded-4">
+                                    <p class="text-danger fw-bold mb-0"><i class="bi bi-x-octagon-fill me-2"></i> Đơn hàng này đã bị hủy bỏ</p>
+                                </div>
+                            <?php endif; ?>
                         </div>
-                        <div class="card-body p-4 pt-0">
+                    </div>
+
+                    <style>
+                    .order-timeline .timeline-line {
+                        position: absolute;
+                        top: 20px;
+                        left: 12.5%;
+                        right: 12.5%;
+                        height: 4px;
+                        background: #eee;
+                        z-index: 0;
+                    }
+                    .timeline-step .step-icon {
+                        width: 44px;
+                        height: 44px;
+                        background: #eee;
+                        border-radius: 50%;
+                        color: #aaa;
+                        font-size: 1.25rem;
+                        border: 4px solid #fff;
+                        transition: all 0.4s;
+                    }
+                    .timeline-step.active .step-icon {
+                        background: var(--primary);
+                        color: #fff;
+                    }
+                    .timeline-step.active .step-label {
+                        color: var(--primary);
+                    }
+                    .timeline-step.active ~ .timeline-step .step-icon {
+                        background: #eee;
+                    }
+                    /* Line coloring */
+                    .timeline-line::before {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        height: 100%;
+                        background: var(--primary);
+                        width: <?php echo ($currentStep / 3) * 100; ?>%;
+                        transition: width 1s ease-in-out;
+                    }
+                    </style>
+
+                    <div class="card-body p-4 pt-0">
                             <hr class="opacity-10 mb-4">
                             
                             <div class="row g-4 mb-4">

@@ -129,33 +129,34 @@ $basePath = "../";
                             <td>
                                 <!-- Màu sắc hiển thị badge theo trạng thái -->
                                 <?php 
-                                    $badgeClass = 'warning';
-                                    if ($o['status'] == 'Đã duyệt' || $o['status'] == 'Completed') $badgeClass = 'success';
-                                    if ($o['status'] == 'Đã hủy' || $o['status'] == 'Cancelled') $badgeClass = 'danger';
+                                    $badgeClass = 'bg-warning text-dark';
+                                    $s = mb_strtolower($o['status'], 'UTF-8');
+                                    if (str_contains($s, 'đã duyệt')) $badgeClass = 'bg-info text-white';
+                                    elseif (str_contains($s, 'đang giao')) $badgeClass = 'bg-primary text-white';
+                                    elseif (str_contains($s, 'hoàn thành')) $badgeClass = 'bg-success text-white';
+                                    elseif (str_contains($s, 'hủy')) $badgeClass = 'bg-danger text-white';
                                 ?>
-                                <span class="badge bg-<?php echo $badgeClass; ?>-subtle text-dark border fw-normal px-3 py-2 rounded-pill">
+                                <span class="badge <?php echo $badgeClass; ?> border-0 px-3 py-2 rounded-pill small">
                                     <?php echo $o['status']; ?>
                                 </span>
                             </td>
                             <td class="text-end">
                                 <!-- Nút In Hóa Đơn -->
-                                <a href="invoice.php?order_id=<?php echo $o['id']; ?>" target="_blank" class="btn btn-sm btn-light border p-2 text-primary shadow-sm me-1" title="In Hóa Đơn (PDF)">
+                                <a href="invoice.php?order_id=<?php echo $o['id']; ?>" target="_blank" class="btn btn-sm btn-light border p-2 text-primary shadow-sm me-2" title="In Hóa Đơn">
                                     <i class="bi bi-printer"></i>
                                 </a>
                                 
-                                <!-- FORM PHP: Gửi trạng thái mới lên server -->
-                                <form action="orders.php" method="POST" style="display: inline-block;">
+                                <!-- Form Cập nhật trạng thái bằng Dropdown -->
+                                <form action="orders.php" method="POST" class="d-inline-flex gap-2 align-items-center">
                                     <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
-                                    <!-- Nút Duyệt / Hoàn thành -->
-                                    <button type="submit" name="update_status" value="1" class="btn btn-sm btn-light border p-2 text-success shadow-sm" title="Duyệt đơn hàng">
-                                        <i class="bi bi-check-circle"></i>
-                                        <input type="hidden" name="status" value="Đã duyệt">
-                                    </button>
-                                    <!-- Nút Hủy đơn -->
-                                    <button type="submit" name="update_status" value="1" class="btn btn-sm btn-light border p-2 text-danger shadow-sm ms-1" title="Hủy / Từ chối đơn">
-                                        <i class="bi bi-x-circle"></i>
-                                        <input type="hidden" name="status" value="Đã hủy">
-                                    </button>
+                                    <select name="status" class="form-select form-select-sm border-secondary-subtle rounded-3" style="width: auto;" onchange="this.form.submit()">
+                                        <option value="Chờ duyệt" <?php if($o['status'] == 'Chờ duyệt') echo 'selected'; ?>>Chờ duyệt</option>
+                                        <option value="Đã duyệt" <?php if($o['status'] == 'Đã duyệt') echo 'selected'; ?>>Đã duyệt</option>
+                                        <option value="Đang giao" <?php if($o['status'] == 'Đang giao') echo 'selected'; ?>>Đang giao</option>
+                                        <option value="Hoàn thành" <?php if($o['status'] == 'Hoàn thành') echo 'selected'; ?>>Hoàn thành</option>
+                                        <option value="Đã hủy" <?php if($o['status'] == 'Đã hủy') echo 'selected'; ?>>Đã hủy</option>
+                                    </select>
+                                    <input type="hidden" name="update_status" value="1">
                                 </form>
                             </td>
                         </tr>
