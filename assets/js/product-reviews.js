@@ -1,19 +1,24 @@
 /**
- * NHK MOBILE - PRODUCT REVIEWS HANDLER (JS Separation v1.0)
- * Handles star rating selection, fetching reviews via AJAX, and form submission.
+ * NHK MOBILE - XỬ LÝ ĐÁNH GIÁ SẢN PHẨM (JS v1.0)
+ * Quản lý chọn sao, tải danh sách đánh giá qua AJAX và gửi form đánh giá mới.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Lấy ID sản phẩm từ trường ẩn trên trang chi tiết
     const productIdEl = document.getElementById('product_id');
     if (!productIdEl) return;
     
     const productId = productIdEl.value;
     let currentPage = 1;
-    const limit = 5;
+    const limit = 5; // Số lượng đánh giá mỗi lần tải
     
     const stars = document.querySelectorAll('.rating-star');
     const ratingInput = document.getElementById('rating_val');
     
+    /**
+     * Cập nhật giao diện sao khi người dùng chọn hoặc di chuột.
+     * @param {number} val Số sao (1-5)
+     */
     function updateStars(val) {
         stars.forEach(star => {
             if(parseInt(star.dataset.value) <= val) {
@@ -26,9 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Initial state
+    // Thiết lập trạng thái sao ban đầu (mặc định là 5 sao)
     if (ratingInput) updateStars(parseInt(ratingInput.value) || 5);
     
+    // Gắn sự kiện click cho từng ngôi sao để chọn mức đánh giá
     stars.forEach(star => {
         star.addEventListener('click', (e) => {
             const val = parseInt(e.target.dataset.value);
@@ -37,15 +43,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    /**
+     * Tải danh sách đánh giá từ API backend.
+     * @param {number} page Trang hiện tại cần tải
+     */
     const loadReviews = async (page = 1) => {
         try {
             const res = await fetch(`api/reviews.php?id=${productId}&page=${page}&limit=${limit}`);
             const data = await res.json();
             
             if(data.success) {
-                renderReviews(data.reviews, page === 1);
-                updateMeta(data.meta);
+                renderReviews(data.reviews, page === 1); // Hiển thị đánh giá
+                updateMeta(data.meta); // Cập nhật tổng điểm trung bình
                 
+                // Xử lý nút "Xem thêm"
                 const loadMoreBtn = document.getElementById('load-more-btn');
                 if (loadMoreBtn) {
                     if(data.meta.page < data.meta.total_pages) {
@@ -57,10 +68,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch(err) {
-            console.error("Lỗi tải đánh giá:", err);
+            console.error("Lỗi hệ thống khi tải đánh giá:", err);
         }
     };
     
+    /**
+     * Cập nhật thông số tổng quát (điểm trung bình, số lượng) lên giao diện.
+     * @param {object} meta Chứa avg_rating và total reviews
+     */
     const updateMeta = (meta) => {
         const avgEl = document.getElementById('avg-rating');
         const totalEl = document.getElementById('total-reviews');
@@ -69,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (avgEl) avgEl.innerText = meta.avg_rating.toFixed(1);
         if (totalEl) totalEl.innerText = `${meta.total} đánh giá`;
         
+        // Vẽ lại dải sao vàng trung bình
         if (starRatingEl) {
             let starHtml = '';
             const fullStars = Math.floor(meta.avg_rating);
@@ -81,6 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
+    /**
+     * Hiển thị danh sách đánh giá vào vùng chứa trên trang.
+     * @param {array} reviews Mảng các đối tượng đánh giá
+     * @param {boolean} clear Nếu true, xóa hết danh sách cũ trước khi nạp
+     */
     const renderReviews = (reviews, clear = false) => {
         const list = document.getElementById('reviews-list');
         if (!list) return;
@@ -117,6 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
     
+    // Xử lý khi nhấn nút gửi Form Đánh giá
     const reviewForm = document.getElementById('review-form');
     if (reviewForm) {
         reviewForm.addEventListener('submit', async(e) => {
@@ -127,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (btn) btn.disabled = true;
             if (msg) msg.innerHTML = '<span class="text-primary small">Đang gửi đánh giá...</span>';
             
+            // Thu thập dữ liệu từ Form (bao gồm cả file ảnh nếu có)
             const formData = new FormData();
             formData.append('product_id', parseInt(productId));
             formData.append('rating', parseInt(document.getElementById('rating_val').value));
@@ -144,24 +167,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             try {
+                // Gửi yêu cầu POST lên API
                 const res = await fetch('api/reviews.php', { method: 'POST', body: formData });
                 const data = await res.json();
                 if(data.success) {
                     if (msg) msg.innerHTML = `<span class="text-success small fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Đánh giá đã được gửi!</span>`;
-                    e.target.reset();
-                    updateStars(5);
-                    loadReviews(1);
+                    e.target.reset(); // Xóa sạch form
+                    updateStars(5); // Reset về 5 sao
+                    loadReviews(1); // Tải lại danh sách mới nhất
                 } else {
                     if (msg) msg.innerHTML = `<span class="text-danger small">${data.error}</span>`;
                 }
             } catch(err) {
-                if (msg) msg.innerHTML = `<span class="text-danger small">Lỗi kết nối</span>`;
+                if (msg) msg.innerHTML = `<span class="text-danger small">Lỗi kết nối máy chủ</span>`;
             } finally {
                 if (btn) btn.disabled = false;
             }
         });
     }
 
-    // Load initial reviews
+    // Tự động tải danh sách đánh giá khi người dùng vào trang
     loadReviews();
 });

@@ -366,36 +366,46 @@ if (isset($_GET['edit'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Sidebar Toggle for Mobile
+        // Các phần tử giao diện Sidebar (Mobile)
         const sidebarMenu = document.getElementById('sidebarMenu');
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebarClose = document.getElementById('sidebarClose');
 
+        /**
+         * Hàm bật/tắt menu Sidebar trên thiết bị di động.
+         */
         function toggleSidebar() {
             sidebarMenu.classList.toggle('show');
             sidebarOverlay.classList.toggle('show');
             document.body.classList.toggle('overflow-hidden');
         }
 
+        // Gắn sự kiện cho các nút điều khiển Sidebar
         if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
         if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
         if (sidebarClose) sidebarClose.addEventListener('click', toggleSidebar);
 
-        // Xử lý chọn tất cả checkbox
+        // Xử lý logic chọn hàng loạt (Bulk Selection)
         const selectAll = document.getElementById('selectAll');
         const selectItems = document.querySelectorAll('.select-item');
         const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
 
+        /**
+         * Kiểm tra số lượng mục đã chọn để ẩn/hiện nút "Xóa mục đã chọn".
+         */
         function toggleBulkDeleteBtn() {
             const checkedCount = document.querySelectorAll('.select-item:checked').length;
             if (checkedCount > 0) {
-                bulkDeleteBtn.classList.remove('d-none');
+                bulkDeleteBtn.classList.remove('d-none'); // Hiện nút nếu có ít nhất 1 mục được chọn
             } else {
-                bulkDeleteBtn.classList.add('d-none');
+                bulkDeleteBtn.classList.add('d-none'); // Ẩn nếu không có mục nào
             }
         }
 
+        /**
+         * Sự kiện "Chọn tất cả" checkbox ở đầu bảng.
+         */
         selectAll.addEventListener('change', function() {
             selectItems.forEach(item => {
                 item.checked = this.checked;
@@ -403,13 +413,14 @@ if (isset($_GET['edit'])) {
             toggleBulkDeleteBtn();
         });
 
+        // Gắn sự kiện cho từng checkbox lẻ trong bảng
         selectItems.forEach(item => {
             item.addEventListener('change', function() {
                 // Nếu có 1 item không được chọn thì bỏ check selectAll
                 if (!this.checked) {
                     selectAll.checked = false;
                 } else {
-                    // Nếu tất cả item đều được chọn thì check selectAll
+                    // Nếu tất cả item đều được chọn thì tự động check selectAll
                     const allChecked = Array.from(selectItems).every(i => i.checked);
                     selectAll.checked = allChecked;
                 }

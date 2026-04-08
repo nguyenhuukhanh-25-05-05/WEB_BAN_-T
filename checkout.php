@@ -38,10 +38,12 @@ if (isset($_POST['place_order'])) {
     $isInstallment = isset($_SESSION['is_installment']) && $_SESSION['is_installment'] ? 'true' : 'false';
 
     // Thực hiện chèn đơn hàng vào bảng orders trong Postgres
-    $sqlOrder = "INSERT INTO orders (customer_name, customer_phone, total_price, status, payment_method, user_id, is_installment) VALUES (?, ?, ?, 'Chờ duyệt', ?, ?, ?) RETURNING id";
+    $sqlOrder = "INSERT INTO orders (customer_name, customer_phone, total_price, status, payment_method, user_id, is_installment) VALUES (?, ?, ?, 'Chờ duyệt', ?, ?, ?)";
     $stmtOrder = $pdo->prepare($sqlOrder);
-    $stmtOrder->execute([$name, $phone, $total, $payment, $userId, $isInstallment]);
-    $orderId = $stmtOrder->fetchColumn(); // Lấy ID vừa chèn (Postgres dùng RETURNING)
+    $stmtOrder->execute([$name, $phone, $total, $payment, $userId, $isInstallment ? 'true' : 'false']);
+    
+    // Lấy ID vừa chèn (Postgres dùng lastInsertId cho SERIAL hoặc RETURNING)
+    $orderId = $pdo->lastInsertId();
 
     // Lưu từng sản phẩm trong giỏ vào bảng order_items
     $sqlItem = "INSERT INTO order_items (order_id, product_id, product_name, price, quantity) VALUES (?, ?, ?, ?, ?)";
@@ -49,6 +51,10 @@ if (isset($_POST['place_order'])) {
     foreach ($cartItems as $pid => $item) {
         $stmtItem->execute([$orderId, $pid, $item['name'], $item['price'], $item['qty']]);
     }
+    
+    // Lưu thông tin đơn vừa đặt vào session để trang thành công có thể hiển thị/tra cứu
+    $_SESSION['last_order_id'] = $orderId;
+    $_SESSION['last_order_phone'] = $phone;
     
     // Sau khi lưu đơn thành công, xóa sạch giỏ hàng trong Session và Database
     unset($_SESSION['cart']);
@@ -95,11 +101,11 @@ include 'includes/header.php';
                             </div>
 
                             <div class="d-flex flex-column flex-md-row gap-3 justify-content-center mt-2">
-                                <a href="order_history.php" class="btn-main btn-primary px-5 py-3 rounded-pill fw-700">
-                                    <i class="bi bi-receipt me-2"></i>Xem đơn hàng
+                                <a href="track_order.php?order_id=<?php echo $_SESSION['last_order_id']; ?>&phone=<?php echo urlencode($_SESSION['last_order_phone'] ?? ''); ?>" class="btn-main btn-primary px-5 py-3 rounded-pill fw-700 shadow">
+                                    <i class="bi bi-geo-alt me-2"></i>Theo dõi đơn hàng
                                 </a>
-                                <a href="index.php" class="btn-main btn-outline px-5 py-3 rounded-pill fw-700 text-dark">
-                                    Quay về trang chủ
+                                <a href="index.php" class="btn-main btn-outline px-5 py-3 rounded-pill fw-700 text-dark border-dark">
+                                    <i class="bi bi-house me-2"></i>Quay về trang chủ
                                 </a>
                             </div>
                         </div>
