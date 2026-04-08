@@ -67,7 +67,6 @@ if (isset($_GET['edit'])) {
     $stmtEdit->execute([$_GET['edit']]);
     $editData = $stmtEdit->fetch();
 }
-?>
 
 $pageTitle = "Quản lý Tin tức | Admin NHK Mobile";
 $basePath = "../";

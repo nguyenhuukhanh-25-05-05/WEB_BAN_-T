@@ -50,7 +50,7 @@
                     </div>
                     <ul class="footer-links list-unstyled accordion-content-mobile">
                         <li><a href="warranty.php">Trung tâm Bảo hành</a></li>
-                        <li><a href="track_order.php">Tình trạng đơn hàng</a></li>
+                        <li><a href="track_order.php"><?php echo isset($_SESSION['user_id']) ? 'Đơn hàng của tôi' : 'Tình trạng đơn hàng'; ?></a></li>
                         <li><a href="#">Giao hàng tận nơi</a></li>
                         <li><a href="#">Hình thức thanh toán</a></li>
                     </ul>

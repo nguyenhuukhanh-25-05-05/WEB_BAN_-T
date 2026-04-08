@@ -20,21 +20,27 @@ $orders_list = [];
 $error = null;
 $items = [];
 
-// TỰ ĐỘNG NHẬN DIỆN KHÁCH HÀNG ĐÃ ĐĂNG NHẬP
-if (isset($_SESSION['user_id']) && !isset($_GET['phone'])) {
+// 1. CHẾ ĐỘ CÁ NHÂN HÓA (Dành cho Member)
+$is_logged_in = isset($_SESSION['user_id']);
+$orders_list = [];
+
+if ($is_logged_in) {
     $userId = $_SESSION['user_id'];
-    $stmtUser = $pdo->prepare("SELECT phone FROM users WHERE id = ?");
-    $stmtUser->execute([$userId]);
-    $userPhone = $stmtUser->fetchColumn();
     
-    if ($userPhone) {
-        // Tự động gán số điện thoại để tra cứu ngay khi vào trang
-        $_GET['phone'] = $userPhone;
+    // Ưu tiên lấy đơn hàng theo ID tài khoản
+    $stmtUserOrders = $pdo->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
+    $stmtUserOrders->execute([$userId]);
+    $orders_list = $stmtUserOrders->fetchAll();
+    
+    // Nếu có đơn hàng, và không đang xem chi tiết đơn cụ thể nào thì mặc định chuẩn bị list
+    if (!empty($orders_list) && !isset($_GET['order_id'])) {
+        // Tự động gán trạng thái để hiển thị danh sách
+        $_GET['phone'] = 'authenticated'; 
     }
 }
 
-// Xử lý khi nhấn nút Tra cứu (hoặc tự động tra cứu từ session bên trên)
-if (isset($_GET['phone'])) {
+// 2. CHẾ ĐỘ TRA CỨU THỦ CÔNG (Dành cho Khách vãng lai hoặc Member tra đơn khác)
+if (isset($_GET['phone']) && $_GET['phone'] !== 'authenticated') {
     $phone = trim($_GET['phone']);
     $orderId = isset($_GET['order_id']) && !empty($_GET['order_id']) ? (int)$_GET['order_id'] : null;
 
@@ -42,7 +48,7 @@ if (isset($_GET['phone'])) {
         $error = "Vui lòng nhập Số điện thoại đã đặt hàng.";
     } else {
         if (!empty($orderId)) {
-            // Trường hợp 1: Tra cứu Đích danh 1 đơn (ID + Phone)
+            // Tra cứu đích danh 1 đơn
             $stmt = $pdo->prepare("SELECT * FROM orders WHERE id = ? AND customer_phone = ?");
             $stmt->execute([$orderId, $phone]);
             $order = $stmt->fetch();
@@ -50,25 +56,19 @@ if (isset($_GET['phone'])) {
             if (!$order) {
                 $error = "Không tìm thấy đơn hàng #$orderId khớp với số điện thoại này.";
             } else {
-                // Lấy chi tiết sản phẩm
                 $stmtItems = $pdo->prepare("SELECT order_items.*, products.image FROM order_items LEFT JOIN products ON order_items.product_id = products.id WHERE order_id = ?");
                 $stmtItems->execute([$order['id']]);
                 $items = $stmtItems->fetchAll();
             }
         } else {
-            // Trường hợp 2: Tra cứu Toàn bộ đơn theo số điện thoại
+            // Tra cứu list đơn theo SĐT
             $stmt = $pdo->prepare("SELECT * FROM orders WHERE customer_phone = ? ORDER BY created_at DESC");
             $stmt->execute([$phone]);
             $orders_list = $stmt->fetchAll();
 
             if (!$orders_list) {
-                if (isset($_SESSION['user_id'])) {
-                    $error = "Tài khoản của bạn chưa có đơn hàng nào.";
-                } else {
-                    $error = "Số điện thoại này chưa có đơn hàng nào tại NHK Mobile.";
-                }
+                $error = "Số điện thoại này chưa có đơn hàng nào tại NHK Mobile.";
             } elseif (count($orders_list) === 1 && !isset($_GET['list_all'])) {
-                // Nếu chỉ có 1 đơn thì tự động hiển thị chi tiết luôn cho nhanh (trừ khi khách bấm 'xem tất cả')
                 $order = $orders_list[0];
                 $stmtItems = $pdo->prepare("SELECT order_items.*, products.image FROM order_items LEFT JOIN products ON order_items.product_id = products.id WHERE order_id = ?");
                 $stmtItems->execute([$order['id']]);
@@ -78,7 +78,7 @@ if (isset($_GET['phone'])) {
     }
 }
 
-$pageTitle = "Tra cứu đơn hàng | NHK Mobile";
+$pageTitle = $is_logged_in ? "Đơn hàng của tôi | NHK Mobile" : "Tra cứu đơn hàng | NHK Mobile";
 $basePath = "";
 include 'includes/header.php';
 ?>
@@ -89,7 +89,9 @@ include 'includes/header.php';
     border-radius: 1.5rem;
     box-shadow: 0 1rem 3rem rgba(0,0,0,0.08);
     overflow: hidden;
+    transition: transform 0.3s;
 }
+.track-card:hover { transform: translateY(-5px); }
 .track-header {
     background: linear-gradient(135deg, #1d1d1f 0%, #434343 100%);
     color: #fff;
@@ -111,6 +113,13 @@ include 'includes/header.php';
     padding: 4px;
     border: 1px solid #eee;
 }
+.search-toggle-btn {
+    background: #f5f5f7;
+    border: 1px solid #e5e5e7;
+    color: #1d1d1f;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
 </style>
 
 <main class="bg-premium-light min-vh-100 pb-5" style="padding-top: 80px;">
@@ -118,42 +127,59 @@ include 'includes/header.php';
         <div class="row justify-content-center">
             <div class="col-lg-8 col-xl-7">
                 
-                <!-- Search Form -->
-                <div class="track-card bg-white mb-5 animate-reveal">
-                    <div class="track-header">
-                        <i class="bi bi-box-seam display-4 mb-3 d-block opacity-75"></i>
-                        <h2 class="fw-800 mb-2">Theo dõi đơn hàng</h2>
-                        <p class="mb-0 opacity-75">Nhập thông tin để cập nhật trạng thái đơn hàng của bạn.</p>
+                <!-- Dashboard Header for Authenticated Users -->
+                <?php if ($is_logged_in): ?>
+                    <div class="d-flex justify-content-between align-items-center mb-4 animate-reveal">
+                        <div>
+                            <h2 class="fw-800 mb-1">Đơn hàng của tôi</h2>
+                            <p class="text-secondary mb-0">Quản lý lịch sử và trạng thái các đơn hàng của bạn.</p>
+                        </div>
+                        <button class="btn search-toggle-btn rounded-pill px-4 shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#manualSearchForm">
+                            <i class="bi bi-search me-2"></i> Tra đơn khác
+                        </button>
                     </div>
-                    <div class="card-body p-4 p-md-5">
-                        <form action="track_order.php" method="GET" class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-uppercase tracking-wider text-secondary">Mã đơn hàng (Tùy chọn)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0"><i class="bi bi-hash"></i></span>
-                                    <input type="number" name="order_id" class="form-control bg-light border-0 py-2" placeholder="VD: 1024" value="<?php echo htmlspecialchars($_GET['order_id'] ?? ''); ?>">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-uppercase tracking-wider text-secondary">Số điện thoại đặt hàng</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0"><i class="bi bi-phone"></i></span>
-                                    <input type="text" name="phone" class="form-control bg-light border-0 py-2" placeholder="VD: 0987xxx" value="<?php echo htmlspecialchars($_GET['phone'] ?? ''); ?>" required>
-                                </div>
-                            </div>
-                            <div class="col-12 mt-4">
-                                <button type="submit" class="btn btn-dark w-100 py-3 rounded-pill fw-bold shadow-sm transition-all hover-lift">
-                                    <i class="bi bi-search me-2"></i> TRA CỨU NGAY
-                                </button>
-                            </div>
-                        </form>
+                <?php endif; ?>
 
-                        <?php if ($error): ?>
-                            <div class="alert alert-danger border-0 rounded-4 mt-4 mb-0 d-flex align-items-center">
-                                <i class="bi bi-exclamation-circle-fill me-3 fs-4"></i>
-                                <div><?php echo $error; ?></div>
-                            </div>
-                        <?php endif; ?>
+                <!-- Search Form (Prominent for Guests, Collapsible for Members) -->
+                <div class="collapse <?php echo !$is_logged_in ? 'show' : ''; ?> mb-5" id="manualSearchForm">
+                    <div class="track-card bg-white animate-reveal">
+                        <div class="track-header">
+                            <i class="bi bi-box-seam display-4 mb-3 d-block opacity-75"></i>
+                            <h2 class="fw-800 mb-2"><?php echo $is_logged_in ? 'Tra cứu đơn hàng vãng lai' : 'Theo dõi đơn hàng'; ?></h2>
+                            <p class="mb-0 opacity-75">Nhập mã đơn và SĐT để cập nhật tình trạng mới nhất.</p>
+                        </div>
+                        <div class="card-body p-4 p-md-5">
+                            <form action="track_order.php" method="GET" class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-uppercase tracking-wider text-secondary">Mã đơn hàng</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-0"><i class="bi bi-hash"></i></span>
+                                        <input type="number" name="order_id" class="form-control bg-light border-0 py-2" placeholder="VD: 1024" value="<?php echo htmlspecialchars($_GET['order_id'] ?? ''); ?>" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-uppercase tracking-wider text-secondary">Số điện thoại</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-0"><i class="bi bi-phone"></i></span>
+                                        <input type="text" name="phone" class="form-control bg-light border-0 py-2" placeholder="VD: 0987xxx" value="<?php echo htmlspecialchars($_GET['phone'] ?? ''); ?>" required>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-4 text-center">
+                                    <button type="submit" class="btn btn-dark w-100 py-3 rounded-pill fw-bold shadow-sm transition-all hover-lift">
+                                        <i class="bi bi-search me-2"></i> TRA CỨU NGAY
+                                    </button>
+                                    <?php if ($is_logged_in): ?>
+                                        <a href="track_order.php" class="btn btn-link link-secondary text-decoration-none small mt-3">Quay lại Đơn hàng của tôi</a>
+                                    <?php endif; ?>
+                                </div>
+                            </form>
+                            <?php if ($error): ?>
+                                <div class="alert alert-danger border-0 rounded-4 mt-4 mb-0 d-flex align-items-center">
+                                    <i class="bi bi-exclamation-circle-fill me-3 fs-4"></i>
+                                    <div><?php echo $error; ?></div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
 

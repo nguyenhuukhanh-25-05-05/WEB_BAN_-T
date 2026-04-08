@@ -155,8 +155,8 @@
                     </a>
                 <?php elseif (isset($_SESSION['user_id'])): ?>
                     <!-- User thường: Chỉ hiện Theo dõi đơn hàng -->
-                    <a href="<?php echo $basePath; ?>order_history.php" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
-                        <i class="bi bi-geo-alt fs-5"></i> Theo dõi đơn hàng
+                    <a href="<?php echo $basePath; ?>track_order.php" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-box-seam fs-5"></i> Đơn hàng của tôi
                     </a>
                 <?php endif; ?>
             </div>
