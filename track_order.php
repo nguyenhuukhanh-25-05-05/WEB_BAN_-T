@@ -4,34 +4,47 @@ require_once 'includes/db.php';
 require_once 'includes/auth_functions.php';
 
 $order = null;
+$orders_list = [];
 $error = null;
 $items = [];
 
 // Xử lý khi nhấn nút Tra cứu
-if (isset($_GET['order_id']) && isset($_GET['phone'])) {
-    $orderId = (int)$_GET['order_id'];
+if (isset($_GET['phone'])) {
     $phone = trim($_GET['phone']);
+    $orderId = isset($_GET['order_id']) ? (int)$_GET['order_id'] : null;
 
-    if (empty($orderId) || empty($phone)) {
-        $error = "Vui lòng nhập đầy đủ Mã đơn hàng và Số điện thoại.";
+    if (empty($phone)) {
+        $error = "Vui lòng nhập Số điện thoại đã đặt hàng.";
     } else {
-        // Truy vấn đơn hàng khớp ID và Số điện thoại
-        $stmt = $pdo->prepare("SELECT * FROM orders WHERE id = ? AND customer_phone = ?");
-        $stmt->execute([$orderId, $phone]);
-        $order = $stmt->fetch();
+        if (!empty($orderId)) {
+            // Trường hợp 1: Tra cứu Đích danh 1 đơn (ID + Phone)
+            $stmt = $pdo->prepare("SELECT * FROM orders WHERE id = ? AND customer_phone = ?");
+            $stmt->execute([$orderId, $phone]);
+            $order = $stmt->fetch();
 
-        if (!$order) {
-            $error = "Không tìm thấy đơn hàng nào khớp với thông tin đã cung cấp.";
+            if (!$order) {
+                $error = "Không tìm thấy đơn hàng #$orderId khớp với số điện thoại này.";
+            } else {
+                // Lấy chi tiết sản phẩm
+                $stmtItems = $pdo->prepare("SELECT order_items.*, products.image FROM order_items LEFT JOIN products ON order_items.product_id = products.id WHERE order_id = ?");
+                $stmtItems->execute([$order['id']]);
+                $items = $stmtItems->fetchAll();
+            }
         } else {
-            // Lấy chi tiết sản phẩm trong đơn
-            $stmtItems = $pdo->prepare("
-                SELECT order_items.*, products.image 
-                FROM order_items 
-                LEFT JOIN products ON order_items.product_id = products.id 
-                WHERE order_id = ?
-            ");
-            $stmtItems->execute([$order['id']]);
-            $items = $stmtItems->fetchAll();
+            // Trường hợp 2: Tra cứu Toàn bộ đơn theo số điện thoại
+            $stmt = $pdo->prepare("SELECT * FROM orders WHERE customer_phone = ? ORDER BY created_at DESC");
+            $stmt->execute([$phone]);
+            $orders_list = $stmt->fetchAll();
+
+            if (!$orders_list) {
+                $error = "Số điện thoại này chưa có đơn hàng nào tại NHK Mobile.";
+            } elseif (count($orders_list) === 1) {
+                // Nếu chỉ có 1 đơn thì tự động hiển thị chi tiết luôn cho nhanh
+                $order = $orders_list[0];
+                $stmtItems = $pdo->prepare("SELECT order_items.*, products.image FROM order_items LEFT JOIN products ON order_items.product_id = products.id WHERE order_id = ?");
+                $stmtItems->execute([$order['id']]);
+                $items = $stmtItems->fetchAll();
+            }
         }
     }
 }
@@ -86,10 +99,10 @@ include 'includes/header.php';
                     <div class="card-body p-4 p-md-5">
                         <form action="track_order.php" method="GET" class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold text-uppercase tracking-wider text-secondary">Mã đơn hàng</label>
+                                <label class="form-label small fw-bold text-uppercase tracking-wider text-secondary">Mã đơn hàng (Tùy chọn)</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-0"><i class="bi bi-hash"></i></span>
-                                    <input type="number" name="order_id" class="form-control bg-light border-0 py-2" placeholder="VD: 1024" value="<?php echo htmlspecialchars($_GET['order_id'] ?? ''); ?>" required>
+                                    <input type="number" name="order_id" class="form-control bg-light border-0 py-2" placeholder="VD: 1024" value="<?php echo htmlspecialchars($_GET['order_id'] ?? ''); ?>">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -100,7 +113,7 @@ include 'includes/header.php';
                                 </div>
                             </div>
                             <div class="col-12 mt-4">
-                                <button type="submit" class="btn btn-dark w-100 py-3 rounded-pill fw-bold shadow-sm">
+                                <button type="submit" class="btn btn-dark w-100 py-3 rounded-pill fw-bold shadow-sm transition-all hover-lift">
                                     <i class="bi bi-search me-2"></i> TRA CỨU NGAY
                                 </button>
                             </div>
@@ -114,6 +127,46 @@ include 'includes/header.php';
                         <?php endif; ?>
                     </div>
                 </div>
+
+                <!-- Multiple Results (Order List View) -->
+                <?php if (!empty($orders_list) && count($orders_list) > 1 && !$order): ?>
+                    <div class="animate-reveal">
+                        <div class="d-flex align-items-center gap-2 mb-4">
+                            <div class="bg-primary rounded-pill px-3 py-1 text-white small fw-bold">Tìm thấy <?php echo count($orders_list); ?> đơn hàng</div>
+                            <div class="text-secondary small">Dưới đây là lịch sử đặt hàng của bạn</div>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <?php foreach ($orders_list as $o): ?>
+                                <div class="col-12">
+                                    <div class="track-card bg-white p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-light rounded-4 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                <i class="bi bi-receipt text-primary fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-0">Đơn hàng #<?php echo $o['id']; ?></h6>
+                                                <small class="text-secondary"><?php echo date('d/m/Y', strtotime($o['created_at'])); ?> • <?php echo number_format($o['total_price'], 0, ',', '.'); ?>đ</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex align-items-center gap-3">
+                                            <?php
+                                                $s = mb_strtolower($o['status'], 'UTF-8');
+                                                $badgeClass = 'bg-warning text-dark';
+                                                if (str_contains($s, 'hoàn thành')) $badgeClass = 'bg-success text-white';
+                                                elseif (str_contains($s, 'đang giao')) $badgeClass = 'bg-primary text-white';
+                                                elseif (str_contains($s, 'hủy')) $badgeClass = 'bg-danger text-white';
+                                            ?>
+                                            <span class="badge <?php echo $badgeClass; ?> rounded-pill px-3 py-2 small"><?php echo $o['status']; ?></span>
+                                            <a href="track_order.php?order_id=<?php echo $o['id']; ?>&phone=<?php echo urlencode($phone); ?>" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">Xem chi tiết</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
 
                 <!-- Results -->
                 <?php if ($order): ?>

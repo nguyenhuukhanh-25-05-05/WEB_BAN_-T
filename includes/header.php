@@ -136,17 +136,19 @@
                 <?php endif; ?>
             </div>
             
-            <div class="list-group list-group-flush">
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="#" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center">
-                        <i class="bi bi-person-badge me-3"></i> <span>Thông tin cá nhân</span>
+            <div class="px-4 py-4 d-grid gap-3">
+                <?php if (isset($_SESSION['admin_id'])): ?>
+                    <!-- Admin: Hiện cả 2 nút để tiện test -->
+                    <a href="<?php echo $basePath; ?>admin/dashboard.php" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-speedometer2 fs-5"></i> Bảng điều khiển Admin
                     </a>
-                    <a href="<?php echo $basePath; ?>order_history.php" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center">
-                        <i class="bi bi-clock-history me-3"></i> <span>Lịch sử mua hàng</span>
+                    <a href="<?php echo $basePath; ?>track_order.php" class="btn btn-outline-dark w-100 rounded-pill py-3 fw-bold d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-geo-alt fs-5"></i> Theo dõi đơn hàng
                     </a>
-                <?php else: ?>
-                    <a href="<?php echo $basePath; ?>admin/dashboard.php" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center">
-                        <i class="bi bi-speedometer2 me-3"></i> <span>Bảng điều khiển Admin</span>
+                <?php elseif (isset($_SESSION['user_id'])): ?>
+                    <!-- User thường: Chỉ hiện Theo dõi đơn hàng -->
+                    <a href="<?php echo $basePath; ?>order_history.php" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-geo-alt fs-5"></i> Theo dõi đơn hàng
                     </a>
                 <?php endif; ?>
             </div>
