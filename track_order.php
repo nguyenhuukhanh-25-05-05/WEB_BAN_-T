@@ -8,10 +8,23 @@ $orders_list = [];
 $error = null;
 $items = [];
 
-// Xử lý khi nhấn nút Tra cứu
+// TỰ ĐỘNG NHẬN DIỆN KHÁCH HÀNG ĐÃ ĐĂNG NHẬP
+if (isset($_SESSION['user_id']) && !isset($_GET['phone'])) {
+    $userId = $_SESSION['user_id'];
+    $stmtUser = $pdo->prepare("SELECT phone FROM users WHERE id = ?");
+    $stmtUser->execute([$userId]);
+    $userPhone = $stmtUser->fetchColumn();
+    
+    if ($userPhone) {
+        // Tự động gán số điện thoại để tra cứu ngay khi vào trang
+        $_GET['phone'] = $userPhone;
+    }
+}
+
+// Xử lý khi nhấn nút Tra cứu (hoặc tự động tra cứu từ session bên trên)
 if (isset($_GET['phone'])) {
     $phone = trim($_GET['phone']);
-    $orderId = isset($_GET['order_id']) ? (int)$_GET['order_id'] : null;
+    $orderId = isset($_GET['order_id']) && !empty($_GET['order_id']) ? (int)$_GET['order_id'] : null;
 
     if (empty($phone)) {
         $error = "Vui lòng nhập Số điện thoại đã đặt hàng.";
@@ -37,9 +50,13 @@ if (isset($_GET['phone'])) {
             $orders_list = $stmt->fetchAll();
 
             if (!$orders_list) {
-                $error = "Số điện thoại này chưa có đơn hàng nào tại NHK Mobile.";
-            } elseif (count($orders_list) === 1) {
-                // Nếu chỉ có 1 đơn thì tự động hiển thị chi tiết luôn cho nhanh
+                if (isset($_SESSION['user_id'])) {
+                    $error = "Tài khoản của bạn chưa có đơn hàng nào.";
+                } else {
+                    $error = "Số điện thoại này chưa có đơn hàng nào tại NHK Mobile.";
+                }
+            } elseif (count($orders_list) === 1 && !isset($_GET['list_all'])) {
+                // Nếu chỉ có 1 đơn thì tự động hiển thị chi tiết luôn cho nhanh (trừ khi khách bấm 'xem tất cả')
                 $order = $orders_list[0];
                 $stmtItems = $pdo->prepare("SELECT order_items.*, products.image FROM order_items LEFT JOIN products ON order_items.product_id = products.id WHERE order_id = ?");
                 $stmtItems->execute([$order['id']]);
@@ -310,8 +327,16 @@ include 'includes/header.php';
 
                             <div class="text-center mt-5">
                                 <p class="small text-muted mb-4 text-center mx-auto" style="max-width: 400px;">Nếu bạn có bất kỳ thắc mắc nào về đơn hàng, vui lòng liên hệ hotline <strong>1800 1234</strong> để được hỗ trợ nhanh nhất.</p>
-                                <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-4 me-2"><i class="bi bi-printer me-2"></i> In đơn hàng</button>
-                                <a href="product.php" class="btn btn-dark btn-sm rounded-pill px-4">Tiếp tục mua hàng</a>
+                                
+                                <div class="d-flex justify-content-center gap-2">
+                                    <?php if (count($orders_list) > 1): ?>
+                                        <a href="track_order.php?phone=<?php echo urlencode($phone); ?>&list_all=1" class="btn btn-outline-dark btn-sm rounded-pill px-4">
+                                            <i class="bi bi-list-ul me-2"></i> Quay lại danh sách
+                                        </a>
+                                    <?php endif; ?>
+                                    <button onclick="window.print()" class="btn btn-outline-dark btn-sm rounded-pill px-4"><i class="bi bi-printer me-2"></i> In đơn hàng</button>
+                                    <a href="product.php" class="btn btn-dark btn-sm rounded-pill px-4">Tiếp tục mua hàng</a>
+                                </div>
                             </div>
                         </div>
                     </div>
