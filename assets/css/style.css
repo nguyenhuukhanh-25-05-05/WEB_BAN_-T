@@ -644,3 +644,18 @@ h1, h2, h3, h4, h5, h6 {
     padding: 20px 24px;
     border-top: 1px solid var(--border-light);
 }
+
+/* Animations */
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); opacity: 1; }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+.bounce-in {
+    animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.max-w-600 { max-width: 600px; }
+.letter-spacing { letter-spacing: 0.1em; }
+.fw-800 { font-weight: 800; }

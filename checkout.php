@@ -70,16 +70,39 @@ include 'includes/header.php';
 
     <main class="py-5 mt-5">
         <div class="container px-xl-5">
-            <!-- Hiển thị thông báo khi đặt hàng thành công -->
+            <!-- Hiển thị thông báo khi đặt hàng thành công (Premium UI) -->
             <?php if (isset($_GET['order']) && $_GET['order'] == 'success'): ?>
-                <div class="text-center py-5">
-                    <img src="assets/images/logo-k.svg" height="40" class="mb-4 d-block mx-auto opacity-25">
-                    <i class="bi bi-send-check display-1 text-primary mb-4 d-block"></i>
-                    <h2 class="fw-bold">Đơn hàng đã được gửi đi!</h2>
-                    <p class="text-secondary max-w-600 mx-auto">Đơn đặt hàng của bạn đã được gửi đến ban quản trị để phê duyệt. Vui lòng chờ nhân viên kiểm tra tình trạng kho và xác nhận lại với bạn trong ít phút tới.</p>
-                    <div class="mt-5">
-                        <a href="index.php" class="btn btn-dark rounded-pill px-5 py-3 fw-bold">Về trang chủ</a>
-                        <a href="order_history.php" class="btn btn-outline-dark rounded-pill px-5 py-3 fw-bold ms-3">Theo dõi đơn hàng</a>
+                <div class="row justify-content-center py-5">
+                    <div class="col-md-8 col-lg-6">
+                        <div class="card border-0 rounded-5 shadow-sm p-4 p-md-5 text-center bg-white">
+                            <div class="success-icon-wrapper mb-4">
+                                <div class="nav-icon bg-success bg-opacity-10 text-success mx-auto rounded-circle d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; font-size: 50px;">
+                                    <i class="bi bi-check-circle-fill bounce-in"></i>
+                                </div>
+                            </div>
+                            
+                            <h1 class="fw-800 mb-3">Đặt hàng thành công!</h1>
+                            <p class="text-secondary fs-5 mb-4 px-md-4">
+                                Cảm ơn bạn đã tin tưởng **NHK Mobile**. Đơn hàng của bạn đã được tiếp nhận và đang chờ bộ phận kỹ thuật kiểm tra kho sản phẩm.
+                            </p>
+                            
+                            <div class="bg-light rounded-4 p-4 mb-5 text-start border">
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <i class="bi bi-info-circle text-primary"></i>
+                                    <span class="fw-700 small text-uppercase letter-spacing text-muted">Bước tiếp theo</span>
+                                </div>
+                                <p class="small text-secondary mb-0">Chúng tôi sẽ gọi điện xác nhận lại với bạn trong vòng 15-30 phút tới. Vui lòng giữ máy.</p>
+                            </div>
+
+                            <div class="d-flex flex-column flex-md-row gap-3 justify-content-center mt-2">
+                                <a href="order_history.php" class="btn-main btn-primary px-5 py-3 rounded-pill fw-700">
+                                    <i class="bi bi-receipt me-2"></i>Xem đơn hàng
+                                </a>
+                                <a href="index.php" class="btn-main btn-outline px-5 py-3 rounded-pill fw-700 text-dark">
+                                    Quay về trang chủ
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             <?php else: ?>

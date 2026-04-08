@@ -46,7 +46,7 @@ include 'includes/header.php';
                         <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
                             <i class="bi bi-person"></i>
                         </div>
-                        <h4 class="fw-bold mb-1"><?php echo htmlspecialchars($_SESSION['user_fullname']); ?></h4>
+                        <h4 class="fw-bold mb-1"><?php echo htmlspecialchars(get_logged_in_name()); ?></h4>
                         <p class="text-secondary small mb-4">Thành viên NHK Mobile</p>
                         <div class="list-group list-group-flush text-start border-0">
                             <a href="#" class="list-group-item list-group-item-action border-0 py-3 rounded-3 mb-1"><i class="bi bi-person-badge me-2"></i> Thông tin tài khoản</a>
