@@ -152,7 +152,7 @@ document.getElementById('newsletterForm').addEventListener('submit', function(e)
     btnSubscribe.textContent = 'Đang gửi...';
     msgDiv.style.display = 'none';
 
-    fetch('subscribe.php', {
+    fetch('api/subscribe.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

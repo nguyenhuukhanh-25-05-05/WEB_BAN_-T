@@ -29,8 +29,6 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?php echo $basePath; ?>assets/css/style.css?v=<?php echo time(); ?>">
-    <!-- Tailwind CSS -->
-    <link rel="stylesheet" href="<?php echo $basePath; ?>assets/css/tailwind.css?v=<?php echo time(); ?>">
 
     <script>
         const BASE_PATH = "<?php echo $basePath; ?>";

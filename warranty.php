@@ -131,7 +131,7 @@ include 'includes/header.php';
         btnSpinner.classList.remove('d-none');
 
         // Real API call
-        fetch('ajax_check_imei.php?imei=' + encodeURIComponent(input))
+        fetch('api/ajax_check_imei.php?imei=' + encodeURIComponent(input))
             .then(response => response.json())
             .then(data => {
                 this.disabled = false;
