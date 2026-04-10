@@ -116,33 +116,17 @@ INSERT INTO admins (username, password) VALUES ('admin', 'admin123') ON CONFLICT
 INSERT INTO subscribers (email) VALUES ('khachhang1@gmail.com') ON CONFLICT (email) DO NOTHING;
 INSERT INTO subscribers (email) VALUES ('nguoihammocongnghe@yahoo.com') ON CONFLICT (email) DO NOTHING;
 
--- Dữ liệu mẫu Sản phẩm (Sửa tên tệp ảnh có dấu cách)
-INSERT INTO products (name, category, price, stock, image, description) VALUES 
-('iPhone 17 Pro Max', 'Apple', 32990000, 45, 'ai_ip17_pm.png', 'Siêu phẩm Apple 2026 với trí tuệ nhân tạo tích hợp sâu.'),
-('iPhone 16 Pro', 'Apple', 28990000, 20, 'ai_ip16_pro.png', 'Thiết kế sang trọng, hiệu năng mạnh mẽ.'),
-('iPhone 15 Pro Max', 'Apple', 22500000, 15, 'ai_ip15_pm.png', 'Mạnh mẽ và bền bỉ với khung viền Titan.'),
-('iPhone 16e', 'Apple', 14900000, 30, 'ai_ip16e.png', 'Phiên bản đặc biệt, mỏng nhẹ và đầy màu sắc.'),
-('Samsung Galaxy S25 Ultra', 'Samsung', 29490000, 30, 'ai_s25_ultra.png', 'Đỉnh cao công nghệ màn hình và camera từ Samsung.'),
-('Samsung Galaxy S24 Ultra', 'Samsung', 23900000, 12, 'ai_s24_ultra.png', 'Siêu phẩm Galaxy AI đầu tiên.'),
-('Samsung Galaxy S23', 'Samsung', 12500000, 25, 'ai_s23.png', 'Nhỏ gọn nhưng đầy nội lực.'),
-('Xiaomi 17 Ultra', 'Xiaomi', 24500000, 8, 'ai_mi17_ultra.png', 'Quái thú nhiếp ảnh với cảm biến 1 inch thế hệ mới.'),
-('Xiaomi 15T Pro', 'Xiaomi', 14200000, 40, 'ai_mi15t.png', 'Sức mạnh flagship với mức giá tầm trung.'),
-('Xiaomi Mix Flip', 'Xiaomi', 21500000, 10, 'ai_mi_flip.png', 'Điện thoại gập nhỏ gọn, màn hình ngoài cực đại.'),
-('Oppo Find X10 Pro', 'Oppo', 22900000, 15, 'oppo_findx10.png', 'Thiết kế độc bản, camera tele tiềm vọng đỉnh cao.'),
-('Oppo K300', 'Oppo', 8900000, 100, 'oppo_k300.png', 'Hiệu năng mạnh mẽ cho game thủ tầm trung.'),
-('Oppo Mix Flip 5090', 'Oppo', 19500000, 10, 'oppo_mixflip5090.png', 'Siêu phẩm nắp gập thời thượng.'),
-('Vivo X300 Pro', 'Vivo', 20500000, 18, 'ai_vivo_x300.png', 'Bậc thầy chụp đêm và quay phim chuyên nghiệp.'),
-('Vivo X200 (Black Edition)', 'Vivo', 16200000, 22, 'ai_vivo_x200_black.png', 'Mỏng nhẹ tinh tế, camera Zeiss đỉnh cao.'),
-('OnePlus 15', 'OnePlus', 18900000, 15, 'oneplus15.png', 'Sát thủ Flagship với sạc siêu nhanh 150W.'),
-('OnePlus 13', 'OnePlus', 15500000, 20, 'oneplus13.png', 'Mượt mà vượt trội với OxygenOS.'),
-('OnePlus 15R', 'OnePlus', 12900000, 35, 'oneplus15r.png', 'Hiệu suất cao cho phân khúc cận cao cấp.'),
-('Honor Magic 10', 'Honor', 17500000, 15, 'honor_magic10.png', 'Công nghệ bảo vệ mắt và camera AI thông minh.'),
-('Honor Magic 9', 'Honor', 14500000, 25, 'honor_magic9.png', 'Thiết kế sang trọng với mặt lưng lấp lánh.'),
-('Realme GT9 Pro', 'Realme', 14900000, 30, 'realme_gt9.png', 'Tốc độ tối thượng, sạc nhanh nhất thế giới.'),
-('Realme GT8 Pro', 'Realme', 12500000, 40, 'realme_gt8pro.png', 'Cân mọi tác vụ nặng với Snapdragon 8 gen mới.'),
-('Nubia RedMagic 15', 'Nubia', 21900000, 10, 'nubia_magic15.png', 'Chiến thần gaming với quạt tản nhiệt tích hợp.'),
-('Nubia V1000', 'Nubia', 7500000, 50, 'nubia_v1000.png', 'Điện thoại tầm trung pin trâu 6000mAh.'),
-('Nubia V90', 'Nubia', 5900000, 80, 'nubia_v90.png', 'Sự lựa chọn ổn định cho các tác vụ cơ bản.');
+-- Dữ liệu mẫu Sản phẩm (Đã tinh gọn - Chỉ giữ các siêu phẩm tiêu biểu)
+INSERT INTO products (name, category, price, stock, image, description, is_featured) VALUES 
+('iPhone 17 Pro Max', 'Apple', 32990000, 45, 'ai_ip17_pm.png', 'Siêu phẩm Apple 2026 với trí tuệ nhân tạo tích hợp sâu.', TRUE),
+('iPhone 16 Pro', 'Apple', 28990000, 20, 'ai_ip16_pro.png', 'Thiết kế sang trọng, hiệu năng mạnh mẽ.', FALSE),
+('Samsung Galaxy S25 Ultra', 'Samsung', 29490000, 30, 'ai_s25_ultra.png', 'Đỉnh cao công nghệ màn hình và camera từ Samsung.', TRUE),
+('Xiaomi 17 Ultra', 'Xiaomi', 24500000, 8, 'ai_mi17_ultra.png', 'Quái thú nhiếp ảnh với cảm biến 1 inch thế hệ mới.', TRUE),
+('Oppo Find X10 Pro', 'Oppo', 22900000, 15, 'oppo_findx10.png', 'Thiết kế độc bản, camera tele tiềm vọng đỉnh cao.', FALSE),
+('Vivo X300 Pro', 'Vivo', 20500000, 18, 'ai_vivo_x300.png', 'Bậc thầy chụp đêm và quay phim chuyên nghiệp.', FALSE),
+('OnePlus 13', 'OnePlus', 15500000, 20, 'oneplus13.png', 'Mượt mà vượt trội với OxygenOS.', FALSE),
+('Realme GT9 Pro', 'Realme', 14900000, 30, 'realme_gt9.png', 'Tốc độ tối thượng, sạc nhanh nhất thế giới.', FALSE),
+('Nubia RedMagic 15', 'Nubia', 21900000, 10, 'nubia_magic15.png', 'Chiến thần gaming với quạt tản nhiệt tích hợp.', TRUE);
 
 -- Dữ liệu mẫu Tin tức (Tech News)
 INSERT INTO news (title, excerpt, content, image, category) VALUES 

@@ -34,7 +34,7 @@ include 'includes/header.php';
     <!-- CONTENT: Light Body -->
     <section class="py-huge bg-premium-light">
         <div class="container px-xl-5">
-            <div class="row g-5">
+            <div class="row g-5 align-items-start">
                 <div class="col-lg-8 animate-reveal">
                     <div class="mb-5">
                         <h3 class="display-6 fw-bold mb-4 text-dark">1. Thời hạn bảo hành</h3>
@@ -74,9 +74,9 @@ include 'includes/header.php';
                     </div>
                 </div>
 
-                <div class="col-lg-4 animate-reveal" style="animation-delay: 0.2s">
-                    <div class="glass-card p-5 rounded-5 shadow-2xl sticky-top"
-                        style="top: 120px; background: linear-gradient(145deg, #1d1d1f 0%, #3a3a40 100%); border: 1px solid rgba(255,255,255,0.1);">
+                <div class="col-lg-4">
+                    <div class="glass-card p-5 rounded-5 shadow-2xl sticky-lg-top"
+                        style="top: 100px; background: linear-gradient(145deg, #1d1d1f 0%, #3a3a40 100%); border: 1px solid rgba(255,255,255,0.1); z-index: 10;">
                         <h4 class="fw-bold mb-4" style="color: #ffffff !important;">Tra cứu nhanh</h4>
                         <p class="small mb-4" style="color: rgba(255,255,255,0.7) !important;">Nhập mã IMEI (15 số) để
                             kiểm tra thời hạn và lịch sử sửa chữa của máy.</p>

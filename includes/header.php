@@ -75,8 +75,8 @@
     <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileNav" style="width: 280px; border-right: none;">
         <div class="offcanvas-header py-4 px-4 border-bottom">
             <div class="nav-brand">
-                <div class="logo-box" style="width: 34px; height: 34px; font-size: 0.9rem; border-radius: 8px;">K</div>
-                <span class="fw-800 fs-6 tracking-tight text-main">NHK MOBILE</span>
+                <div class="brand-logo-box sm me-2">NHK</div>
+                <span class="brand-text sm">MOBILE</span>
             </div>
             <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas"></button>
         </div>
@@ -87,16 +87,16 @@
                         <i class="bi bi-house me-3 fs-5"></i> Trang chủ
                     </a>
                     <a href="<?php echo $basePath; ?>product.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
-                        <i class="bi bi-phone me-3 fs-5"></i> Điện thoại & Phụ kiện
-                    </a>
-                    <a href="<?php echo $basePath; ?>warranty.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
-                        <i class="bi bi-shield-check me-3 fs-5"></i> Tra cứu Bảo hành
+                        <i class="bi bi-phone me-3 fs-5"></i> Sản phẩm
                     </a>
                     <a href="<?php echo $basePath; ?>track_order.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
-                        <i class="bi bi-box-seam me-3 fs-5"></i> Tra cứu Đơn hàng
+                        <i class="bi bi-receipt-cutoff me-3 fs-5"></i> Lịch sử mua hàng
+                    </a>
+                    <a href="<?php echo $basePath; ?>warranty.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
+                        <i class="bi bi-shield-check me-3 fs-5"></i> Bảo hành
                     </a>
                     <a href="<?php echo $basePath; ?>news.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
-                        <i class="bi bi-newspaper me-3 fs-5"></i> Tin tức Công nghệ
+                        <i class="bi bi-newspaper me-3 fs-5"></i> Tin tức
                     </a>
                 </div>
             </div>
