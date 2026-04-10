@@ -15,9 +15,9 @@
             <div class="footer-grid">
                 <!-- Brand Section -->
                 <div class="footer-brand">
-                    <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-4">
-                        <div class="logo-box me-3">K</div>
-                        <span class="fw-800 fs-5 tracking-tight text-main">NHK MOBILE</span>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="brand-logo-box md me-2">NHK</div>
+                        <span class="brand-text md">MOBILE</span>
                     </div>
                     <p class="text-secondary small mb-4" style="max-width: 300px;">Đại lý ủy quyền chính thức của Apple tại Việt Nam. Chúng tôi mang đến những trải nghiệm công nghệ đỉnh cao cùng dịch vụ hậu mãi chuẩn 5 sao.</p>
                     <div class="d-flex justify-content-center justify-content-md-start gap-3">

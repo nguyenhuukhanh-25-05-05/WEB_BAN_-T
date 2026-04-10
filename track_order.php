@@ -82,9 +82,18 @@ include 'includes/header.php';
 @media print {
     body { background: #fff !important; }
     nav, footer, .btn, .no-print, .alert { display: none !important; }
-    .container { max-width: 100% !important; margin: 0 !important; }
-    .track-card { box-shadow: none !important; border: 1px solid #000 !important; }
+    .container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    .track-card { 
+        box-shadow: none !important; 
+        border: 2px solid #000 !important; 
+        width: 100% !important; 
+        margin: 0 !important;
+        page-break-inside: avoid;
+    }
     .order-items { background: #fff !important; }
+    .main-content { padding-top: 0 !important; }
+    .bg-premium-light { background: #fff !important; }
+    main { padding-top: 0 !important; }
 }
 </style>
 
@@ -105,14 +114,16 @@ include 'includes/header.php';
                             <button onclick="window.print()" class="btn btn-primary rounded-pill"><i class="bi bi-printer me-2"></i> In đơn hàng</button>
                         </div>
 
-                        <div class="row mb-5">
+                        <div class="row mb-5 align-items-center">
                             <div class="col-6">
                                 <h2 class="fw-900 mb-0">HÓA ĐƠN</h2>
-                                <p class="text-muted">Mã đơn: #<?php echo $order['id']; ?></p>
+                                <p class="text-muted small">Mã đơn: #<?php echo $order['id']; ?></p>
                             </div>
                             <div class="col-6 text-end">
-                                <img src="assets/images/logo-k.svg" height="40" alt="Logo">
-                                <p class="small text-muted mb-0">NHK Mobile Authorized</p>
+                                <div class="d-flex flex-column align-items-end">
+                                    <div class="brand-logo-box lg mb-2">NHK</div>
+                                    <p class="small text-muted fw-bold mb-0">NHK Mobile Authorized</p>
+                                </div>
                             </div>
                         </div>
 
@@ -163,8 +174,8 @@ include 'includes/header.php';
                             </table>
                         </div>
 
-                        <div class="text-center mt-5 pt-5 border-top small text-muted">
-                            <p>Cảm ơn bạn đã tin tưởng lựa chọn NHK Mobile!</p>
+                        <div class="text-center mt-5 pt-4 border-top small text-muted">
+                            <p class="mb-1">Cảm ơn bạn đã tin tưởng lựa chọn NHK Mobile!</p>
                             <p class="mb-0">Hotline: 1800 1234 | Website: nhkmobile.vn</p>
                         </div>
                     </div>

@@ -30,8 +30,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <button class="btn btn-link text-dark p-0 me-3" id="sidebarToggle">
             <i class="bi bi-list fs-1 shadow-sm"></i>
         </button>
-        <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="24" alt="Logo">
-        <span class="ms-2 fw-800 small text-uppercase tracking-tighter">NHK ADMIN</span>
+        <div class="brand-logo-box sm me-2">NHK</div>
+        <span class="brand-text sm">ADMIN</span>
     </div>
 
     <!-- SIDEBAR OVERLAY -->
@@ -41,8 +41,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <aside class="sidebar" id="sidebarMenu">
         <div class="d-flex align-items-center justify-content-between mb-5">
              <div class="d-flex align-items-center">
-                <img src="<?php echo $basePath; ?>assets/images/logo-k.svg" height="28" alt="Logo" class="me-2">
-                <span class="fw-800 fs-5 tracking-tight">NHK ADMIN</span>
+                <div class="brand-logo-box sm me-2">NHK</div>
+                <span class="brand-text sm">ADMIN</span>
              </div>
              <button class="btn btn-link text-dark d-lg-none p-0" id="sidebarClose">
                 <i class="bi bi-x-lg fs-4"></i>

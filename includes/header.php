@@ -38,9 +38,9 @@
 <body>
     <nav class="navbar-minimal">
         <div class="container-wide nav-content">
-            <a href="<?php echo $basePath; ?>index.php" class="nav-brand">
-                <div class="logo-box">K</div>
-                <span class="fw-800 fs-6 tracking-tight text-main d-none d-sm-block">NHK MOBILE</span>
+            <a href="<?php echo $basePath; ?>index.php" class="nav-brand d-flex align-items-center">
+                <div class="brand-logo-box sm me-2">NHK</div>
+                <span class="brand-text sm d-none d-sm-block">MOBILE</span>
             </a>
 
             <ul class="nav-links mb-0 d-none d-lg-flex">

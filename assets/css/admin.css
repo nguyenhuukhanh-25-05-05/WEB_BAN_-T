@@ -23,6 +23,31 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+/* --- Unified Branding --- */
+.brand-logo-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--admin-text);
+    border-radius: 8px;
+    font-weight: 900;
+    transition: all 0.3s;
+    background: #fff;
+}
+
+.brand-logo-box.sm { width: 34px; height: 34px; font-size: 11px; }
+.brand-logo-box.md { width: 42px; height: 42px; font-size: 14px; }
+.brand-logo-box.lg { width: 56px; height: 56px; font-size: 18px; border-width: 3px; }
+
+.brand-text {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--admin-text);
+}
+
+.brand-text.sm { font-size: 14px; }
+.brand-text.md { font-size: 18px; }
+
 /* --- Sidebar Upgrade --- */
 .sidebar {
     width: 280px;
