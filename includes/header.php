@@ -51,13 +51,12 @@
 
             <div class="nav-actions">
                 <a href="#" id="searchTrigger" class="nav-icon d-none d-md-flex"><i class="bi bi-search"></i></a>
-                <a href="<?php echo $basePath; ?>cart.php" class="nav-icon position-relative">
+                <a href="<?php echo $basePath; ?>cart.php" class="nav-icon position-relative" id="cartNavIcon">
                     <i class="bi bi-bag-heart"></i>
-                    <?php if(isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" style="font-size: 0.65rem; padding: 0.35em 0.5em;">
-                            <?php echo count($_SESSION['cart']); ?>
-                        </span>
-                    <?php endif; ?>
+                    <span id="cartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" 
+                          style="font-size: 0.65rem; padding: 0.35em 0.5em; display: <?php echo (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0 && isset($_SESSION['user_id'])) ? 'inline-flex' : 'none'; ?>;">
+                        <?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?>
+                    </span>
                 </a>
                 
                 <a href="#mobileNav" data-bs-toggle="offcanvas" class="nav-icon d-flex d-lg-none"><i class="bi bi-list"></i></a>

@@ -99,6 +99,38 @@
         });
     </script>
 
+    <!-- Cart Badge Realtime Updater -->
+    <script>
+        function updateCartBadge() {
+            fetch(BASE_PATH + 'api/cart_count.php')
+                .then(r => r.json())
+                .then(data => {
+                    const badge = document.getElementById('cartBadge');
+                    if (!badge) return;
+                    if (data.logged_in && data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'inline-flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(() => {});
+        }
+
+        // Cập nhật ngay khi trang load
+        updateCartBadge();
+
+        // Cập nhật lại mỗi 30 giây
+        setInterval(updateCartBadge, 30000);
+
+        // Cập nhật ngay sau khi bấm nút thêm vào giỏ
+        document.querySelectorAll('a[href*="add="]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                setTimeout(updateCartBadge, 500);
+            });
+        });
+    </script>
+
     <!-- Search Overlay -->
     <?php include 'includes/search_overlay.php'; ?>
 

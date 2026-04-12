@@ -23,54 +23,55 @@ function syncCartWithDatabase($pdo) {
         session_start();
     }
     
-    $sessionId = session_id();
     $userId = $_SESSION['user_id'] ?? null;
+
+    // Chỉ đồng bộ khi đã đăng nhập
+    if (!$userId) {
+        // Chưa đăng nhập: xóa sạch giỏ hàng trong session (không load từ DB)
+        $_SESSION['cart'] = [];
+        return;
+    }
     
-    // TRƯỜNG HỢP 1: Giỏ hàng trong Session đang rỗng -> Tìm trong DB để nạp lên
+    // TRƯỜNG HỢP 1: Session rỗng -> Nạp giỏ hàng từ DB theo user_id
     if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
-        $sql = "SELECT ci.*, p.name, p.price, p.image FROM cart_items ci JOIN products p ON ci.product_id = p.id WHERE ci.session_id = ?";
-        $params = [$sessionId];
-        if ($userId) {
-            $sql = "SELECT ci.*, p.name, p.price, p.image FROM cart_items ci JOIN products p ON ci.product_id = p.id WHERE ci.session_id = ? OR ci.user_id = ?";
-            $params = [$sessionId, $userId];
-        }
+        $sql = "SELECT ci.*, p.name, p.price, p.image FROM cart_items ci 
+                JOIN products p ON ci.product_id = p.id 
+                WHERE ci.user_id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute([$userId]);
         $items = $stmt->fetchAll();
         
-        if ($items) {
-            $_SESSION['cart'] = [];
-            foreach ($items as $item) {
-                $_SESSION['cart'][$item['product_id']] = [
-                    'name' => $item['name'],
-                    'price' => $item['price'],
-                    'image' => $item['image'],
-                    'qty' => $item['quantity']
-                ];
-            }
+        $_SESSION['cart'] = [];
+        foreach ($items as $item) {
+            $_SESSION['cart'][$item['product_id']] = [
+                'name'  => $item['name'],
+                'price' => $item['price'],
+                'image' => $item['image'],
+                'qty'   => $item['quantity']
+            ];
         }
     } 
-    // TRƯỜNG HỢP 2: Session đã có hàng -> Cập nhật xuống DB để lưu trữ bền vững
+    // TRƯỜNG HỢP 2: Session có hàng -> Lưu xuống DB theo user_id
     else {
         foreach ($_SESSION['cart'] as $pid => $item) {
             $stmt = $pdo->prepare("
-                INSERT INTO cart_items (session_id, user_id, product_id, quantity) 
-                VALUES (?, ?, ?, ?)
+                INSERT INTO cart_items (user_id, product_id, quantity, session_id) 
+                VALUES (?, ?, ?, '')
                 ON CONFLICT (session_id, product_id) 
                 DO UPDATE SET quantity = EXCLUDED.quantity, user_id = EXCLUDED.user_id
             ");
-            $stmt->execute([$sessionId, $userId, $pid, $item['qty']]);
+            $stmt->execute([$userId, $pid, $item['qty']]);
         }
         
-        // Xóa những món trong DB mà Session không còn giữ (vì đã bị người dùng xóa)
+        // Xóa những món trong DB mà session không giữ nữa
         $productIds = array_keys($_SESSION['cart']);
         if (!empty($productIds)) {
             $placeholders = implode(',', array_fill(0, count($productIds), '?'));
             $stmt = $pdo->prepare("
                 DELETE FROM cart_items 
-                WHERE session_id = ? AND product_id NOT IN ($placeholders)
+                WHERE user_id = ? AND product_id NOT IN ($placeholders)
             ");
-            $params = array_merge([$sessionId], $productIds);
+            $params = array_merge([$userId], $productIds);
             $stmt->execute($params);
         }
     }
@@ -86,7 +87,10 @@ function removeFromCartDB($pdo, $pid) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
-    $stmt = $pdo->prepare("DELETE FROM cart_items WHERE session_id = ? AND product_id = ?");
-    $stmt->execute([session_id(), $pid]);
+    $userId = $_SESSION['user_id'] ?? null;
+    if ($userId) {
+        $stmt = $pdo->prepare("DELETE FROM cart_items WHERE user_id = ? AND product_id = ?");
+        $stmt->execute([$userId, $pid]);
+    }
 }
 ?>
