@@ -107,6 +107,34 @@ try {
         $pdo->exec("ALTER TABLE cart_items ADD CONSTRAINT cart_items_session_product_unique UNIQUE (session_id, product_id);"); 
     } catch (\PDOException $e) { /* Bỏ qua nếu đã tồn tại */ }
 
+    // Đảm bảo có bảng Bảo hành IMEI (Warranties)
+    try { $pdo->exec("
+        CREATE TABLE IF NOT EXISTS warranties (
+            id          SERIAL PRIMARY KEY,
+            imei        VARCHAR(20) NOT NULL UNIQUE,
+            product_id  INT REFERENCES products(id) ON DELETE SET NULL,
+            order_id    INT REFERENCES orders(id) ON DELETE SET NULL,
+            status      VARCHAR(50) NOT NULL DEFAULT 'Active',
+            expires_at  DATE NOT NULL,
+            created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    "); } catch (\PDOException $e) {}
+
+    // Bổ sung cột hồ sơ người dùng (profile)
+    try { $pdo->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS phone   VARCHAR(20);");  } catch (\PDOException $e) {}
+    try { $pdo->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS address TEXT;");         } catch (\PDOException $e) {}
+
+    // Đảm bảo có bảng Danh sách Yêu thích (Wishlists)
+    try { $pdo->exec("
+        CREATE TABLE IF NOT EXISTS wishlists (
+            id         SERIAL PRIMARY KEY,
+            user_id    INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE (user_id, product_id)
+        );
+    "); } catch (\PDOException $e) {}
+
 } catch (\PDOException $e) {
     die("Lỗi nghiêm trọng khi kết nối cơ sở dữ liệu: " . $e->getMessage());
 }

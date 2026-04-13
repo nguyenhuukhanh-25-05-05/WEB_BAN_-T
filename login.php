@@ -32,8 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user['status'] === 'banned') {
                 $error = "Tài khoản của bạn đã bị khóa.";
             } else {
-                $_SESSION['user_id'] = $user['id'];
+                // Xóa session admin nếu có (không để cả 2 vào cùng lúc)
+                unset($_SESSION['admin_id'], $_SESSION['admin_user']);
+                $_SESSION['user_id']       = $user['id'];
                 $_SESSION['user_fullname'] = $user['fullname'];
+                $_SESSION['user_email']    = $user['email'];
                 header("Location: " . $redirect);
                 exit;
             }
@@ -45,7 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($admin) {
             if ($password === $admin['password'] || password_verify($password, $admin['password'])) {
-                $_SESSION['admin_id'] = $admin['id'];
+                // Xóa session user nếu có (admin và user không được cùng session)
+                unset($_SESSION['user_id'], $_SESSION['user_fullname'], $_SESSION['user_email']);
+                $_SESSION['admin_id']   = $admin['id'];
                 $_SESSION['admin_user'] = $admin['username'];
                 header("Location: admin/dashboard.php");
                 exit;

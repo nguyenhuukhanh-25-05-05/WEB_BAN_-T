@@ -55,6 +55,17 @@ if (isset($_GET['delete'])) {
  * 2. LẤY DỮ LIỆU HIỂN THỊ
  */
 
+// Khởi tạo biến editData mặc định là null (chế độ thêm mới)
+$editData = null;
+
+// Nếu URL có ?edit=ID thì lấy dữ liệu bản ghi đó để điền vào form
+if (isset($_GET['edit'])) {
+    $editId = (int)$_GET['edit'];
+    $stmtEdit = $pdo->prepare("SELECT * FROM warranties WHERE id = ?");
+    $stmtEdit->execute([$editId]);
+    $editData = $stmtEdit->fetch() ?: null;
+}
+
 // Lấy danh sách bảo hành kèm tên sản phẩm
 $sql = "
     SELECT w.*, p.name as product_name 
@@ -68,6 +79,7 @@ $warranties = $stmt->fetchAll();
 // Lấy danh sách sản phẩm để cho vào dropdown
 $stmtProd = $pdo->query("SELECT id, name FROM products ORDER BY name ASC");
 $productsList = $stmtProd->fetchAll();
+
 
 $pageTitle = "Quản lý Bảo hành | Admin NHK Mobile";
 $basePath = "../";

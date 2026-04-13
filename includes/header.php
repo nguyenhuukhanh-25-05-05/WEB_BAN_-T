@@ -58,6 +58,28 @@
                         <?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?>
                     </span>
                 </a>
+
+                <?php if (isset($_SESSION['user_id'])): ?>
+                <?php
+                    // Đếm số lượng wishlist cho badge navbar (chỉ hiện với user thường)
+                    $wlCount = 0;
+                    try {
+                        $wlNavStmt = $pdo->prepare("SELECT COUNT(*) FROM wishlists WHERE user_id = ?");
+                        $wlNavStmt->execute([$_SESSION['user_id']]);
+                        $wlCount = (int)$wlNavStmt->fetchColumn();
+                    } catch (Exception $e) { $wlCount = 0; }
+                ?>
+                <a href="<?php echo $basePath; ?>wishlist.php" class="nav-icon position-relative d-none d-md-flex" title="Yêu thích">
+                    <i class="bi bi-heart"></i>
+                    <span id="wishlistBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          style="font-size: 0.65rem; padding: 0.35em 0.5em; display: <?php echo $wlCount > 0 ? 'inline-flex' : 'none'; ?>;">
+                        <?php echo $wlCount; ?>
+                    </span>
+                </a>
+                <?php else: ?>
+                <!-- Admin không có wishlist cá nhân -->
+                <span id="wishlistBadge" style="display:none;"></span>
+                <?php endif; ?>
                 
                 <a href="#mobileNav" data-bs-toggle="offcanvas" class="nav-icon d-flex d-lg-none"><i class="bi bi-list"></i></a>
                 
@@ -91,6 +113,14 @@
                     <a href="<?php echo $basePath; ?>track_order.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
                         <i class="bi bi-receipt-cutoff me-3 fs-5"></i> Lịch sử mua hàng
                     </a>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="<?php echo $basePath; ?>wishlist.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
+                        <i class="bi bi-heart me-3 fs-5 text-danger"></i> Yêu thích
+                    </a>
+                    <a href="<?php echo $basePath; ?>profile.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
+                        <i class="bi bi-person-vcard me-3 fs-5"></i> Hồ sơ của tôi
+                    </a>
+                    <?php endif; ?>
                     <a href="<?php echo $basePath; ?>warranty.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
                         <i class="bi bi-shield-check me-3 fs-5"></i> Bảo hành
                     </a>
@@ -131,21 +161,33 @@
             <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body p-0">
-            <div class="p-4 text-center border-bottom bg-light">
-                <div class="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px; font-size: 2rem; border: 1px solid var(--border-light);">
-                    <i class="bi bi-person text-primary"></i>
-                </div>
+            <div class="py-5 px-4 text-center border-bottom" style="background:#fff;">
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <h6 class="fw-bold mb-1"><?php echo htmlspecialchars($_SESSION['user_fullname'] ?? 'Khách hàng'); ?></h6>
-                    <p class="text-muted small mb-0">Thành viên NHK Mobile</p>
+                    <!-- Avatar icon người trên nền tròn xám nhạt -->
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-4"
+                         style="width:80px;height:80px;border:1.5px solid #e8eaf0;">
+                        <i class="bi bi-person-fill text-primary" style="font-size:2.2rem;"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1" style="font-size:1rem;">
+                        <?php echo htmlspecialchars($_SESSION['user_fullname'] ?? 'Khách hàng'); ?>
+                    </h6>
+                    <p class="text-muted mb-0" style="font-size:0.85rem;">Thành viên NHK Mobile</p>
                 <?php else: ?>
-                    <h6 class="fw-bold text-primary mb-1">Quản trị viên</h6>
+                    <!-- Admin avatar -->
+                    <div class="rounded-circle bg-dark d-flex align-items-center justify-content-center mx-auto mb-4"
+                         style="width:80px;height:80px;">
+                        <i class="bi bi-shield-check text-warning" style="font-size:2rem;"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1" style="font-size:1rem;">
+                        <?php echo htmlspecialchars($_SESSION['admin_user'] ?? 'Admin'); ?>
+                    </h6>
+                    <p class="text-muted mb-0" style="font-size:0.85rem;">Quản trị viên NHK Mobile</p>
                 <?php endif; ?>
             </div>
             
             <div class="px-4 py-4 d-grid gap-3">
                 <?php if (isset($_SESSION['admin_id'])): ?>
-                    <!-- Admin: Hiện cả 2 nút để tiện test -->
+                    <!-- Admin -->
                     <a href="<?php echo $basePath; ?>admin/dashboard.php" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
                         <i class="bi bi-speedometer2 fs-5"></i> Bảng điều khiển Admin
                     </a>
@@ -153,9 +195,15 @@
                         <i class="bi bi-receipt-cutoff fs-5"></i> Lịch sử mua hàng
                     </a>
                 <?php elseif (isset($_SESSION['user_id'])): ?>
-                    <!-- User thường: Chỉ hiện Theo dõi đơn hàng -->
-                    <a href="<?php echo $basePath; ?>track_order.php" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
-                        <i class="bi bi-box-seam fs-5"></i> Đơn hàng của tôi
+                    <!-- User thường -->
+                    <a href="<?php echo $basePath; ?>profile.php" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-person-vcard fs-5"></i> Hồ sơ của tôi
+                    </a>
+                    <a href="<?php echo $basePath; ?>wishlist.php" class="btn w-100 rounded-pill py-3 fw-bold d-flex align-items-center justify-content-center gap-2" style="border: 2px solid #e74c3c; color:#e74c3c;">
+                        <i class="bi bi-heart-fill fs-5"></i> Yêu thích
+                    </a>
+                    <a href="<?php echo $basePath; ?>track_order.php" class="btn btn-outline-dark w-100 rounded-pill py-3 fw-bold d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-receipt-cutoff fs-5"></i> Đơn hàng của tôi
                     </a>
                 <?php endif; ?>
             </div>

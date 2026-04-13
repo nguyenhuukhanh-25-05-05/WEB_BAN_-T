@@ -28,6 +28,14 @@ if (!$product) {
     die("Sản phẩm không tồn tại!");
 }
 
+// Kiểm tra user đã lưu yêu thích sản phẩm này chưa
+$isWishlisted = false;
+if (isset($_SESSION['user_id'])) {
+    $wlChk = $pdo->prepare("SELECT 1 FROM wishlists WHERE user_id = ? AND product_id = ?");
+    $wlChk->execute([$_SESSION['user_id'], $product['id']]);
+    $isWishlisted = (bool)$wlChk->fetchColumn();
+}
+
 $pageTitle = "NHK Mobile | " . $product['name'];
 $basePath = "";
 include 'includes/header.php';
@@ -73,6 +81,21 @@ include 'includes/header.php';
                                 <a href="cart.php?add=<?php echo $product['id']; ?>&installment=1" class="btn-main btn-outline w-100 py-3 fs-5">Mua trả góp 0%</a>
                             <?php else: ?>
                                 <button class="btn-main btn-outline w-100 py-3 fs-5" disabled>Hết hàng</button>
+                            <?php endif; ?>
+
+                            <!-- Nút yêu thích: chỉ user thường -->
+                            <?php if (isset($_SESSION['user_id']) && !isset($_SESSION['admin_id'])): ?>
+                            <button id="detailWishlistBtn"
+                                    class="btn-detail-wishlist <?php echo $isWishlisted ? 'active' : ''; ?>"
+                                    onclick="toggleWishlistDetail(<?php echo $product['id']; ?>, this)">
+                                <i class="bi <?php echo $isWishlisted ? 'bi-heart-fill' : 'bi-heart'; ?>"></i>
+                                <span><?php echo $isWishlisted ? 'Đã lưu yêu thích' : 'Lưu yêu thích'; ?></span>
+                            </button>
+                            <?php elseif (!isset($_SESSION['admin_id'])): ?>
+                            <a href="login.php?redirect=product-detail.php?id=<?php echo $product['id']; ?>" class="btn-detail-wishlist">
+                                <i class="bi bi-heart"></i>
+                                <span>Đăng nhập để lưu</span>
+                            </a>
                             <?php endif; ?>
                         </div>
 
@@ -174,7 +197,75 @@ include 'includes/header.php';
 <style>
 .text-warning, .rating-star.bi-star-fill, #star-rating .bi-star-fill, #star-rating .bi-star-half { color: #FF9500 !important; }
 .breadcrumb-item + .breadcrumb-item::before { content: "•"; color: var(--text-muted); }
+
+.btn-detail-wishlist {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 16px;
+    border-radius: 980px;
+    border: 2px solid #e0e0e0;
+    background: #fff;
+    color: #888;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    text-decoration: none;
+}
+.btn-detail-wishlist:hover {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    transform: translateY(-2px);
+}
+.btn-detail-wishlist.active {
+    border-color: #e74c3c;
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    color: #fff;
+}
+.btn-detail-wishlist.active:hover {
+    opacity: 0.9;
+    color: #fff;
+}
+.btn-detail-wishlist i { font-size: 1.2rem; }
 </style>
+
+<script>
+function toggleWishlistDetail(productId, btn) {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const icon = btn.querySelector('i');
+    const text = btn.querySelector('span');
+
+    fetch('api/wishlist.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'product_id=' + productId
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error && data.redirect) { location.href = data.redirect; return; }
+        if (data.status === 'added') {
+            btn.classList.add('active');
+            icon.className = 'bi bi-heart-fill';
+            text.textContent = 'Đã lưu yêu thích';
+        } else {
+            btn.classList.remove('active');
+            icon.className = 'bi bi-heart';
+            text.textContent = 'Lưu yêu thích';
+        }
+        const badge = document.getElementById('wishlistBadge');
+        if (badge) {
+            badge.textContent = data.count;
+            badge.style.display = data.count > 0 ? 'inline-flex' : 'none';
+        }
+        btn.disabled = false;
+    })
+    .catch(() => btn.disabled = false);
+}
+</script>
 
 <script src="assets/js/product-reviews.js?v=1.0.1"></script>
 

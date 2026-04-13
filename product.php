@@ -12,6 +12,14 @@
 session_start();
 require_once 'includes/db.php';
 
+// Lấy danh sách product_id đã yêu thích của user (nếu đăng nhập)
+$wishlistIds = [];
+if (isset($_SESSION['user_id'])) {
+    $wlStmt = $pdo->prepare("SELECT product_id FROM wishlists WHERE user_id = ?");
+    $wlStmt->execute([$_SESSION['user_id']]);
+    $wishlistIds = $wlStmt->fetchAll(PDO::FETCH_COLUMN);
+}
+
 // Handle search, category filters, and sorting parameters
 $category = isset($_GET['category']) ? $_GET['category'] : null;
 $search = isset($_GET['q']) ? $_GET['q'] : null;
@@ -133,8 +141,23 @@ include 'includes/header.php';
                         <a href="product.php" class="btn-main btn-primary mt-4">Quay lại cửa hàng</a>
                     </div>
                 <?php else: ?>
-                    <?php foreach ($products as $p): ?>
+                    <?php foreach ($products as $p):
+                        $isWishlisted = in_array($p['id'], $wishlistIds);
+                    ?>
                         <div class="product-card-new">
+                            <!-- Nút yêu thích: chỉ hiện với user thường, không hiện với admin -->
+                            <?php if (isset($_SESSION['user_id']) && !isset($_SESSION['admin_id'])): ?>
+                            <button class="btn-wishlist <?php echo $isWishlisted ? 'active' : ''; ?>"
+                                    onclick="toggleWishlist(<?php echo $p['id']; ?>, this)"
+                                    title="<?php echo $isWishlisted ? 'Bỏ yêu thích' : 'Thêm yêu thích'; ?>">
+                                <i class="bi <?php echo $isWishlisted ? 'bi-heart-fill' : 'bi-heart'; ?>"></i>
+                            </button>
+                            <?php elseif (!isset($_SESSION['admin_id'])): ?>
+                            <a href="login.php?redirect=product.php" class="btn-wishlist" title="Đăng nhập để lưu yêu thích">
+                                <i class="bi bi-heart"></i>
+                            </a>
+                            <?php endif; ?>
+
                             <a href="product-detail.php?id=<?php echo $p['id']; ?>">
                                 <div class="product-img-box">
                                     <img src="assets/images/<?php echo $p['image']; ?>" alt="<?php echo $p['name']; ?>"
@@ -156,5 +179,71 @@ include 'includes/header.php';
         </div>
     </section>
 </main>
+
+<style>
+.btn-wishlist {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 1rem;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: all 0.25s;
+    z-index: 5;
+    text-decoration: none;
+}
+.btn-wishlist:hover,
+.btn-wishlist.active { color: #e74c3c; background: #fff; transform: scale(1.15); }
+.btn-wishlist.active i { animation: heartPop 0.3s ease; }
+@keyframes heartPop {
+    0%  { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100%{ transform: scale(1); }
+}
+</style>
+
+<script>
+function toggleWishlist(productId, btn) {
+    if (btn.disabled) return;
+    btn.disabled = true;
+
+    fetch('api/wishlist.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'product_id=' + productId
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error && data.redirect) { location.href = data.redirect; return; }
+        const icon = btn.querySelector('i');
+        if (data.status === 'added') {
+            btn.classList.add('active');
+            icon.className = 'bi bi-heart-fill';
+            btn.title = 'Bỏ yêu thích';
+        } else {
+            btn.classList.remove('active');
+            icon.className = 'bi bi-heart';
+            btn.title = 'Thêm yêu thích';
+        }
+        // Cập nhật badge wishlist trên navbar
+        const badge = document.getElementById('wishlistBadge');
+        if (badge) {
+            badge.textContent = data.count;
+            badge.style.display = data.count > 0 ? 'inline-flex' : 'none';
+        }
+        btn.disabled = false;
+    })
+    .catch(() => btn.disabled = false);
+}
+</script>
 
 <?php include 'includes/footer.php'; ?>
