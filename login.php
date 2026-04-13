@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email_or_user) || empty($password)) {
         $error = "Vui lòng nhập đầy đủ tài khoản và mật khẩu.";
     } else {
-        $stmt = $pdo->prepare("SELECT id, fullname, password, status FROM users WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id, fullname, email, password, status FROM users WHERE email = ?");
         $stmt->execute([$email_or_user]);
         $user = $stmt->fetch();
 
