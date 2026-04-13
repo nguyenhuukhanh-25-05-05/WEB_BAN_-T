@@ -66,14 +66,33 @@ include 'includes/admin_header.php';
                         <tr>
                             <td class="text-secondary fw-bold small">#USR-<?php echo $u['id']; ?></td>
                             <td>
-                                 <div class="fw-bold"><?php echo htmlspecialchars($u['fullname']); ?></div>
-                                 <div class="small text-secondary" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?php echo htmlspecialchars($u['address']); ?>">
-                                    <i class="bi bi-geo-alt"></i> <?php echo htmlspecialchars($u['address']); ?>
+                                 <div class="fw-bold"><?php echo htmlspecialchars($u['fullname'] ?? ''); ?></div>
+                                 <div class="small text-secondary"
+                                      style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+                                      title="<?php echo htmlspecialchars($u['address'] ?? ''); ?>">
+                                     <i class="bi bi-geo-alt"></i>
+                                     <?php
+                                         $addr = $u['address'] ?? '';
+                                         echo $addr !== ''
+                                             ? htmlspecialchars($addr)
+                                             : '<span class="text-muted fst-italic">Chưa cập nhật</span>';
+                                     ?>
                                  </div>
                             </td>
                             <td>
-                                <div class="small"><i class="bi bi-envelope"></i> <?php echo htmlspecialchars($u['email']); ?></div>
-                                <div class="small"><i class="bi bi-telephone"></i> <?php echo htmlspecialchars($u['phone']); ?></div>
+                                <div class="small">
+                                    <i class="bi bi-envelope"></i>
+                                    <?php echo htmlspecialchars($u['email'] ?? ''); ?>
+                                </div>
+                                <div class="small text-secondary">
+                                    <i class="bi bi-telephone"></i>
+                                    <?php
+                                        $phone = $u['phone'] ?? '';
+                                        echo $phone !== ''
+                                            ? htmlspecialchars($phone)
+                                            : '<span class="text-muted fst-italic">Chưa cập nhật</span>';
+                                    ?>
+                                </div>
                             </td>
                             <td class="small text-secondary"><?php echo date('d/m/Y H:i', strtotime($u['created_at'])); ?></td>
                             <td>
@@ -88,12 +107,16 @@ include 'includes/admin_header.php';
                                     <input type="hidden" name="id" value="<?php echo $u['id']; ?>">
                                     
                                     <?php if ($u['status'] === 'active' || empty($u['status'])): ?>
-                                        <button type="submit" name="update_status" value="1" class="btn btn-sm btn-outline-danger shadow-sm px-3 rounded-pill" title="Khóa tài khoản này">
+                                        <button type="submit" name="update_status" value="1"
+                                                class="btn btn-sm btn-outline-danger shadow-sm px-3 rounded-pill"
+                                                title="Khóa tài khoản này">
                                             <i class="bi bi-lock me-1"></i> Khóa
                                             <input type="hidden" name="status" value="banned">
                                         </button>
                                     <?php else: ?>
-                                        <button type="submit" name="update_status" value="1" class="btn btn-sm btn-outline-success shadow-sm px-3 rounded-pill" title="Mở khóa tài khoản">
+                                        <button type="submit" name="update_status" value="1"
+                                                class="btn btn-sm btn-outline-success shadow-sm px-3 rounded-pill"
+                                                title="Mở khóa tài khoản">
                                             <i class="bi bi-unlock me-1"></i> Mở khóa
                                             <input type="hidden" name="status" value="active">
                                         </button>

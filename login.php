@@ -52,7 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 unset($_SESSION['user_id'], $_SESSION['user_fullname'], $_SESSION['user_email']);
                 $_SESSION['admin_id']   = $admin['id'];
                 $_SESSION['admin_user'] = $admin['username'];
-                header("Location: admin/dashboard.php");
+                // Redirect về admin/dashboard.php luôn — không phụ thuộc $redirect
+                $adminUrl = rtrim(dirname($_SERVER['PHP_SELF']), '/\\') === '' 
+                    ? '/admin/dashboard.php' 
+                    : 'admin/dashboard.php';
+                header("Location: " . $adminUrl);
                 exit;
             }
         }
