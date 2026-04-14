@@ -81,11 +81,26 @@ if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     try {
         $pdo->beginTransaction();
-        // Xóa các mục liên quan trong giỏ hàng trước
-        $stmtCart = $pdo->prepare("DELETE FROM cart_items WHERE product_id = ?");
-        $stmtCart->execute([$id]);
         
-        // Xóa sản phẩm
+        // 1. Xóa các mục liên quan trong giỏ hàng
+        $pdo->prepare("DELETE FROM cart_items WHERE product_id = ?")->execute([$id]);
+        
+        // 2. Xóa các mục trong danh sách yêu thích
+        $pdo->prepare("DELETE FROM wishlists WHERE product_id = ?")->execute([$id]);
+        
+        // 3. Xóa các đánh giá
+        $pdo->prepare("DELETE FROM reviews WHERE product_id = ?")->execute([$id]);
+        
+        // 4. Xóa lịch sử sửa chữa của các bảo hành thuộc sản phẩm này
+        $pdo->prepare("DELETE FROM repair_history WHERE warranty_id IN (SELECT id FROM warranties WHERE product_id = ?)")->execute([$id]);
+        
+        // 5. Xóa các bảo hành
+        $pdo->prepare("DELETE FROM warranties WHERE product_id = ?")->execute([$id]);
+        
+        // 6. Xóa các chi tiết đơn hàng (lưu ý sẽ ảnh hưởng đến đơn hàng cũ nhưng buộc phải xóa nếu muốn xóa sản phẩm triệt để)
+        $pdo->prepare("DELETE FROM order_items WHERE product_id = ?")->execute([$id]);
+        
+        // Cuối cùng: Xóa sản phẩm
         $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
         $stmt->execute([$id]);
         
@@ -105,11 +120,13 @@ if (isset($_POST['bulk_delete']) && !empty($_POST['selected_ids'])) {
         $pdo->beginTransaction();
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         
-        // Xóa trong giỏ hàng trước
-        $stmtCart = $pdo->prepare("DELETE FROM cart_items WHERE product_id IN ($placeholders)");
-        $stmtCart->execute($ids);
+        $pdo->prepare("DELETE FROM cart_items WHERE product_id IN ($placeholders)")->execute($ids);
+        $pdo->prepare("DELETE FROM wishlists WHERE product_id IN ($placeholders)")->execute($ids);
+        $pdo->prepare("DELETE FROM reviews WHERE product_id IN ($placeholders)")->execute($ids);
+        $pdo->prepare("DELETE FROM repair_history WHERE warranty_id IN (SELECT id FROM warranties WHERE product_id IN ($placeholders))")->execute($ids);
+        $pdo->prepare("DELETE FROM warranties WHERE product_id IN ($placeholders)")->execute($ids);
+        $pdo->prepare("DELETE FROM order_items WHERE product_id IN ($placeholders)")->execute($ids);
         
-        // Xóa sản phẩm
         $sql = "DELETE FROM products WHERE id IN ($placeholders)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($ids);

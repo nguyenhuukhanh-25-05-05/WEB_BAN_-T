@@ -166,7 +166,10 @@ include 'includes/header.php';
                             </div>
                             <p class="small mb-1" style="color: rgba(255,255,255,0.6) !important;">Dòng máy: <strong style="color: #fff !important;">${w.product_name}</strong></p>
                             <p class="small mb-1" style="color: rgba(255,255,255,0.6) !important;">IMEI: <strong style="color: #fff !important;">${w.imei}</strong></p>
-                            <p class="small mb-0" style="color: rgba(255,255,255,0.6) !important;">Hạn cuối: <strong style="color: #fff !important;">${w.expires_at}</strong></p>
+                            <p class="small mb-2" style="color: rgba(255,255,255,0.6) !important;">Hạn cuối: <strong style="color: #fff !important;">${w.expires_at}</strong></p>
+                            <a href="warranty-detail.php?imei=${encodeURIComponent(w.imei)}" class="btn btn-sm w-100 fw-semibold rounded-pill mt-2" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); backdrop-filter: blur(4px); transition: all .2s;" onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                                <i class="bi bi-file-earmark-text me-1"></i> Chi tiết bảo hành
+                            </a>
                         </div>
                     `;
                     } else {
@@ -180,7 +183,10 @@ include 'includes/header.php';
                             </div>
                             <p class="small mb-1" style="color: rgba(255,255,255,0.6) !important;">Dòng máy: <strong style="color: #fff !important;">${w.product_name}</strong></p>
                             <p class="small mb-1" style="color: rgba(255,255,255,0.6) !important;">IMEI: <strong style="color: #fff !important;">${w.imei}</strong></p>
-                            <p class="small mb-0" style="color: rgba(255,255,255,0.6) !important;">Dịch vụ: <strong style="color: #fff !important;">Bảo hành VIP đến ${w.expires_at}</strong></p>
+                            <p class="small mb-2" style="color: rgba(255,255,255,0.6) !important;">Dịch vụ: <strong style="color: #fff !important;">Bảo hành VIP đến ${w.expires_at}</strong></p>
+                            <a href="warranty-detail.php?imei=${encodeURIComponent(w.imei)}" class="btn btn-sm w-100 fw-semibold rounded-pill mt-2" style="background: rgba(52,199,89,0.25); color: #32d74b; border: 1px solid rgba(52,199,89,0.4); transition: all .2s;" onmouseover="this.style.background='rgba(52,199,89,0.4)'" onmouseout="this.style.background='rgba(52,199,89,0.25)'">
+                                <i class="bi bi-file-earmark-text me-1"></i> Chi tiết bảo hành
+                            </a>
                         </div>
                     `;
                     }

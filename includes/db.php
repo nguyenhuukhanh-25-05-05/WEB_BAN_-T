@@ -120,6 +120,26 @@ try {
         );
     "); } catch (\PDOException $e) {}
 
+    // Bổ sung cột bị thiếu trên bảng warranties legacy
+    try { $pdo->exec("ALTER TABLE warranties ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;"); } catch (\PDOException $e) {}
+    try { $pdo->exec("ALTER TABLE warranties ADD COLUMN IF NOT EXISTS customer_name VARCHAR(255);"); } catch (\PDOException $e) {}
+    try { $pdo->exec("ALTER TABLE warranties ADD COLUMN IF NOT EXISTS customer_phone VARCHAR(20);"); } catch (\PDOException $e) {}
+    try { $pdo->exec("ALTER TABLE warranties ADD COLUMN IF NOT EXISTS order_id INT REFERENCES orders(id) ON DELETE SET NULL;"); } catch (\PDOException $e) {}
+
+    // Đảm bảo có bảng Lịch sử Sửa chữa (Repair History)
+    try { $pdo->exec("
+        CREATE TABLE IF NOT EXISTS repair_history (
+            id          SERIAL PRIMARY KEY,
+            warranty_id INT REFERENCES warranties(id) ON DELETE CASCADE,
+            repair_date DATE NOT NULL,
+            title       VARCHAR(255) NOT NULL,
+            description TEXT,
+            location    VARCHAR(255),
+            repair_id   VARCHAR(50),
+            created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    "); } catch (\PDOException $e) {}
+
     // Bổ sung cột hồ sơ người dùng (profile)
     try { $pdo->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS phone   VARCHAR(20);");  } catch (\PDOException $e) {}
     try { $pdo->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS address TEXT;");         } catch (\PDOException $e) {}
@@ -134,6 +154,7 @@ try {
             UNIQUE (user_id, product_id)
         );
     "); } catch (\PDOException $e) {}
+
 
 } catch (\PDOException $e) {
     die("Lỗi nghiêm trọng khi kết nối cơ sở dữ liệu: " . $e->getMessage());
