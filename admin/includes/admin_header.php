@@ -55,6 +55,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <a href="users.php" class="nav-link-admin <?php echo $current_page == 'users.php' ? 'active' : ''; ?>"><i class="bi bi-people-fill"></i> Khách hàng</a>
             <a href="warranties.php" class="nav-link-admin <?php echo $current_page == 'warranties.php' ? 'active' : ''; ?>"><i class="bi bi-shield-lock"></i> Bảo hành</a>
             <a href="news.php" class="nav-link-admin <?php echo $current_page == 'news.php' ? 'active' : ''; ?>"><i class="bi bi-journal-text"></i> Tin tức</a>
+            <a href="revenue.php" class="nav-link-admin <?php echo $current_page == 'revenue.php' ? 'active' : ''; ?>"><i class="bi bi-wallet2"></i> Doanh thu</a>
         </nav>
         
         <div class="mt-4 pt-4 border-top flex-shrink-0">
