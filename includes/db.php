@@ -155,6 +155,28 @@ try {
         );
     "); } catch (\PDOException $e) {}
 
+    // Đảm bảo email trong bảng users là UNIQUE (phòng trường hợp migration cũ)
+    try { $pdo->exec("ALTER TABLE users ADD CONSTRAINT users_email_unique UNIQUE (email);"); } catch (\PDOException $e) {}
+
+    // Đảm bảo có bảng Password Resets cho chức năng quên mật khẩu
+    try { $pdo->exec("
+        CREATE TABLE IF NOT EXISTS password_resets (
+            id SERIAL PRIMARY KEY,
+            user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            reset_token VARCHAR(255) NOT NULL UNIQUE,
+            expires_at TIMESTAMP NOT NULL,
+            is_used BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    "); } catch (\PDOException $e) {}
+
+    // Thêm cột username cho bảng users nếu chưa có (để tương thích)
+    try { $pdo->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(50);"); } catch (\PDOException $e) {}
+    try { $pdo->exec("ALTER TABLE users ADD CONSTRAINT users_username_unique UNIQUE (username);"); } catch (\PDOException $e) {}
+
+    // Thêm cột reset_status cho bảng users để track password reset requests
+    try { $pdo->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_password_reset TIMESTAMP;"); } catch (\PDOException $e) {}
+
 
 } catch (\PDOException $e) {
     die("Lỗi nghiêm trọng khi kết nối cơ sở dữ liệu: " . $e->getMessage());

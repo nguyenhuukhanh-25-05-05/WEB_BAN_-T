@@ -58,17 +58,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmt->fetch()) {
                 $error = "Email này đã được sử dụng.";
             } else {
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("INSERT INTO users (fullname, email, password, status) VALUES (?, ?, ?, 'active')");
-                if ($stmt->execute([$fullname, $email, $hashedPassword])) {
-                    $success = "Đăng ký thành công! Đang chuyển hướng...";
-                    clear_rate_limit('register');
-                    clear_csrf_token();
-                    log_auth_attempt('register', $email, true, 'Registration successful');
-                    header("refresh:2;url=login.php");
-                } else {
-                    $error = "Có lỗi xảy ra, vui lòng thử lại.";
-                    log_auth_attempt('register', $email, false, 'Database error');
+                try {
+                    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                    $stmt = $pdo->prepare("INSERT INTO users (fullname, email, password, status) VALUES (?, ?, ?, 'active')");
+                    if ($stmt->execute([$fullname, $email, $hashedPassword])) {
+                        $success = "Đăng ký thành công! Đang chuyển hướng...";
+                        clear_rate_limit('register');
+                        clear_csrf_token();
+                        log_auth_attempt('register', $email, true, 'Registration successful');
+                        header("refresh:2;url=login.php");
+                    } else {
+                        $error = "Có lỗi xảy ra, vui lòng thử lại.";
+                        log_auth_attempt('register', $email, false, 'Database error');
+                    }
+                } catch (PDOException $e) {
+                    // Catch unique constraint violation
+                    if (strpos($e->getMessage(), 'unique') !== false || strpos($e->getMessage(), 'duplicate') !== false) {
+                        $error = "Email này đã được đăng ký.";
+                    } else {
+                        $error = "Có lỗi xảy ra, vui lòng thử lại.";
+                    }
+                    log_auth_attempt('register', $email, false, 'Database constraint violation');
                 }
             }
         }

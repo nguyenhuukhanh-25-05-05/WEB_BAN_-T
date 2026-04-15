@@ -40,6 +40,7 @@ include 'includes/admin_header.php';
                          <li><a class="dropdown-item py-2 px-4 fw-600" href="news.php"><i class="bi bi-newspaper me-2 text-success"></i> Bài viết mới</a></li>
                          <li><hr class="dropdown-divider opacity-50"></li>
                          <li><a class="dropdown-item py-2 px-4 fw-600" href="warranties.php"><i class="bi bi-shield-check me-2 text-info"></i> Kích hoạt bảo hành</a></li>
+                         <li><a class="dropdown-item py-2 px-4 fw-600" href="password_resets.php"><i class="bi bi-key me-2 text-warning"></i> Đặt lại mật khẩu</a></li>
                      </ul>
                  </div>
              </div>
