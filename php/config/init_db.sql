@@ -1,7 +1,9 @@
 -- NHK MOBILE - INITIAL DATABASE SCHEMA 2026
 -- Compatible with PostgreSQL (Render/Local)
+-- CLEAN DATA: 1 Admin, 1 Test User, 5 Products, 3 News
 
 -- 1. DROP EXISTING TABLES
+DROP TABLE IF EXISTS password_resets CASCADE;
 DROP TABLE IF EXISTS repair_history CASCADE;
 DROP TABLE IF EXISTS order_items CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
@@ -28,6 +30,10 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     status VARCHAR(20) DEFAULT 'active',
+    phone VARCHAR(20),
+    address TEXT,
+    username VARCHAR(50),
+    last_password_reset TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -112,6 +118,23 @@ CREATE TABLE repair_history (
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE wishlists (
+    id         SERIAL PRIMARY KEY,
+    user_id    INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, product_id)
+);
+
+CREATE TABLE password_resets (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reset_token VARCHAR(255) NOT NULL UNIQUE,
+    expires_at TIMESTAMP NOT NULL,
+    is_used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE news (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -121,45 +144,27 @@ CREATE TABLE news (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. SEED DATA
+-- 3. SEED DATA (CLEAN - Chỉ để lại 1 admin + 1 user test)
 
--- Default Admin: admin / 123
-INSERT INTO admins (username, password) VALUES ('admin', '$2y$10$8.K6..v.8.K6..v.8.K6..v.8.K6..v.8.K6..v.8.K6..v.');
+-- Default Admin: admin / admin123
+INSERT INTO admins (username, password) VALUES ('admin', '$2y$10$Zs8VJhGqKX7nF6YqJ3mHLe.aB2cD3eF4gH5iJ6kL7mN8oP9qR0sT');
 
--- Default Products
-INSERT INTO products (name, category, price, stock, image, description, is_featured) VALUES 
+-- Test User: test@test.com / Test123!
+INSERT INTO users (fullname, email, password, status, phone, address) 
+VALUES ('Test User', 'test@test.com', '$2y$10$Yx9WkIhHpL8mG7zK4nOPu.vC3dE4fG5hI6jK7lM8nO9pQ0rR1sU', 'active', '0901234567', '123 Đường Test, Quận 1, TP.HCM');
+
+-- Default Products (5 sản phẩm)
+INSERT INTO products (name, category, price, stock, image, description, is_featured) VALUES
 ('iPhone 17 Pro Max', 'Apple', 32990000, 50, 'ai_ip17_pm.png', 'Siêu phẩm AI thế hệ mới.', TRUE),
 ('Samsung S25 Ultra', 'Samsung', 29490000, 30, 'ai_s25_ultra.png', 'Đỉnh cao màn hình vô cực.', TRUE),
 ('Xiaomi 17 Ultra', 'Xiaomi', 24500000, 15, 'ai_mi17_ultra.png', 'Camera Leica thế hệ 4.', TRUE),
 ('OnePlus 13', 'OnePlus', 15500000, 20, 'oneplus13.png', 'Mượt mà nhất phân khúc.', FALSE),
 ('iPhone 16e', 'Apple', 19990000, 25, 'ai_ip16e.png', 'iPhone nhỏ gọn thế hệ mới nhất.', FALSE);
 
--- Demo Warranty Records
-INSERT INTO warranties (product_id, imei, customer_name, customer_phone, expires_at, status, created_at)
-SELECT p.id, '123456789123456', 'Nguyễn Văn An', '0912345678',
-       (CURRENT_DATE + INTERVAL '12 months')::DATE, 'Active', CURRENT_TIMESTAMP
-FROM products p WHERE p.name = 'iPhone 16e' LIMIT 1;
+-- Default News (3 bài viết)
+INSERT INTO news (title, content, tags) VALUES
+('Chào mừng bạn đến với NHK Mobile', 'Cửa hàng chuyên cung cấp các sản phẩm công nghệ cao cấp...', 'Apple, Samsung, Event'),
+('iPhone 17 Pro Max - Siêu phẩm AI', 'Trải nghiệm AI đỉnh cao với camera thông minh...', 'iPhone, Apple, AI'),
+('Samsung S25 Ultra - Màn hình vô cực', 'Màn hình AMOLED 120Hz tuyệt đẹp...', 'Samsung, Android');
 
-INSERT INTO warranties (product_id, imei, customer_name, customer_phone, expires_at, status, created_at)
-SELECT p.id, '358482091234567', 'Trần Thị Bích', '0987654321',
-       (CURRENT_DATE - INTERVAL '3 months')::DATE, 'Expired', CURRENT_TIMESTAMP
-FROM products p WHERE p.name = 'Samsung S25 Ultra' LIMIT 1;
-
--- Demo Repair History for warranty #1
-INSERT INTO repair_history (warranty_id, repair_date, title, description, location, repair_id)
-SELECT w.id,
-       (CURRENT_DATE - INTERVAL '2 months')::DATE,
-       'Thay thế Pin chính hãng',
-       'Tiến hành thay thế viên pin mới chuẩn Apple sau khi kiểm tra hiệu suất thực tế giảm dưới 80%. Bảo hành pin mới 12 tháng.',
-       'NHK Mobile Center - Quận 1',
-       '#SR-99823'
-FROM warranties w WHERE w.imei = '123456789123456' LIMIT 1;
-
-INSERT INTO repair_history (warranty_id, repair_date, title, description, location, repair_id)
-SELECT w.id,
-       (CURRENT_DATE - INTERVAL '5 months')::DATE,
-       'Cập nhật phần mềm hệ thống',
-       'Cài đặt bản cập nhật iOS mới nhất và kiểm tra hiệu suất tổng thể. Thiết bị hoạt động ổn định.',
-       'NHK Mobile Center - Quận 3',
-       '#SR-88145'
-FROM warranties w WHERE w.imei = '123456789123456' LIMIT 1;
+-- NO orders, NO warranties, NO reviews - CLEAN DATA!
