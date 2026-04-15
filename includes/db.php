@@ -47,20 +47,24 @@ try {
 
     // CHECK FOR FORCE RESET (via environment variable)
     // Set FORCE_DB_RESET=true in Render environment to trigger full reset
-    $forceReset = getenv('FORCE_DB_RESET') === 'true' || $_ENV['FORCE_DB_RESET'] === 'true';
-    
-    if ($forceReset) {
-        error_log("[DB] FORCE RESET TRIGGERED - Dropping and recreating all tables...");
+    try {
+        $forceReset = getenv('FORCE_DB_RESET') === 'true' || ($_ENV['FORCE_DB_RESET'] ?? '') === 'true';
         
-        // Drop tất cả tables
-        $tables = [
-            'password_resets', 'repair_history', 'order_items', 'orders',
-            'cart_items', 'reviews', 'wishlists', 'warranties',
-            'products', 'users', 'admins', 'news'
-        ];
-        foreach ($tables as $table) {
-            try { $pdo->exec("DROP TABLE IF EXISTS $table CASCADE"); } catch (\PDOException $e) {}
+        if ($forceReset) {
+            @error_log("[DB] FORCE RESET TRIGGERED - Dropping and recreating all tables...");
+            
+            // Drop tất cả tables
+            $tables = [
+                'password_resets', 'repair_history', 'order_items', 'orders',
+                'cart_items', 'reviews', 'wishlists', 'warranties',
+                'products', 'users', 'admins', 'news'
+            ];
+            foreach ($tables as $table) {
+                try { $pdo->exec("DROP TABLE IF EXISTS $table CASCADE"); } catch (\PDOException $e) {}
+            }
         }
+    } catch (\Exception $e) {
+        // Ignore FORCE_RESET errors
     }
 
     /**

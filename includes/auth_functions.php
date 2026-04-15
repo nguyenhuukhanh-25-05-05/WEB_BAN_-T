@@ -152,32 +152,41 @@ function clear_rate_limit($action) {
  * @param string $details Additional details
  */
 function log_auth_attempt($action, $email, $success, $details = '') {
+    // Skip logging on production environments where filesystem may be read-only
     $logFile = __DIR__ . '/../logs/auth.log';
     $logDir = dirname($logFile);
 
-    // Create logs directory if not exists
-    if (!is_dir($logDir)) {
-        mkdir($logDir, 0755, true);
+    // Try to create logs directory, but don't fail if it can't be created
+    try {
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0755, true);
+        }
+
+        // Only log if directory is writable
+        if (is_writable($logDir)) {
+            $timestamp = date('Y-m-d H:i:s');
+            $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+            $status = $success ? 'SUCCESS' : 'FAILED';
+
+            $logEntry = sprintf(
+                "[%s] [%s] Action: %s | Email: %s | IP: %s | Status: %s | Details: %s | UA: %s" . PHP_EOL,
+                $timestamp,
+                $status,
+                $action,
+                $email,
+                $ip,
+                $status,
+                $details,
+                substr($userAgent, 0, 100)
+            );
+
+            @error_log($logEntry, 3, $logFile);
+        }
+    } catch (\Exception $e) {
+        // Silently fail - logging is not critical
+        error_log("Auth attempt (no file logging): $action | $email | " . ($success ? 'SUCCESS' : 'FAILED'));
     }
-
-    $timestamp = date('Y-m-d H:i:s');
-    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
-    $status = $success ? 'SUCCESS' : 'FAILED';
-
-    $logEntry = sprintf(
-        "[%s] [%s] Action: %s | Email: %s | IP: %s | Status: %s | Details: %s | UA: %s" . PHP_EOL,
-        $timestamp,
-        $status,
-        $action,
-        $email,
-        $ip,
-        $status,
-        $details,
-        substr($userAgent, 0, 100)
-    );
-
-    error_log($logEntry, 3, $logFile);
 }
 
 /**
