@@ -29,6 +29,147 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?php echo $basePath; ?>assets/css/style.css?v=<?php echo time(); ?>">
+    
+    <!-- Auth Animation Styles -->
+    <style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .auth-card {
+        animation: slideUp 0.6s ease-out forwards;
+    }
+    
+    .auth-input {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .auth-input:focus {
+        background: #fff !important;
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .auth-btn {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 122, 255, 0.3);
+    }
+    
+    .auth-btn:active {
+        transform: translateY(0);
+    }
+    
+    .auth-link {
+        transition: all 0.3s ease;
+    }
+    
+    .auth-link:hover {
+        transform: scale(1.05);
+        color: #0056b3 !important;
+    }
+    
+    .auth-error {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    .auth-success {
+        animation: fadeIn 0.5s ease-out;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+        20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+    
+    .password-strength {
+        margin-top: 8px;
+    }
+    
+    .strength-bar {
+        height: 4px;
+        background: #e9ecef;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    
+    .strength-fill {
+        height: 100%;
+        width: 0;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+    
+    .strength-text {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    
+    .strength-weak .strength-fill {
+        width: 33%;
+        background: #dc3545;
+    }
+    
+    .strength-medium .strength-fill {
+        width: 66%;
+        background: #ffc107;
+    }
+    
+    .strength-strong .strength-fill {
+        width: 100%;
+        background: #28a745;
+    }
+    
+    /* Icon animations */
+    .nav-icon {
+        transition: all 0.2s ease;
+    }
+    
+    .nav-icon:hover {
+        transform: scale(1.1);
+    }
+    
+    .nav-icon:active {
+        transform: scale(0.95);
+    }
+    
+    /* Button improvements */
+    .btn {
+        transition: all 0.2s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+    
+    .btn:active {
+        transform: translateY(0);
+    }
+    
+    /* Smooth scroll */
+    html {
+        scroll-behavior: smooth;
+    }
+    </style>
 
     <script>
         const BASE_PATH = "<?php echo $basePath; ?>";
