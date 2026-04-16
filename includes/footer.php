@@ -134,6 +134,17 @@
     <!-- Search Overlay -->
     <?php include 'includes/search_overlay.php'; ?>
 
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" onclick="scrollToTop()">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?php echo $basePath; ?>assets/js/search-overlay.js"></script>
@@ -151,6 +162,102 @@
                 });
             }
         })();
+
+        // Scroll Reveal Animation
+        (function() {
+            const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+
+            const revealOnScroll = () => {
+                reveals.forEach(el => {
+                    const windowHeight = window.innerHeight;
+                    const elementTop = el.getBoundingClientRect().top;
+                    const revealPoint = 100;
+
+                    if (elementTop < windowHeight - revealPoint) {
+                        el.classList.add('active');
+                    }
+                });
+            };
+
+            window.addEventListener('scroll', revealOnScroll);
+            window.addEventListener('load', revealOnScroll);
+        })();
+
+        // Scroll Progress Bar
+        (function() {
+            const progressBar = document.getElementById('scrollProgress');
+            if (progressBar) {
+                window.addEventListener('scroll', () => {
+                    const scrollTop = window.scrollY;
+                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                    const scrollPercent = (scrollTop / docHeight) * 100;
+                    progressBar.style.width = scrollPercent + '%';
+                });
+            }
+        })();
+
+        // Back to Top Button
+        (function() {
+            const backToTop = document.getElementById('backToTop');
+            if (backToTop) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 500) {
+                        backToTop.classList.add('visible');
+                    } else {
+                        backToTop.classList.remove('visible');
+                    }
+                });
+            }
+        })();
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Toast Notification Function
+        function showToast(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icon = type === 'success' ? 'check-circle' :
+                        type === 'error' ? 'x-circle' :
+                        type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+
+            toast.innerHTML = `
+                <i class="bi bi-${icon}-fill"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 400);
+            }, duration);
+        }
+
+        // Add to cart with toast notification
+        document.querySelectorAll('a[href*="cart.php?add="]').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+
+                fetch(href)
+                    .then(() => {
+                        showToast('Đã thêm sản phẩm vào giỏ hàng!', 'success');
+                        if (typeof loadMiniCart === 'function') {
+                            loadMiniCart();
+                        }
+                        updateCartBadge();
+                    })
+                    .catch(() => {
+                        showToast('Có lỗi xảy ra, vui lòng thử lại.', 'error');
+                    });
+            });
+        });
     </script>
 </body>
 </html>

@@ -19,6 +19,7 @@
  * @param PDO $pdo Đối tượng kết nối cơ sở dữ liệu
  */
 function syncCartWithDatabase($pdo) {
+    global $pdo; // Đảm bảo IDE nhận diện biến toàn cục
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }

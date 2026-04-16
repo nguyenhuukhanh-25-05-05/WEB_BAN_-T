@@ -11,6 +11,8 @@
  * Date: 2026-04-08
  */
 
+require_once __DIR__ . '/functions.php';
+
 // 1. Detect environment-specific connection strings (Render/Heroku/Local)
 $databaseUrl = getenv('DATABASE_URL');
 if (!$databaseUrl)
@@ -43,6 +45,7 @@ $options = [
 
 try {
     // Khởi tạo kết nối PDO
+    /** @var PDO $pdo */
     $pdo = new PDO($dsn, $user, $pass, $options);
 
     // CHECK FOR FORCE RESET (via environment variable)

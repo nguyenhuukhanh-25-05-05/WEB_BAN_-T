@@ -10,25 +10,33 @@ header('Content-Type: application/json');
 
 // Chưa đăng nhập -> giỏ hàng rỗng
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['count' => 0, 'logged_in' => false]);
+    echo json_encode(['count' => 0, 'logged_in' => false, 'items' => [], 'total' => 0]);
     exit;
 }
 
 $userId = $_SESSION['user_id'];
 
-// Cộng tổng số lượng từ DB theo user
-$stmt = $pdo->prepare("SELECT COALESCE(SUM(quantity), 0) as total FROM cart_items WHERE user_id = ?");
+// Lấy chi tiết giỏ hàng từ DB
+$stmt = $pdo->prepare("
+    SELECT ci.product_id, ci.quantity, p.name, p.price, p.image
+    FROM cart_items ci
+    JOIN products p ON ci.product_id = p.id
+    WHERE ci.user_id = ?
+");
 $stmt->execute([$userId]);
-$row = $stmt->fetch();
+$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Cũng lấy từ session nếu có (ưu tiên số thực tế hơn)
-$sessionCount = 0;
-if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
-    foreach ($_SESSION['cart'] as $item) {
-        $sessionCount += isset($item['qty']) ? (int)$item['qty'] : 1;
-    }
+// Tính tổng
+$count = 0;
+$total = 0;
+foreach ($items as $item) {
+    $count += (int)$item['quantity'];
+    $total += (float)$item['price'] * (int)$item['quantity'];
 }
 
-$count = max((int)$row['total'], $sessionCount);
-
-echo json_encode(['count' => $count, 'logged_in' => true]);
+echo json_encode([
+    'count' => $count,
+    'logged_in' => true,
+    'items' => $items,
+    'total' => $total
+]);

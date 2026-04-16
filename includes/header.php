@@ -169,11 +169,277 @@
     html {
         scroll-behavior: smooth;
     }
+
+    /* Mini Cart Dropdown */
+    .mini-cart-wrapper {
+        position: relative;
+    }
+
+    .mini-cart-dropdown {
+        position: absolute;
+        top: calc(100% + 12px);
+        right: 0;
+        width: 380px;
+        background: #fff;
+        border-radius: var(--radius-lg);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        border: 1px solid var(--border-light);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1001;
+    }
+
+    .mini-cart-wrapper:hover .mini-cart-dropdown,
+    .mini-cart-dropdown.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .mini-cart-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .mini-cart-header h5 {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .mini-cart-items {
+        max-height: 320px;
+        overflow-y: auto;
+        padding: 16px;
+    }
+
+    .mini-cart-item {
+        display: flex;
+        gap: 16px;
+        padding: 12px;
+        border-radius: var(--radius-md);
+        transition: all 0.2s;
+    }
+
+    .mini-cart-item:hover {
+        background: var(--bg-soft);
+    }
+
+    .mini-cart-item img {
+        width: 64px;
+        height: 64px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+        background: var(--bg-gray);
+    }
+
+    .mini-cart-item-info {
+        flex: 1;
+    }
+
+    .mini-cart-item-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 4px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .mini-cart-item-price {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .mini-cart-item-qty {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .mini-cart-footer {
+        padding: 20px 24px;
+        border-top: 1px solid var(--border-light);
+        background: var(--bg-soft);
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+
+    .mini-cart-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .mini-cart-total span {
+        font-size: 14px;
+        color: var(--text-secondary);
+    }
+
+    .mini-cart-total strong {
+        font-size: 18px;
+        color: var(--text-main);
+    }
+
+    .mini-cart-empty {
+        text-align: center;
+        padding: 40px 24px;
+    }
+
+    .mini-cart-empty i {
+        font-size: 48px;
+        color: var(--border-light);
+        margin-bottom: 16px;
+    }
+
+    .mini-cart-empty p {
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    /* Dark Mode Toggle */
+    .dark-mode-toggle {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: var(--text-main);
+        transition: all 0.3s ease;
+    }
+
+    .dark-mode-toggle:hover {
+        background: rgba(0, 122, 255, 0.1);
+        color: var(--primary);
+    }
+
+    /* Dark Mode Styles */
+    body.dark-mode {
+        --bg-white: #0d0d0d;
+        --bg-soft: #1a1a1a;
+        --bg-gray: #2d2d2d;
+        --text-main: #ffffff;
+        --text-secondary: #a0a0a0;
+        --text-muted: #6e6e73;
+        --border-light: rgba(255, 255, 255, 0.1);
+        --glass-bg: rgba(30, 30, 30, 0.8);
+        --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode .navbar-minimal {
+        background: rgba(13, 13, 13, 0.8);
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode .mini-cart-dropdown,
+    body.dark-mode .product-card-new,
+    body.dark-mode .feature-item,
+    body.dark-mode .category-item,
+    body.dark-mode .testimonial-card {
+        background: #1a1a1a;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode .mini-cart-footer {
+        background: #0d0d0d;
+    }
     </style>
 
     <script>
         const BASE_PATH = "<?php echo $basePath; ?>";
         const SEARCH_API_URL = BASE_PATH + "api/search_suggestions.php";
+
+        // Mini Cart Functions
+        function loadMiniCart() {
+            fetch(BASE_PATH + 'api/cart_count.php')
+                .then(r => r.json())
+                .then(data => {
+                    const badge = document.getElementById('cartBadge');
+                    const countEl = document.getElementById('miniCartCount');
+                    const itemsEl = document.getElementById('miniCartItems');
+                    const totalEl = document.getElementById('miniCartTotal');
+
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'inline-flex';
+                        if (countEl) countEl.textContent = data.count + ' sản phẩm';
+
+                        // Load cart items
+                        if (itemsEl && data.items) {
+                            itemsEl.innerHTML = data.items.map(item => `
+                                <div class="mini-cart-item">
+                                    <img src="${BASE_PATH}assets/images/${item.image}" alt="${item.name}"
+                                         onerror="this.src='https://placehold.co/100x100/f5f5f7/1d1d1f?text=Phone'">
+                                    <div class="mini-cart-item-info">
+                                        <div class="mini-cart-item-name">${item.name}</div>
+                                        <div class="mini-cart-item-price">${new Intl.NumberFormat('vi-VN').format(item.price)}₫</div>
+                                        <div class="mini-cart-item-qty">SL: ${item.quantity}</div>
+                                    </div>
+                                </div>
+                            `).join('');
+                        }
+
+                        if (totalEl && data.total) {
+                            totalEl.textContent = new Intl.NumberFormat('vi-VN').format(data.total) + '₫';
+                        }
+                    } else {
+                        badge.style.display = 'none';
+                        if (countEl) countEl.textContent = '0 sản phẩm';
+                        if (itemsEl) {
+                            itemsEl.innerHTML = `
+                                <div class="mini-cart-empty">
+                                    <i class="bi bi-bag-heart"></i>
+                                    <p>Giỏ hàng của bạn đang trống</p>
+                                </div>
+                            `;
+                        }
+                        if (totalEl) totalEl.textContent = '0₫';
+                    }
+                })
+                .catch(() => {});
+        }
+
+        // Load mini cart on page load
+        document.addEventListener('DOMContentLoaded', loadMiniCart);
+
+        // Dark Mode Functions
+        function toggleDarkMode() {
+            const body = document.body;
+            const icon = document.getElementById('darkModeIcon');
+            const isDark = body.classList.toggle('dark-mode');
+
+            // Save preference
+            localStorage.setItem('darkMode', isDark ? '1' : '0');
+
+            // Update icon
+            if (isDark) {
+                icon.className = 'bi bi-sun-fill';
+            } else {
+                icon.className = 'bi bi-moon-stars';
+            }
+        }
+
+        // Load dark mode preference
+        document.addEventListener('DOMContentLoaded', function() {
+            const isDark = localStorage.getItem('darkMode') === '1';
+            const icon = document.getElementById('darkModeIcon');
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                if (icon) icon.className = 'bi bi-sun-fill';
+            }
+        });
     </script>
 </head>
 <body>
@@ -192,13 +458,32 @@
 
             <div class="nav-actions">
                 <a href="#" id="searchTrigger" class="nav-icon d-none d-md-flex"><i class="bi bi-search"></i></a>
-                <a href="<?php echo $basePath; ?>cart.php" class="nav-icon position-relative" id="cartNavIcon">
-                    <i class="bi bi-bag-heart"></i>
-                    <span id="cartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" 
-                          style="font-size: 0.65rem; padding: 0.35em 0.5em; display: <?php echo (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0 && isset($_SESSION['user_id'])) ? 'inline-flex' : 'none'; ?>;">
-                        <?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?>
-                    </span>
-                </a>
+                <!-- Mini Cart Dropdown -->
+                <div class="mini-cart-wrapper">
+                    <a href="<?php echo $basePath; ?>cart.php" class="nav-icon position-relative" id="cartNavIcon">
+                        <i class="bi bi-bag-heart"></i>
+                        <span id="cartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary"
+                              style="font-size: 0.65rem; padding: 0.35em 0.5em; display: none;">
+                            0
+                        </span>
+                    </a>
+                    <div class="mini-cart-dropdown" id="miniCartDropdown">
+                        <div class="mini-cart-header">
+                            <h5>Giỏ hàng của bạn</h5>
+                            <span class="text-muted" id="miniCartCount">0 sản phẩm</span>
+                        </div>
+                        <div class="mini-cart-items" id="miniCartItems">
+                            <!-- Items will be loaded via AJAX -->
+                        </div>
+                        <div class="mini-cart-footer">
+                            <div class="mini-cart-total">
+                                <span>Tổng cộng:</span>
+                                <strong id="miniCartTotal">0₫</strong>
+                            </div>
+                            <a href="<?php echo $basePath; ?>cart.php" class="btn btn-dark w-100 rounded-pill py-2 fw-bold">Xem giỏ hàng</a>
+                        </div>
+                    </div>
+                </div>
 
                 <?php if (isset($_SESSION['user_id'])): ?>
                 <?php
@@ -224,6 +509,11 @@
                 
                 <a href="#mobileNav" data-bs-toggle="offcanvas" class="nav-icon d-flex d-lg-none"><i class="bi bi-list"></i></a>
                 
+                <!-- Dark Mode Toggle -->
+                <button class="dark-mode-toggle d-none d-md-flex" onclick="toggleDarkMode()" title="Chuyển đổi chế độ tối">
+                    <i class="bi bi-moon-stars" id="darkModeIcon"></i>
+                </button>
+
                 <?php if (isset($_SESSION['user_id']) || isset($_SESSION['admin_id'])): ?>
                     <a href="#accountOffcanvas" role="button" class="nav-icon d-none d-sm-flex" data-bs-toggle="offcanvas"><i class="bi bi-person-circle"></i></a>
                 <?php else: ?>
