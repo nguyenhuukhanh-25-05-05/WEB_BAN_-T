@@ -13,8 +13,8 @@
 
 require_once __DIR__ . '/functions.php';
 
-// 1. Cấu hình kết nối - ƯU TIÊN SUPABASE
-$databaseUrl = 'postgresql://postgres:' . urlencode('@Khanh2006') . '@db.qfaslglevzkujkmylxfx.supabase.co:5432/postgres';
+// 1. Cấu hình kết nối - SỬ DỤNG TRANSACTION POOLER (CỔNG 6543) ĐỂ ỔN ĐỊNH TRÊN RENDER
+$databaseUrl = 'postgresql://postgres.qfaslglevzkujkmylxfx:' . urlencode('@Khanh2006') . '@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres';
 
 // Nếu có biến môi trường từ Render và không phải database cũ, mới ghi đè
 $envUrl = getenv('DATABASE_URL') ?: ($_ENV['DATABASE_URL'] ?? $_SERVER['DATABASE_URL'] ?? null);
