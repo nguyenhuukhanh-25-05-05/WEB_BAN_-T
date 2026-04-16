@@ -20,8 +20,8 @@ if (!$databaseUrl)
 
 // Fallback connection string - THAY CHUỖI DƯỚI ĐÂY BẰNG SUPABASE HOẶC NEON URL CỦA BẠN
 if (!$databaseUrl) {
-    // Thông tin lấy từ URL dự án mới: qfaslglevzkujkmylxfx và mật khẩu của bạn
-    $databaseUrl = 'postgresql://postgres:@Khanh2006@db.qfaslglevzkujkmylxfx.supabase.co:5432/postgres';
+    // Thông tin lấy từ URL dự án mới: qfaslglevzkujkmylxfx và mật khẩu của bạn (đã mã hóa @ thành %40)
+    $databaseUrl = 'postgresql://postgres:%40Khanh2006@db.qfaslglevzkujkmylxfx.supabase.co:5432/postgres';
 }
 
 $connected = false;
