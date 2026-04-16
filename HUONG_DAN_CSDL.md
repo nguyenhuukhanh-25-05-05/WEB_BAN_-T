@@ -13,16 +13,16 @@ Tài liệu này hướng dẫn cách kết nối trực tiếp vào Database tr
 
 ---
 
-## PHẦN 2: LẤY THÔNG TIN KẾT NỐI TỪ RENDER
+## PHẦN 2: LẤY THÔNG TIN KẾT NỐI TỪ SUPABASE
 
-Database của bạn nằm trên Cloud, bạn cần lấy chuỗi kết nối ngoại vi (External Connection String):
+Database của bạn hiện đã được chuyển sang Supabase để sử dụng miễn phí lâu dài:
 
-1. Đăng nhập [Dashboard Render](https://dashboard.render.com/).
-2. Click vào tên dịch vụ **PostgreSQL** của bạn (ví dụ: `nhkmobile_db`).
-3. Trong mục **Info** (mặc định), tìm phần **Connections**.
-4. Tìm dòng **External Connection String**.
-5. Nhấn vào biểu tượng **Copy** ở cuối dòng đó. Nó sẽ có dạng: 
-   `postgresql://nhkmobile_db_user:Abc123xyz@dpg-xxxxxx.render.com/nhkmobile_db`
+1. Đăng nhập [Supabase Dashboard](https://supabase.com/dashboard).
+2. Chọn Project của bạn (`qfaslglevzkujkmylxfx`).
+3. Vào mục **Project Settings** (biểu tượng bánh răng) -> **Database**.
+4. Tìm phần **Connection string**, chọn tab **URI**.
+5. Copy chuỗi có dạng: `postgresql://postgres:[YOUR-PASSWORD]@db.qfaslglevzkujkmylxfx.supabase.co:5432/postgres`
+   *Lưu ý: Thay `[YOUR-PASSWORD]` bằng mật khẩu bạn đã đặt.*
 
 ---
 

@@ -18,9 +18,10 @@ $databaseUrl = getenv('DATABASE_URL');
 if (!$databaseUrl)
     $databaseUrl = $_ENV['DATABASE_URL'] ?? $_SERVER['DATABASE_URL'] ?? null;
 
-// Fallback connection string nếu không có env var
+// Fallback connection string - THAY CHUỖI DƯỚI ĐÂY BẰNG SUPABASE HOẶC NEON URL CỦA BẠN
 if (!$databaseUrl) {
-    $databaseUrl = 'postgresql://nhkmobile_db_user:AJIKpubrkKYEbsRHZ4xMnM7YVxNKnJUJ@dpg-d6slq6i4d50c73bqegug-a/nhkmobile_db';
+    // Thông tin lấy từ URL dự án mới: qfaslglevzkujkmylxfx và mật khẩu của bạn
+    $databaseUrl = 'postgresql://postgres:@Khanh2006@db.qfaslglevzkujkmylxfx.supabase.co:5432/postgres';
 }
 
 $connected = false;
@@ -209,6 +210,7 @@ try {
     try { $pdo->exec("ALTER TABLE news ADD COLUMN IF NOT EXISTS tags VARCHAR(255);"); } catch (\PDOException $e) {}
     try { $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS rating DECIMAL(3,2) DEFAULT 0.00;"); } catch (\PDOException $e) {}
     try { $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS review_count INT DEFAULT 0;"); } catch (\PDOException $e) {}
+    try { $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS specs TEXT;"); } catch (\PDOException $e) {}
     try { $pdo->exec("ALTER TABLE products ADD CONSTRAINT products_name_unique UNIQUE (name);"); } catch (\PDOException $e) {}
     
     // Cập nhật cấu trúc bảng Orders (Đơn hàng)

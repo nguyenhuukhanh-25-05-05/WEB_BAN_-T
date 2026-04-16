@@ -81,6 +81,7 @@ try {
         stock INT DEFAULT 0,
         image VARCHAR(255),
         description TEXT,
+        specs TEXT,
         is_featured BOOLEAN DEFAULT FALSE,
         rating DECIMAL(3,2) DEFAULT 0.00,
         review_count INT DEFAULT 0,
@@ -217,14 +218,14 @@ try {
 
     // Featured Products
     $products = [
-        ['iPhone 17 Pro Max', 'Apple', 32990000, 50, 'ai_ip17_pm.png', 'Siêu phẩm AI thế hệ mới.', true],
-        ['Samsung S25 Ultra', 'Samsung', 29490000, 30, 'ai_s25_ultra.png', 'Đỉnh cao màn hình vô cực.', true],
-        ['Xiaomi 17 Ultra', 'Xiaomi', 24500000, 15, 'ai_mi17_ultra.png', 'Camera Leica thế hệ 4.', true],
-        ['OnePlus 13', 'OnePlus', 15500000, 20, 'oneplus13.png', 'Mượt mà nhất phân khúc.', false],
-        ['iPhone 16e', 'Apple', 19990000, 25, 'ai_ip16e.png', 'iPhone nhỏ gọn thế hệ mới nhất.', false]
+        ['iPhone 17 Pro Max', 'Apple', 32990000, 50, 'ai_ip17_pm.png', 'Siêu phẩm AI thế hệ mới.', '256GB, 12GB RAM, A19 Pro', true],
+        ['Samsung S25 Ultra', 'Samsung', 29490000, 30, 'ai_s25_ultra.png', 'Đỉnh cao màn hình vô cực.', '512GB, 16GB RAM, Snapdragon 8 Gen 4', true],
+        ['Xiaomi 17 Ultra', 'Xiaomi', 24500000, 15, 'ai_mi17_ultra.png', 'Camera Leica thế hệ 4.', '256GB, 12GB RAM, Leica Camera', true],
+        ['OnePlus 13', 'OnePlus', 15500000, 20, 'oneplus13.png', 'Mượt mà nhất phân khúc.', '128GB, 8GB RAM', false],
+        ['iPhone 16e', 'Apple', 19990000, 25, 'ai_ip16e.png', 'iPhone nhỏ gọn thế hệ mới nhất.', '128GB, 8GB RAM', false]
     ];
 
-    $stmt = $pdo->prepare("INSERT INTO products (name, category, price, stock, image, description, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO products (name, category, price, stock, image, description, specs, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     foreach ($products as $p) {
         $stmt->execute($p);
     }

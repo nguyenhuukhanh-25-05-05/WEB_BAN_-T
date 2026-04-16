@@ -45,6 +45,7 @@ CREATE TABLE products (
     stock INT DEFAULT 0,
     image VARCHAR(255),
     description TEXT,
+    specs TEXT,
     is_featured BOOLEAN DEFAULT FALSE,
     rating DECIMAL(3,2) DEFAULT 0.00,
     review_count INT DEFAULT 0,
@@ -154,12 +155,12 @@ INSERT INTO users (fullname, email, password, status, phone, address)
 VALUES ('Test User', 'test@test.com', '$2y$10$Yx9WkIhHpL8mG7zK4nOPu.vC3dE4fG5hI6jK7lM8nO9pQ0rR1sU', 'active', '0901234567', '123 Đường Test, Quận 1, TP.HCM');
 
 -- Default Products (5 sản phẩm)
-INSERT INTO products (name, category, price, stock, image, description, is_featured) VALUES
-('iPhone 17 Pro Max', 'Apple', 32990000, 50, 'ai_ip17_pm.png', 'Siêu phẩm AI thế hệ mới.', TRUE),
-('Samsung S25 Ultra', 'Samsung', 29490000, 30, 'ai_s25_ultra.png', 'Đỉnh cao màn hình vô cực.', TRUE),
-('Xiaomi 17 Ultra', 'Xiaomi', 24500000, 15, 'ai_mi17_ultra.png', 'Camera Leica thế hệ 4.', TRUE),
-('OnePlus 13', 'OnePlus', 15500000, 20, 'oneplus13.png', 'Mượt mà nhất phân khúc.', FALSE),
-('iPhone 16e', 'Apple', 19990000, 25, 'ai_ip16e.png', 'iPhone nhỏ gọn thế hệ mới nhất.', FALSE);
+INSERT INTO products (name, category, price, stock, image, description, specs, is_featured) VALUES
+('iPhone 17 Pro Max', 'Apple', 32990000, 50, 'ai_ip17_pm.png', 'Siêu phẩm AI thế hệ mới.', '256GB, 12GB RAM, A19 Pro', TRUE),
+('Samsung S25 Ultra', 'Samsung', 29490000, 30, 'ai_s25_ultra.png', 'Đỉnh cao màn hình vô cực.', '512GB, 16GB RAM, Snapdragon 8 Gen 4', TRUE),
+('Xiaomi 17 Ultra', 'Xiaomi', 24500000, 15, 'ai_mi17_ultra.png', 'Camera Leica thế hệ 4.', '256GB, 12GB RAM, Leica Camera', TRUE),
+('OnePlus 13', 'OnePlus', 15500000, 20, 'oneplus13.png', 'Mượt mà nhất phân khúc.', '128GB, 8GB RAM', FALSE),
+('iPhone 16e', 'Apple', 19990000, 25, 'ai_ip16e.png', 'iPhone nhỏ gọn thế hệ mới nhất.', '128GB, 8GB RAM', FALSE);
 
 -- Default News (3 bài viết)
 INSERT INTO news (title, content, tags) VALUES
