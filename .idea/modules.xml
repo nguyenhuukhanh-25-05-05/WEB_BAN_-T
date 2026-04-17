@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/WEB_BAN_-T-main.iml" filepath="$PROJECT_DIR$/.idea/WEB_BAN_-T-main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/nhkmobile_web.iml" filepath="$PROJECT_DIR$/.idea/nhkmobile_web.iml" />
     </modules>
   </component>
 </project>

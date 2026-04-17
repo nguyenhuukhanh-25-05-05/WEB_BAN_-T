@@ -228,21 +228,12 @@ include 'includes/header.php';
             </div>
             <div class="product-grid-new">
                 <?php
-                // Lấy sản phẩm giảm giá (flash sale)
-                $flashSaleStmt = $pdo->query("SELECT * FROM products WHERE discount_price IS NOT NULL AND discount_price > 0 ORDER BY RANDOM() LIMIT 4");
+                // Lấy sản phẩm flash sale (ngẫu nhiên, giảm giá giả lập)
+                $flashSaleStmt = $pdo->query("SELECT * FROM products ORDER BY RANDOM() LIMIT 4");
                 $flashSaleProducts = $flashSaleStmt->fetchAll();
-                if (empty($flashSaleProducts)) {
-                    // Nếu không có sản phẩm giảm giá, lấy sản phẩm ngẫu nhiên
-                    $flashSaleStmt = $pdo->query("SELECT * FROM products ORDER BY RANDOM() LIMIT 4");
-                    $flashSaleProducts = $flashSaleStmt->fetchAll();
-                }
                 foreach ($flashSaleProducts as $p):
-                    $discountPercent = isset($p['discount_price']) && $p['discount_price'] > 0
-                        ? round((1 - $p['discount_price'] / $p['price']) * 100)
-                        : rand(10, 30);
-                    $salePrice = isset($p['discount_price']) && $p['discount_price'] > 0
-                        ? $p['discount_price']
-                        : $p['price'] * (100 - $discountPercent) / 100;
+                    $discountPercent = rand(10, 30);
+                    $salePrice = $p['price'] * (100 - $discountPercent) / 100;
                 ?>
                     <div class="product-card-new" style="background: #fff; border: none;">
                         <a href="product-detail.php?id=<?php echo $p['id']; ?>">
