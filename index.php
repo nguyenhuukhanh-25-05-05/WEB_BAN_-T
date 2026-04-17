@@ -55,7 +55,7 @@ include 'includes/header.php';
                         </div>
                     </div>
                     <div class="hero-image-container">
-                        <img src="assets/images/ai_ip17_pm.png" alt="iPhone 17 Pro" class="hero-image-new"
+                        <img src="assets/images/apple-iphone-17-pro-max.png" alt="iPhone 17 Pro" class="hero-image-new"
                             onerror="this.src='https://placehold.co/800x1000/transparent/333?text=iPhone+17+Pro'">
                         <div class="hero-glow"></div>
                     </div>
@@ -84,7 +84,7 @@ include 'includes/header.php';
                         </div>
                     </div>
                     <div class="hero-image-container">
-                        <img src="assets/images/samsung_s25.png" alt="Galaxy S25 Ultra" class="hero-image-new"
+                        <img src="assets/images/samsung-galaxy-s25-ultra.png" alt="Galaxy S25 Ultra" class="hero-image-new"
                             onerror="this.src='https://placehold.co/800x1000/transparent/1428a0?text=Galaxy+S25+Ultra'">
                         <div class="hero-glow" style="background: #1428a0;"></div>
                     </div>
@@ -113,7 +113,7 @@ include 'includes/header.php';
                         </div>
                     </div>
                     <div class="hero-image-container">
-                        <img src="assets/images/xiaomi_15.png" alt="Xiaomi 15 Ultra" class="hero-image-new"
+                        <img src="assets/images/xiaomi-17-ultra.png" alt="Xiaomi 15 Ultra" class="hero-image-new"
                             onerror="this.src='https://placehold.co/800x1000/transparent/ff6900?text=Xiaomi+15+Ultra'">
                         <div class="hero-glow" style="background: #ff6900;"></div>
                     </div>
