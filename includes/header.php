@@ -1049,6 +1049,9 @@
                     <a href="<?php echo $basePath; ?>news.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
                         <i class="bi bi-newspaper me-3 fs-5"></i> Tin tức
                     </a>
+                    <a href="<?php echo $basePath; ?>check.php" class="list-group-item list-group-item-action py-3 px-4 border-0 fw-bold d-flex align-items-center">
+                        <i class="bi bi-clipboard-check me-3 fs-5"></i> Kiểm tra hệ thống
+                    </a>
                 </div>
             </div>
             

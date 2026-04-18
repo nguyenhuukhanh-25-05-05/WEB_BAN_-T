@@ -135,10 +135,10 @@ include 'includes/header.php';
                 </div>
             <?php else: ?>
                 <!-- Giao diện trang thanh toán (Nhập thông tin) -->
+                <form action="checkout.php" method="POST" id="checkoutForm">
                 <div class="row g-5">
                     <div class="col-lg-7">
                         <h2 class="fw-bold mb-4">Thông tin nhận hàng.</h2>
-                        <form action="checkout.php" method="POST" id="checkoutForm">
                             <div class="row g-3">
                                 <div class="col-md-12">
                                     <label class="form-label small fw-bold">Họ và tên khách hàng</label>
@@ -194,10 +194,10 @@ include 'includes/header.php';
                                 <h4 class="fw-bold text-primary"><?php echo number_format($total, 0, ',', '.'); ?>₫</h4>
                             </div>
                             <button type="submit" name="place_order" class="btn btn-dark w-100 rounded-pill py-3 fw-bold mt-5 shadow">Xác nhận đặt mua ngay</button>
-                        </form>
                         </div>
                     </div>
                 </div>
+                </form>
             <?php endif; ?>
         </div>
     </main>
