@@ -1,0 +1,10 @@
+node_modules/
+vendor/
+.DS_Store
+Thumbs.db
+*.log
+.env
+composer.lock
+nul
+config.local.php
+api/_secret.php
