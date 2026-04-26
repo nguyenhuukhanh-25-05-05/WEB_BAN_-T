@@ -144,3 +144,10 @@
 
 ---
 *📌 Ký hiệu: ✅ PASS · ❌ FAIL · ⏭️ SKIP · ⬜ Chưa thực hiện*
+ 
+## Test Run Log - 2026-04-26 
+- Cart flow tested on all screen sizes 
+- Checkout process validated 
+- Authentication tested (login, logout, forgot password) 
+- Admin dashboard reviewed 
+- Warranty tracking verified 
