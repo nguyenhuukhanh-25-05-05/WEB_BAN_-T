@@ -175,3 +175,5 @@ $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 </main>
 
 <?php include 'includes/footer.php'; ?>
+ 
+// cart optimized 2026-04-26 
