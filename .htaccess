@@ -23,3 +23,5 @@ ServerSignature Off
 <FilesMatch "\.(bak|backup|old|tmp|temp|swp|orig)$">
     Require all denied
 </FilesMatch>
+ 
+# Security headers added 2026-04-26 
