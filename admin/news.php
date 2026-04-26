@@ -36,10 +36,13 @@ if (isset($_POST['save_news'])) {
         $sql = "UPDATE news SET title = ?, category = ?, excerpt = ?, content = ?, image = ?, tags = ? WHERE id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$title, $category, $excerpt, $content, $image, $tags, $id]);
+        log_admin_action($pdo, 'UPDATE_NEWS', "Cập nhật tin tức ID $id ($title)");
     } else {
         $sql = "INSERT INTO news (title, category, excerpt, content, image, tags) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$title, $category, $excerpt, $content, $image, $tags]);
+        $new_news_id = $pdo->lastInsertId();
+        log_admin_action($pdo, 'ADD_NEWS', "Thêm bài tin tức mới ID $new_news_id ($title)");
     }
     header("Location: news.php?msg=success");
     exit;
@@ -49,6 +52,7 @@ if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $stmt = $pdo->prepare("DELETE FROM news WHERE id = ?");
     $stmt->execute([$id]);
+    log_admin_action($pdo, 'DELETE_NEWS', "Xóa tin tức ID $id");
     header("Location: news.php?msg=deleted");
     exit;
 }

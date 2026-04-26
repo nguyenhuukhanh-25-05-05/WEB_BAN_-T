@@ -305,6 +305,18 @@ try {
     // Thêm cột reset_status cho bảng users để track password reset requests
     try { $pdo->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_password_reset TIMESTAMP;"); } catch (\PDOException $e) {}
 
+    // Đảm bảo có bảng Lưu trữ Lịch sử Thao tác Admin (Admin Logs)
+    try { $pdo->exec("
+        CREATE TABLE IF NOT EXISTS admin_logs (
+            id SERIAL PRIMARY KEY,
+            admin_id INT REFERENCES admins(id) ON DELETE SET NULL,
+            action_type VARCHAR(50) NOT NULL,
+            details TEXT,
+            ip_address VARCHAR(45),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    "); } catch (\PDOException $e) {}
+
 } catch (\PDOException $e) {
     error_log("[DB] Schema management error: " . $e->getMessage());
     // Không die ở đây vì kết nối đã thành công, chỉ là lỗi migration

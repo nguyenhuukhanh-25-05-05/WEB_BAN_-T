@@ -31,6 +31,7 @@ if (isset($_POST['save_user'])) {
                 $stmt->execute([$fullname, $email, $phone, $address, $status, $role, $id]);
             }
             $msg = "Cập nhật thông tin khách hàng thành công!";
+            log_admin_action($pdo, 'UPDATE_USER', "Cập nhật thông tin người dùng ID $id ($fullname, Role: $role, Status: $status)");
         } else {
             if (empty($password)) {
                 $password = '123456';
@@ -40,6 +41,8 @@ if (isset($_POST['save_user'])) {
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$fullname, $email, $phone, $address, $status, $role, $hashed_password]);
             $msg = "Thêm khách hàng mới thành công!";
+            $new_user_id = $pdo->lastInsertId();
+            log_admin_action($pdo, 'ADD_USER', "Thêm người dùng mới ID $new_user_id ($fullname, Role: $role)");
         }
         header("Location: users.php?msg=" . urlencode($msg));
         exit;
@@ -61,6 +64,8 @@ if (isset($_POST['update_status'])) {
     // Câu lệnh SQL cập nhật trạng thái
     $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE id = ?");
     $stmt->execute([$status, $id]);
+    
+    log_admin_action($pdo, 'CHANGE_USER_STATUS', "Đổi trạng thái người dùng ID $id thành $status");
     
     // Lưu thông báo vào URL và reload trang
     header("Location: users.php?msg=" . urlencode("Đã cập nhật trạng thái người dùng thành công!"));

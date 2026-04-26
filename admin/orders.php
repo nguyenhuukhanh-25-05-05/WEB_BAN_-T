@@ -17,6 +17,8 @@ if (isset($_POST['update_status'])) {
     $stmt = $pdo->prepare("UPDATE orders SET status = ? WHERE id = ?");
     $stmt->execute([$status, $id]);
     
+    log_admin_action($pdo, 'UPDATE_ORDER_STATUS', "Cập nhật trạng thái đơn hàng ID $id thành $status");
+    
     // Lưu thông báo vào URL và reload trang
     header("Location: orders.php?msg=updated");
     exit;

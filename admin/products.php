@@ -57,12 +57,15 @@ if (isset($_POST['save_product'])) {
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$name, $category, $price, $stock, $image, $description, $specs, $id]);
         $msg = "success";
+        log_admin_action($pdo, 'UPDATE_PRODUCT', "Cập nhật sản phẩm ID $id ($name)");
     } else {
         // Nếu không có ID -> THÊM MỚI sản phẩm vào bảng
         $sql = "INSERT INTO products (name, category, price, stock, image, description, specs) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$name, $category, $price, $stock, $image, $description, $specs]);
         $msg = "success";
+        $new_product_id = $pdo->lastInsertId();
+        log_admin_action($pdo, 'ADD_PRODUCT', "Thêm sản phẩm mới ID $new_product_id ($name)");
     }
     // Chuyển hướng lại trang để tránh gửi lại form khi F5
     header("Location: products.php?msg=$msg");
@@ -97,6 +100,8 @@ if (isset($_GET['delete'])) {
         $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
         $stmt->execute([$id]);
         
+        log_admin_action($pdo, 'DELETE_PRODUCT', "Xóa sản phẩm ID $id");
+        
         $pdo->commit();
         header("Location: products.php?msg=deleted");
     } catch (Exception $e) {
@@ -124,6 +129,8 @@ if (isset($_POST['bulk_delete']) && !empty($_POST['selected_ids'])) {
         $stmt = $pdo->prepare($sql);
         $stmt->execute($ids);
         
+        log_admin_action($pdo, 'BULK_DELETE_PRODUCTS', "Xóa nhiều sản phẩm, số lượng: " . count($ids));
+        
         $pdo->commit();
         header("Location: products.php?msg=deleted");
     } catch (Exception $e) {
@@ -138,6 +145,7 @@ if (isset($_GET['toggle_featured'])) {
     $id = $_GET['toggle_featured'];
     $stmt = $pdo->prepare("UPDATE products SET is_featured = NOT is_featured WHERE id = ?");
     $stmt->execute([$id]);
+    log_admin_action($pdo, 'TOGGLE_FEATURED_PRODUCT', "Bật/tắt sản phẩm nổi bật ID $id");
     header("Location: products.php?msg=success");
     exit;
 }

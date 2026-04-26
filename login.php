@@ -70,6 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ? '/admin/dashboard.php'
                         : 'admin/dashboard.php';
                     log_auth_attempt('login', $email_or_user, true, 'Admin login successful via role');
+                    require_once 'includes/functions.php';
+                    log_admin_action($pdo, 'LOGIN', "Đăng nhập hệ thống (User có quyền Admin)");
+                    
                     header("Location: " . $adminUrl);
                     exit;
                 } else {
@@ -111,6 +114,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         : 'admin/dashboard.php';
                     
                     log_auth_attempt('login', $email_or_user, true, 'Admin login successful');
+                    require_once 'includes/functions.php';
+                    log_admin_action($pdo, 'LOGIN', "Đăng nhập hệ thống");
+                    
                     header("Location: " . $adminUrl);
                     exit;
                 }

@@ -1,0 +1,22 @@
+Mã lỗi (ID),Chức năng (Module),Mô tả lỗi (Defect Description),Các bước tái hiện (Steps to Reproduce),Mức độ nghiêm trọng (Severity),Trạng thái (Status),Cách khắc phục (Resolution)
+BUG-001,Authentication,Nút Đăng xuất Admin không hoạt động trên một số trang,"1. Đăng nhập Admin
+2. Vào trang không phải Bảo hành
+3. Bấm menu Đăng xuất nhưng không có phản hồi",High,Fixed,"Thay thế Dropdown JS bằng nút bấm tĩnh trong admin_header.php"
+BUG-002,Authentication,Lỗi "Ghost Logout" trên trang Bảo hành,"1. Đăng nhập hệ thống
+2. Chuyển sang trang warranty.php
+3. Giao diện báo chưa đăng nhập, ấn vào hình người thì bị đẩy ra trang Login",High,Fixed,"Sửa file warranty.php: gọi auth_functions.php thay vì session_start() thủ công để giữ đúng Session"
+BUG-003,Authentication,Đăng xuất bị văng về trang chủ (index.php),"1. Ở trang chi tiết sản phẩm
+2. Bấm Đăng xuất
+3. Trình duyệt tự chuyển về index.php gây bất tiện cho người dùng",Medium,Fixed,"Cập nhật logout.php để redirect về HTTP_REFERER (trang trước đó) thay vì index.php"
+BUG-004,Shopping Cart,Admin không thể thêm hàng vào giỏ,"1. Đăng nhập bằng tài khoản Admin
+2. Bấm Thêm vào giỏ hàng
+3. Lỗi không thể thêm (do Admin không có user_id trong bảng users)",High,Fixed,"Bổ sung logic tách biệt giỏ hàng Session cho Admin trong cart_functions.php"
+BUG-005,Checkout,Admin không thể thao tác ở trang thanh toán (Checkout),"1. Thêm hàng vào giỏ bằng Admin
+2. Chuyển sang trang thanh toán
+3. Hệ thống báo lỗi phân quyền",High,Fixed,"Cập nhật quyền truy cập trang checkout.php cho phép cả Admin thao tác"
+BUG-006,System Logging,Không có lịch sử thao tác của Admin,"1. Admin thực hiện xóa user hoặc sửa sản phẩm
+2. Hệ thống không có nơi nào ghi nhận lại hành động này",Medium,Fixed,"Tạo bảng admin_logs và trang giao diện để lưu và hiển thị nhật ký hệ thống"
+BUG-007,Chatbot AI,Lỗi kết nối API của Chatbot,"1. Nhắn tin với Chatbot AI
+2. AI không phản hồi do sai API Key hoặc lỗi Header",High,Fixed,"Cập nhật file chat.php để nạp đúng khóa API của xAI / Gemini và sửa Header"
+BUG-008,Frontend,Lỗi không hiển thị danh sách tin tức nổi bật,"1. Vào trang chủ
+2. Khu vực tin tức không load được data từ Database",Medium,Fixed,"Tách component featured_news.php và fix lại query SQL để lấy đúng dữ liệu"

@@ -32,4 +32,25 @@ function get_order_status_badge($status) {
     
     return "<span class=\"badge $class border-0 px-3 py-1 rounded-pill small\">$status</span>";
 }
+
+/**
+ * Ghi lại lịch sử thao tác của Admin vào cơ sở dữ liệu
+ * @param PDO $pdo Đối tượng kết nối CSDL
+ * @param string $action_type Loại thao tác (ví dụ: LOGIN, UPDATE_USER)
+ * @param string $details Chi tiết thao tác
+ */
+function log_admin_action($pdo, $action_type, $details = '') {
+    if (!isset($_SESSION['admin_id'])) return;
+    
+    $admin_id = $_SESSION['admin_id'];
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    
+    try {
+        $stmt = $pdo->prepare("INSERT INTO admin_logs (admin_id, action_type, details, ip_address) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$admin_id, $action_type, $details, $ip]);
+    } catch (PDOException $e) {
+        // Ghi log ra file nếu lỗi DB
+        error_log("[Admin Log] Failed to insert DB log: " . $e->getMessage());
+    }
+}
 ?>

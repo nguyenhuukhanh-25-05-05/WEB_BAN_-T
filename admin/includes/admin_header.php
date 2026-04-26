@@ -64,6 +64,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <a href="warranties.php" class="nav-link-admin <?php echo $current_page == 'warranties.php' ? 'active' : ''; ?>"><i class="bi bi-shield-check"></i> Bảo hành</a>
             <a href="news.php" class="nav-link-admin <?php echo $current_page == 'news.php' ? 'active' : ''; ?>"><i class="bi bi-newspaper"></i> Tin tức</a>
             <a href="revenue.php" class="nav-link-admin <?php echo $current_page == 'revenue.php' ? 'active' : ''; ?>"><i class="bi bi-graph-up"></i> Doanh thu</a>
+            <a href="logs.php" class="nav-link-admin <?php echo $current_page == 'logs.php' ? 'active' : ''; ?>"><i class="bi bi-journal-text"></i> Nhật ký hệ thống</a>
         </nav>
         <div class="sidebar-footer">
             <a href="password_resets.php" class="nav-link-admin"><i class="bi bi-key"></i> Đặt lại mật khẩu</a>
