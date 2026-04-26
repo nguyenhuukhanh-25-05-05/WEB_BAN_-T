@@ -202,3 +202,8 @@ desktop-app\build.bat
 1. Electron download may fail due to network issues - use manual installation if needed
 2. PHP auto-detection may not find PHP in non-standard paths - set PHP_PATH env var
 3. Port 8080 may conflict with other services - change in main.js if needed
+ 
+## Changes Made (April 26, 2026) 
+- Optimized SQL queries in product listing page. 
+- Improved session handling for cart and wishlist. 
+- Cleaned up unused CSS classes and assets. 
