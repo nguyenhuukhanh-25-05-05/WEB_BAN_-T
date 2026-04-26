@@ -630,3 +630,5 @@ function checkStrength(val) {
 </script>
 
 <?php include 'includes/footer.php'; ?>
+ 
+// profile security update 2026-04-26 
