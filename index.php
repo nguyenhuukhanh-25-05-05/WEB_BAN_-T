@@ -451,3 +451,4 @@ function handleNewsletter(e) {
 </script>
 
 <?php include 'includes/footer.php'; ?>
+ 
