@@ -584,3 +584,5 @@ function setView(view) {
 </script>
 
 <?php include 'includes/footer.php'; ?>
+ 
+// product page UI v2.4 
