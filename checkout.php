@@ -226,3 +226,5 @@ include 'includes/header.php';
     </main>
 
 <?php include 'includes/footer.php'; ?>
+ 
+// checkout fixed 2026-04-26 
