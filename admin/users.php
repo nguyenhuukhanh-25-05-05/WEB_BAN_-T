@@ -15,34 +15,33 @@ if (isset($_POST['save_user'])) {
     $phone = trim($_POST['phone']);
     $address = trim($_POST['address']);
     $status = $_POST['status'];
-    $role = $_POST['role'] ?? 'user';
     $password = $_POST['password'];
 
     try {
         if ($id) {
             if (!empty($password)) {
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                $sql = "UPDATE users SET fullname = ?, email = ?, phone = ?, address = ?, status = ?, role = ?, password = ? WHERE id = ?";
+                $sql = "UPDATE users SET fullname = ?, email = ?, phone = ?, address = ?, status = ?, password = ? WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$fullname, $email, $phone, $address, $status, $role, $hashed_password, $id]);
+                $stmt->execute([$fullname, $email, $phone, $address, $status, $hashed_password, $id]);
             } else {
-                $sql = "UPDATE users SET fullname = ?, email = ?, phone = ?, address = ?, status = ?, role = ? WHERE id = ?";
+                $sql = "UPDATE users SET fullname = ?, email = ?, phone = ?, address = ?, status = ? WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$fullname, $email, $phone, $address, $status, $role, $id]);
+                $stmt->execute([$fullname, $email, $phone, $address, $status, $id]);
             }
             $msg = "Cập nhật thông tin khách hàng thành công!";
-            log_admin_action($pdo, 'UPDATE_USER', "Cập nhật thông tin người dùng ID $id ($fullname, Role: $role, Status: $status)");
+            log_admin_action($pdo, 'UPDATE_USER', "Cập nhật thông tin người dùng ID $id ($fullname, Status: $status)");
         } else {
             if (empty($password)) {
                 $password = '123456';
             }
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $sql = "INSERT INTO users (fullname, email, phone, address, status, role, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO users (fullname, email, phone, address, status, password) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$fullname, $email, $phone, $address, $status, $role, $hashed_password]);
+            $stmt->execute([$fullname, $email, $phone, $address, $status, $hashed_password]);
             $msg = "Thêm khách hàng mới thành công!";
             $new_user_id = $pdo->lastInsertId();
-            log_admin_action($pdo, 'ADD_USER', "Thêm người dùng mới ID $new_user_id ($fullname, Role: $role)");
+            log_admin_action($pdo, 'ADD_USER', "Thêm người dùng mới ID $new_user_id ($fullname)");
         }
         header("Location: users.php?msg=" . urlencode($msg));
         exit;
@@ -76,17 +75,12 @@ if (isset($_POST['update_status'])) {
  * 2. TRUY VẤN DANH SÁCH USER
  */
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-$role_filter = isset($_GET['role_filter']) ? trim($_GET['role_filter']) : '';
 
 $sql = "SELECT * FROM users WHERE 1=1";
 $params = [];
 if ($search !== '') {
     $sql .= " AND phone LIKE ?";
     $params[] = "%$search%";
-}
-if ($role_filter !== '') {
-    $sql .= " AND role = ?";
-    $params[] = $role_filter;
 }
 $sql .= " ORDER BY created_at DESC";
 $stmt = $pdo->prepare($sql);
@@ -117,19 +111,12 @@ include 'includes/admin_header.php';
 
         <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
             <form action="" method="GET" class="row g-2 align-items-center">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <input type="text" name="search" class="form-control bg-light border-0" placeholder="Tìm theo số điện thoại..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
                 </div>
-                <div class="col-md-4">
-                    <select name="role_filter" class="form-select bg-light border-0">
-                        <option value="">Tất cả vai trò</option>
-                        <option value="user" <?php echo ($role_filter == 'user') ? 'selected' : ''; ?>>Khách hàng</option>
-                        <option value="admin" <?php echo ($role_filter == 'admin') ? 'selected' : ''; ?>>Quản trị viên</option>
-                    </select>
-                </div>
-                <div class="col-md-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary px-4 shadow-sm"><i class="bi bi-funnel"></i> Lọc</button>
-                    <?php if ($search || $role_filter): ?>
+                <div class="col-md-6 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm"><i class="bi bi-funnel"></i> Tìm kiếm</button>
+                    <?php if ($search): ?>
                         <a href="users.php" class="btn btn-outline-secondary px-3 shadow-sm">Xóa</a>
                     <?php endif; ?>
                 </div>
@@ -159,7 +146,6 @@ include 'includes/admin_header.php';
                             <th>Người dùng</th>
                             <th>Liên hệ</th>
                             <th>Ngày tham gia</th>
-                            <th>Vai trò</th>
                             <th>Trạng thái</th>
                             <th class="text-end">Hành động</th>
                         </tr>
@@ -199,13 +185,6 @@ include 'includes/admin_header.php';
                                 </div>
                             </td>
                             <td class="small text-secondary"><?php echo date('d/m/Y H:i', strtotime($u['created_at'])); ?></td>
-                            <td>
-                                <?php if (isset($u['role']) && $u['role'] === 'admin'): ?>
-                                    <span class="badge bg-primary-subtle text-primary border fw-normal px-2 rounded-pill"><i class="bi bi-shield-check me-1"></i> Admin</span>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary-subtle text-secondary border fw-normal px-2 rounded-pill"><i class="bi bi-person me-1"></i> Khách</span>
-                                <?php endif; ?>
-                            </td>
                             <td>
                                 <?php if ($u['status'] === 'active' || empty($u['status'])): ?>
                                     <span class="badge bg-success-subtle text-success border fw-normal px-2 rounded-pill">Hoạt động</span>
@@ -272,22 +251,15 @@ include 'includes/admin_header.php';
                         </div>
 
                         <div class="row">
-                            <div class="col-4 mb-3">
+                            <div class="col-6 mb-3">
                                 <label class="form-label small fw-bold">Số điện thoại</label>
                                 <input type="text" name="phone" class="form-control bg-light border-0" value="<?php echo htmlspecialchars($editData['phone'] ?? ''); ?>" placeholder="0901234567">
                             </div>
-                            <div class="col-4 mb-3">
+                            <div class="col-6 mb-3">
                                 <label class="form-label small fw-bold">Trạng thái *</label>
                                 <select name="status" class="form-select bg-light border-0" required>
                                     <option value="active" <?php echo (isset($editData['status']) && $editData['status'] == 'active') ? 'selected' : ''; ?>>Hoạt động</option>
                                     <option value="banned" <?php echo (isset($editData['status']) && $editData['status'] == 'banned') ? 'selected' : ''; ?>>Đã khóa</option>
-                                </select>
-                            </div>
-                            <div class="col-4 mb-3">
-                                <label class="form-label small fw-bold">Vai trò *</label>
-                                <select name="role" class="form-select bg-light border-0" required>
-                                    <option value="user" <?php echo (!isset($editData['role']) || $editData['role'] == 'user') ? 'selected' : ''; ?>>Khách hàng</option>
-                                    <option value="admin" <?php echo (isset($editData['role']) && $editData['role'] == 'admin') ? 'selected' : ''; ?>>Admin</option>
                                 </select>
                             </div>
                         </div>
