@@ -317,6 +317,46 @@ try {
         );
     "); } catch (\PDOException $e) {}
 
+    // Đảm bảo có bảng Chatbot Rules
+    try { 
+        $pdo->exec("
+        CREATE TABLE IF NOT EXISTS chatbot_rules (
+            id SERIAL PRIMARY KEY,
+            keyword VARCHAR(255) NOT NULL,
+            response TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        "); 
+        
+        // Chèn dữ liệu mẫu nếu bảng có ít hơn 15 rule
+        $stmt = $pdo->query("SELECT COUNT(*) FROM chatbot_rules");
+        if ($stmt->fetchColumn() < 15) {
+            $pdo->exec("TRUNCATE TABLE chatbot_rules RESTART IDENTITY;");
+            $pdo->exec("
+            INSERT INTO chatbot_rules (keyword, response) VALUES 
+            ('giá', 'Dạ, anh/chị có thể xem giá chi tiết của các sản phẩm ở trang chủ hoặc trang danh sách sản phẩm ạ. Giá luôn được cập nhật mới nhất!'),
+            ('bảo hành', 'Bên em bảo hành chính hãng 12 tháng, 1 đổi 1 trong 30 ngày đầu nếu có lỗi phần cứng từ nhà sản xuất. Máy cũ bảo hành pin 6 tháng ạ.'),
+            ('địa chỉ', 'Dạ cửa hàng NHK Mobile có hỗ trợ giao hàng toàn quốc và nhận hàng trực tiếp tại các chi nhánh. Anh/chị cứ đặt hàng trên web sẽ có nhân viên gọi xác nhận ạ.'),
+            ('chào', 'Dạ NHK Mobile xin chào anh/chị! Em là trợ lý ảo, anh/chị cần hỗ trợ thông tin gì ạ?'),
+            ('cảm ơn', 'Dạ không có gì ạ! Chúc anh/chị một ngày vui vẻ! 😊'),
+            ('trả góp', 'Dạ cửa hàng có hỗ trợ trả góp 0% qua thẻ tín dụng và các công ty tài chính. Anh/chị để lại SĐT hoặc gọi hotline để được tư vấn thêm nhé.'),
+            ('hotline', 'Dạ hotline hỗ trợ 24/7 của NHK Mobile là: 0375 352 347 ạ.'),
+            ('mua hàng', 'Dạ để mua hàng, anh/chị chỉ cần chọn sản phẩm trên web, bấm \"Thêm vào giỏ\" rồi tiến hành thanh toán là được ạ. Nhân viên bên em sẽ gọi xác nhận ngay.'),
+            ('ship', 'Bên em miễn phí giao hàng toàn quốc ạ. Nếu ở các thành phố lớn sẽ nhận hàng trong vòng 2 giờ, còn các tỉnh khác thì tầm 2-3 ngày ạ.'),
+            ('đổi trả', 'Dạ nếu máy có lỗi từ nhà sản xuất, bên em hỗ trợ 1 đổi 1 trong 30 ngày đầu tiên ạ. Nếu anh/chị không ưng ý muốn đổi máy khác sẽ có thu phí chênh lệch theo quy định.'),
+            ('iphone', 'Dạ NHK Mobile là đại lý uỷ quyền Apple, bên em có đầy đủ các mã iPhone mới nhất như iPhone 17 Series, 16 Series chính hãng VN/A ạ. Anh/chị xem thêm ở phần danh sách sản phẩm nhé.'),
+            ('samsung', 'Dạ các mẫu điện thoại Samsung bên em đều là hàng chính hãng SSVN bảo hành tại mọi trung tâm Samsung trên toàn quốc ạ. Điển hình là Galaxy S25 Ultra đang có giá cực tốt.'),
+            ('xiaomi', 'Dạ điện thoại Xiaomi bên em có đủ từ dòng giá rẻ đến cao cấp như Xiaomi 17 Ultra ạ. Máy chạy ROM Quốc tế sẵn tiếng Việt ạ.'),
+            ('cũ', 'Dạ ngoài máy mới 100%, bên em cũng có dòng máy cũ Likenew 99% nguyên zin chưa qua sửa chữa, bảo hành dài hạn ạ. Anh/chị ghé xem trên web nhé.'),
+            ('phụ kiện', 'Bên em có bán đầy đủ sạc, cáp, ốp lưng, kính cường lực, tai nghe chính hãng ạ. Anh/chị mua kèm máy sẽ được giảm giá thêm 20% - 30% ạ.'),
+            ('imei', 'Dạ để kiểm tra bảo hành, anh/chị vào trang \"Bảo hành\" trên web, nhập số IMEI 15 số (bấm *#06# trên điện thoại) để tra cứu lịch sử sửa chữa và hạn bảo hành nhé.'),
+            ('flash sale', 'Dạ chương trình Flash Sale diễn ra mỗi ngày trên trang chủ với giá cực sốc. Khuyến mãi sẽ kết thúc vào 23:59 mỗi ngày ạ, anh/chị tranh thủ săn deal nhé!');
+            ");
+        }
+    } catch (\PDOException $e) {
+        error_log("[DB] Chatbot Rules creation error: " . $e->getMessage());
+    }
+
 } catch (\PDOException $e) {
     error_log("[DB] Schema management error: " . $e->getMessage());
     // Không die ở đây vì kết nối đã thành công, chỉ là lỗi migration
