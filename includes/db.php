@@ -328,34 +328,88 @@ try {
         );
         "); 
         
-        // Chèn dữ liệu mẫu nếu bảng có ít hơn 15 rule
+        // Chèn dữ liệu mẫu nếu bảng có ít hơn 50 rule
         $stmt = $pdo->query("SELECT COUNT(*) FROM chatbot_rules");
-        if ($stmt->fetchColumn() < 15) {
+        if ($stmt->fetchColumn() < 50) {
             $pdo->exec("TRUNCATE TABLE chatbot_rules RESTART IDENTITY;");
             $pdo->exec("
-            INSERT INTO chatbot_rules (keyword, response) VALUES 
-            ('giá', 'Dạ, anh/chị có thể xem giá chi tiết của các sản phẩm ở trang chủ hoặc trang danh sách sản phẩm ạ. Giá luôn được cập nhật mới nhất!'),
-            ('bảo hành', 'Bên em bảo hành chính hãng 12 tháng, 1 đổi 1 trong 30 ngày đầu nếu có lỗi phần cứng từ nhà sản xuất. Máy cũ bảo hành pin 6 tháng ạ.'),
-            ('địa chỉ', 'Dạ cửa hàng NHK Mobile có hỗ trợ giao hàng toàn quốc và nhận hàng trực tiếp tại các chi nhánh. Anh/chị cứ đặt hàng trên web sẽ có nhân viên gọi xác nhận ạ.'),
-            ('chào', 'Dạ NHK Mobile xin chào anh/chị! Em là trợ lý ảo, anh/chị cần hỗ trợ thông tin gì ạ?'),
-            ('cảm ơn', 'Dạ không có gì ạ! Chúc anh/chị một ngày vui vẻ! 😊'),
-            ('trả góp', 'Dạ cửa hàng có hỗ trợ trả góp 0% qua thẻ tín dụng và các công ty tài chính. Anh/chị để lại SĐT hoặc gọi hotline để được tư vấn thêm nhé.'),
-            ('hotline', 'Dạ hotline hỗ trợ 24/7 của NHK Mobile là: 0375 352 347 ạ.'),
-            ('mua hàng', 'Dạ để mua hàng, anh/chị chỉ cần chọn sản phẩm trên web, bấm \"Thêm vào giỏ\" rồi tiến hành thanh toán là được ạ. Nhân viên bên em sẽ gọi xác nhận ngay.'),
-            ('ship', 'Bên em miễn phí giao hàng toàn quốc ạ. Nếu ở các thành phố lớn sẽ nhận hàng trong vòng 2 giờ, còn các tỉnh khác thì tầm 2-3 ngày ạ.'),
-            ('đổi trả', 'Dạ nếu máy có lỗi từ nhà sản xuất, bên em hỗ trợ 1 đổi 1 trong 30 ngày đầu tiên ạ. Nếu anh/chị không ưng ý muốn đổi máy khác sẽ có thu phí chênh lệch theo quy định.'),
-            ('iphone', 'Dạ NHK Mobile là đại lý uỷ quyền Apple, bên em có đầy đủ các mã iPhone mới nhất như iPhone 17 Series, 16 Series chính hãng VN/A ạ. Anh/chị xem thêm ở phần danh sách sản phẩm nhé.'),
-            ('samsung', 'Dạ các mẫu điện thoại Samsung bên em đều là hàng chính hãng SSVN bảo hành tại mọi trung tâm Samsung trên toàn quốc ạ. Điển hình là Galaxy S25 Ultra đang có giá cực tốt.'),
-            ('xiaomi', 'Dạ điện thoại Xiaomi bên em có đủ từ dòng giá rẻ đến cao cấp như Xiaomi 17 Ultra ạ. Máy chạy ROM Quốc tế sẵn tiếng Việt ạ.'),
-            ('cũ', 'Dạ ngoài máy mới 100%, bên em cũng có dòng máy cũ Likenew 99% nguyên zin chưa qua sửa chữa, bảo hành dài hạn ạ. Anh/chị ghé xem trên web nhé.'),
-            ('phụ kiện', 'Bên em có bán đầy đủ sạc, cáp, ốp lưng, kính cường lực, tai nghe chính hãng ạ. Anh/chị mua kèm máy sẽ được giảm giá thêm 20% - 30% ạ.'),
-            ('imei', 'Dạ để kiểm tra bảo hành, anh/chị vào trang \"Bảo hành\" trên web, nhập số IMEI 15 số (bấm *#06# trên điện thoại) để tra cứu lịch sử sửa chữa và hạn bảo hành nhé.'),
-            ('flash sale', 'Dạ chương trình Flash Sale diễn ra mỗi ngày trên trang chủ với giá cực sốc. Khuyến mãi sẽ kết thúc vào 23:59 mỗi ngày ạ, anh/chị tranh thủ săn deal nhé!');
+            INSERT INTO chatbot_rules (keyword, response) VALUES
+            ('chào', 'Dạ NHK Mobile xin chào anh/chị! 👋 Em là trợ lý ảo, sẵn sàng hỗ trợ 24/7. Anh/chị cần tư vấn sản phẩm hay hỏi về dịch vụ ạ?'),
+            ('hi', 'Hi anh/chị! NHK Mobile ở đây để hỗ trợ. Anh/chị đang tìm chiếc điện thoại nào ạ? 😊'),
+            ('hello', 'Hello anh/chị! Chào mừng đến NHK Mobile – nơi hội tụ công nghệ đỉnh cao. Em có thể giúp gì không ạ?'),
+            ('cảm ơn', 'Dạ không có gì ạ! Cảm ơn anh/chị đã tin tưởng NHK Mobile. Chúc anh/chị một ngày thật vui! 😊'),
+            ('tạm biệt', 'Dạ tạm biệt anh/chị! Nếu cần hỗ trợ thêm, cứ nhắn em nhé. NHK Mobile luôn sẵn sàng! 🌟'),
+            ('ok', 'Dạ vâng ạ! Anh/chị còn muốn hỏi thêm điều gì không? Em luôn sẵn sàng hỗ trợ!'),
+            ('được rồi', 'Dạ vậy là ổn ạ! Nếu cần thêm thông tin gì cứ nhắn em nhé 😊'),
+            ('giá', 'Dạ anh/chị xem giá chi tiết tại trang Sản phẩm ạ. NHK Mobile cam kết giá cạnh tranh nhất thị trường, không nơi nào rẻ hơn!'),
+            ('rẻ', 'Dạ NHK Mobile cam kết giá tốt nhất! Nếu anh/chị tìm được nơi rẻ hơn, bên em giảm thêm 5% so với giá đó. Tham khảo thêm trên web nhé!'),
+            ('khuyến mãi', 'Dạ hiện NHK Mobile đang có: giảm 15% máy cũ, tặng phụ kiện khi mua máy mới, trả góp 0%. Anh/chị ghé trang chủ xem ngay nhé!'),
+            ('giảm giá', 'Dạ bên em có Flash Sale mỗi ngày, giảm đến 30% mẫu máy chọn lọc ạ. Thành viên đăng ký tài khoản nhận thêm ưu đãi độc quyền!'),
+            ('flash sale', 'Dạ Flash Sale diễn ra mỗi ngày trên trang chủ với giá cực sốc ạ! Kết thúc lúc 23:59, anh/chị tranh thủ săn deal nhé! 🔥'),
+            ('voucher', 'Dạ nhận voucher bằng cách: đăng ký tài khoản (50K), giới thiệu bạn bè (100K/lần), theo dõi fanpage NHK Mobile ạ. Rất nhiều ưu đãi chờ anh/chị!'),
+            ('iphone', 'Dạ NHK Mobile là đại lý ủy quyền Apple chính thức! Có đủ iPhone 17 Series, 16 Series, 15 Series – hàng VN/A chính hãng, bảo hành Apple 12 tháng ạ.'),
+            ('samsung', 'Dạ Samsung tại NHK Mobile đều là hàng SSVN chính hãng, bảo hành 12 tháng tại mọi trung tâm Samsung toàn quốc ạ. Có Galaxy S25 Ultra, A56, A35 – rất đáng mua!'),
+            ('xiaomi', 'Dạ Xiaomi bên em có Redmi giá rẻ đến Xiaomi 15 Ultra cao cấp ạ. ROM Quốc tế sẵn tiếng Việt, hiệu năng mạnh, pin khủng – rất đáng tiền!'),
+            ('oppo', 'Dạ OPPO có Reno13 Series, Find N5, A5 Pro – hàng chính hãng bảo hành 12 tháng ạ. Camera đẹp, thiết kế sang trọng, rất phù hợp tặng người thân!'),
+            ('vivo', 'Dạ Vivo có X200 Ultra, V40, Y series – pin trâu, sạc nhanh, camera ấn tượng ạ. Anh/chị xem thêm trong mục Sản phẩm nhé!'),
+            ('realme', 'Dạ Realme có nhiều mẫu giá tốt, hiệu năng cao ạ. GT7 Pro nổi bật với Snapdragon mạnh và sạc siêu nhanh 120W!'),
+            ('tư vấn', 'Dạ để tư vấn đúng máy nhất, anh/chị dùng máy để làm gì (chụp ảnh, gaming, làm việc)? Ngân sách khoảng bao nhiêu ạ?'),
+            ('chọn máy', 'Dạ NHK Mobile sẵn sàng tư vấn! Anh/chị cho em biết ngân sách và nhu cầu sử dụng chính để em gợi ý đúng nhất nhé ạ.'),
+            ('dưới 5 triệu', 'Dạ ngân sách dưới 5 triệu em gợi ý: Xiaomi Redmi 13C, OPPO A38, Samsung A15 – pin trâu, màn hình lớn, đủ dùng cho nhu cầu cơ bản ạ!'),
+            ('dưới 10 triệu', 'Dạ tầm 7-10 triệu có nhiều lựa chọn ngon: Samsung A55, OPPO Reno11, Xiaomi 14T – hiệu năng tốt, camera đẹp, dùng rất mượt ạ!'),
+            ('trên 15 triệu', 'Dạ trên 15 triệu anh/chị có thể thoải mái chọn iPhone 16, Samsung S25, Xiaomi 15 Pro – flagship đỉnh cao, trải nghiệm xuất sắc ạ!'),
+            ('chụp ảnh', 'Dạ ưu tiên camera, em gợi ý: iPhone 16 Pro (camera Pro cực đỉnh), Samsung S25 Ultra (zoom 100x), OPPO Find N5 (Hasselblad) – tùy ngân sách anh/chị nhé!'),
+            ('gaming', 'Dạ máy gaming cần chip mạnh và pin khủng ạ. Em gợi ý: ASUS ROG Phone 9, Xiaomi 15 Ultra (Snapdragon 8 Elite), Samsung S25+ – chơi game cực mượt!'),
+            ('pin trâu', 'Dạ cần pin trâu em gợi ý: Xiaomi Redmi Note 14 Pro (5500mAh, sạc 120W), Vivo Y200t (6000mAh), Samsung M55 – dùng cả ngày thoải mái ạ!'),
+            ('bảo hành', 'Dạ NHK Mobile bảo hành chính hãng 12 tháng máy mới, 6 tháng pin cho máy cũ ạ. 30 ngày đầu lỗi phần cứng đổi máy mới 1:1 miễn phí!'),
+            ('đổi trả', 'Dạ chính sách đổi trả: 30 ngày đổi máy mới nếu lỗi nhà sản xuất, 14 ngày trả hàng hoàn tiền nếu không hài lòng (máy nguyên vẹn). Yên tâm mua sắm!'),
+            ('trả hàng', 'Dạ anh/chị có thể trả hàng trong 14 ngày kể từ khi nhận ạ. Vào Đơn hàng → Chi tiết đơn → Yêu cầu trả hàng để gửi yêu cầu nhé!'),
+            ('hoàn tiền', 'Dạ sau khi shop nhận hàng trả về và kiểm tra OK, bên em hoàn tiền 3-5 ngày làm việc qua tài khoản ngân hàng anh/chị đã đăng ký ạ.'),
+            ('trả góp', 'Dạ trả góp 0% lãi suất qua: thẻ tín dụng Visa/Mastercard (3-24 tháng), Home Credit, FE Credit, MCredit ạ. Chỉ cần CMND + hợp đồng lao động!'),
+            ('ship', 'Dạ NHK Mobile miễn phí giao hàng toàn quốc! TP.HCM & Hà Nội giao trong 2 giờ, tỉnh thành khác 1-3 ngày. Được kiểm tra hàng trước khi nhận ạ!'),
+            ('giao hàng', 'Dạ bên em giao hàng qua GHN, GHTK, Ninja Van ạ. Anh/chị được kiểm tra hàng trước khi thanh toán – đảm bảo an toàn tuyệt đối!'),
+            ('thanh toán', 'Dạ hỗ trợ: COD (trả khi nhận), chuyển khoản, MoMo, ZaloPay, thẻ ATM/Visa/Mastercard và trả góp 0% ạ. Rất tiện lợi!'),
+            ('momo', 'Dạ bên em nhận thanh toán qua MoMo ạ. Chọn phương thức MoMo khi checkout sẽ được quét QR thanh toán ngay!'),
+            ('imei', 'Dạ bấm *#06# trên điện thoại lấy IMEI 15 số, vào mục Bảo hành trên web NHK Mobile để tra cứu hạn bảo hành và lịch sử sửa chữa ạ.'),
+            ('sửa chữa', 'Dạ NHK Mobile có trung tâm sửa chữa uy tín, kỹ thuật viên được Apple & Samsung đào tạo ạ. Thay màn hình, pin, sạc – giá minh bạch, bảo hành linh kiện 3 tháng!'),
+            ('màn hình', 'Dạ bị vỡ màn hình bên em hỗ trợ thay màn hình chính hãng ạ. Đem máy đến trực tiếp hoặc gọi 0375 352 347 để báo giá nhé!'),
+            ('pin', 'Dạ thay pin tại NHK Mobile dùng pin chính hãng, bảo hành 6 tháng ạ. iPhone, Samsung, Xiaomi đều có sẵn – thay khoảng 30-45 phút!'),
+            ('cài đặt', 'Dạ mua máy tại NHK Mobile được cài app, chuyển dữ liệu từ máy cũ sang máy mới miễn phí ạ. Nhân viên phục vụ tận tình ngay tại shop!'),
+            ('đăng ký', 'Dạ vào trang Đăng ký, điền email và mật khẩu là có tài khoản ngay ạ. Thành viên mới được tặng voucher 50K cho đơn hàng đầu tiên!'),
+            ('đăng nhập', 'Dạ quên mật khẩu thì vào Đăng nhập → Quên mật khẩu → nhập email để nhận link đặt lại ạ. Vẫn không được thì gọi 0375 352 347 nhé!'),
+            ('tài khoản', 'Dạ vào trang Hồ sơ để xem thông tin cá nhân, lịch sử đơn hàng, yêu thích và yêu cầu trả hàng ạ. Quản lý tất cả ở một nơi rất tiện!'),
+            ('phụ kiện', 'Dạ có đầy đủ phụ kiện chính hãng: sạc nhanh, cáp USB-C/Lightning, ốp lưng, kính cường lực, tai nghe, pin dự phòng ạ. Mua kèm máy giảm 20-30%!'),
+            ('ốp lưng', 'Dạ ốp lưng có nhiều loại: ốp cứng, ốp dẻo, ốp chống sốc, ốp da cao cấp – giá từ 99K đến 599K ạ. Anh/chị thích loại nào?'),
+            ('tai nghe', 'Dạ có AirPods chính hãng Apple, Samsung Galaxy Buds, Sony WF series và nhiều thương hiệu khác ạ. Giá tốt, bảo hành đầy đủ nhé!'),
+            ('uy tín', 'Dạ NHK Mobile hoạt động hơn 10 năm, là đại lý ủy quyền Apple, Samsung, Xiaomi, OPPO ạ. Hàng chính hãng 100%, cam kết hoàn tiền nếu phát hiện hàng giả!'),
+            ('chính hãng', 'Dạ tất cả sản phẩm NHK Mobile đều chính hãng 100%, có tem bảo hành của hãng, hóa đơn VAT đầy đủ ạ. Anh/chị hoàn toàn yên tâm!'),
+            ('hotline', 'Dạ hotline hỗ trợ 24/7 của NHK Mobile: ☎️ 0375 352 347 ạ. Cũng có thể chat trực tiếp tại đây, em luôn sẵn sàng!'),
+            ('máy cũ', 'Dạ máy cũ NHK Mobile được kiểm định kỹ, đạt chuẩn Likenew 99% nguyên zin chưa qua sửa chữa ạ. Bảo hành pin 6 tháng, giá chỉ 60-70% máy mới!'),
+            ('mua hàng', 'Dạ để mua hàng, chọn sản phẩm trên web, bấm Thêm vào giỏ rồi thanh toán là xong ạ. Nhân viên bên em sẽ gọi xác nhận đơn hàng ngay!');
             ");
         }
     } catch (\PDOException $e) {
         error_log("[DB] Chatbot Rules creation error: " . $e->getMessage());
     }
+
+    // ─── BẢNG YÊU CẦU TRẢ HÀNG / HOÀN TIỀN ─────────────────────────────────
+    try { $pdo->exec("
+        CREATE TABLE IF NOT EXISTS return_requests (
+            id              SERIAL PRIMARY KEY,
+            order_id        INT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+            user_id         INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            customer_name   VARCHAR(255) NOT NULL,
+            customer_phone  VARCHAR(20),
+            order_code      VARCHAR(50),
+            reason_type     VARCHAR(100),
+            reason          TEXT NOT NULL,
+            images          TEXT,
+            status          VARCHAR(50) NOT NULL DEFAULT 'Chờ duyệt',
+            admin_note      TEXT,
+            created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    "); } catch (\PDOException $e) {}
 
 } catch (\PDOException $e) {
     error_log("[DB] Schema management error: " . $e->getMessage());

@@ -56,6 +56,34 @@ if (isset($_GET['order_id'])) {
     $orders_list = $stmtUserOrders->fetchAll();
 }
 
+define('RETURN_DAYS_LIMIT', 14);
+
+// Kiểm tra điều kiện trả hàng (dùng ở view chi tiết đơn)
+$canReturn   = false;
+$daysLeft    = 0;
+$hasReturn   = false;
+if ($order) {
+    if (stripos($order['status'], 'hoàn thành') !== false) {
+        $elapsed  = floor((time() - strtotime($order['updated_at'] ?? $order['created_at'])) / 86400);
+        $daysLeft = RETURN_DAYS_LIMIT - $elapsed;
+        if ($daysLeft >= 0) {
+            $sc = $pdo->prepare("SELECT id FROM return_requests WHERE order_id = ? AND status NOT IN ('Từ chối')");
+            $sc->execute([$order['id']]);
+            $hasReturn = (bool)$sc->fetch();
+            $canReturn = !$hasReturn;
+        }
+    }
+}
+
+// Xác định URL nút "Quay lại" dựa theo nguồn điều hướng
+$ref = $_GET['ref'] ?? '';
+$backUrl   = 'track_order.php';
+$backLabel = 'Đơn hàng của tôi';
+if ($ref === 'profile') {
+    $backUrl   = 'profile.php?tab=orders';
+    $backLabel = 'Quay lại hồ sơ';
+}
+
 $pageTitle = "Lịch sử mua hàng | NHK Mobile";
 $basePath = "";
 include 'includes/header.php';
@@ -102,9 +130,21 @@ include 'includes/header.php';
                 <?php if ($order): ?>
                     <!-- DETAILED ORDER VIEW -->
                     <div class="history-card bg-white p-4 p-md-5">
-                        <div class="d-flex justify-content-between align-items-center mb-5 no-print">
-                            <a href="track_order.php" class="btn btn-light rounded-pill px-4"><i class="bi bi-arrow-left me-2"></i> Quay lại</a>
-                            <button onclick="window.print()" class="btn btn-primary rounded-pill px-4 shadow-sm"><i class="bi bi-printer me-2"></i> In hóa đơn</button>
+                        <div class="d-flex justify-content-between align-items-center mb-5 no-print flex-wrap gap-2">
+                            <a href="<?php echo $backUrl; ?>" class="btn btn-light rounded-pill px-4"><i class="bi bi-arrow-left me-2"></i> <?php echo $backLabel; ?></a>
+                            <div class="d-flex gap-2">
+                                <?php if ($canReturn): ?>
+                                <a href="return_request.php?order_id=<?php echo $order['id']; ?>" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm">
+                                    <i class="bi bi-arrow-return-left me-2"></i>Yêu cầu trả hàng
+                                    <span class="badge bg-dark ms-1"><?= $daysLeft ?> ngày</span>
+                                </a>
+                                <?php elseif ($hasReturn): ?>
+                                <a href="return_request.php" class="btn btn-outline-secondary rounded-pill px-4 fw-bold">
+                                    <i class="bi bi-hourglass-split me-2"></i>Đang xử lý trả hàng
+                                </a>
+                                <?php endif; ?>
+                                <button onclick="window.print()" class="btn btn-primary rounded-pill px-4 shadow-sm"><i class="bi bi-printer me-2"></i> In hóa đơn</button>
+                            </div>
                         </div>
 
                         <div class="row mb-5 align-items-center">

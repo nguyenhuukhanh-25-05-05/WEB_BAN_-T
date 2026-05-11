@@ -21,7 +21,7 @@ if (!isset($_SESSION['user_id'])) {
 $userId   = $_SESSION['user_id'];
 $success  = '';
 $error    = '';
-$activeTab = $_GET['tab'] ?? 'info'; // info | password | orders | wishlist
+$activeTab = $_GET['tab'] ?? 'info'; // info | password | orders | wishlist | returns
 
 // ─── LẤY THÔNG TIN USER HIỆN TẠI ────────────────────────────────────────────
 $stmt = $pdo->prepare("SELECT id, fullname, email, phone, address, created_at FROM users WHERE id = ?");
@@ -93,6 +93,16 @@ if (isset($_POST['change_password'])) {
 $stmtOrders = $pdo->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
 $stmtOrders->execute([$userId]);
 $orders = $stmtOrders->fetchAll();
+
+// ─── LẤY LỊCH SỬ TRẢ HÀNG ──────────────────────────────────────────────────
+$returnHistory = [];
+$returnCount   = 0;
+try {
+    $stmtRet = $pdo->prepare("SELECT rr.*, o.total_price FROM return_requests rr LEFT JOIN orders o ON rr.order_id = o.id WHERE rr.user_id = ? ORDER BY rr.created_at DESC");
+    $stmtRet->execute([$userId]);
+    $returnHistory = $stmtRet->fetchAll();
+    $returnCount   = count($returnHistory);
+} catch (PDOException $e) { /* Bảng chưa tạo */ }
 
 // ─── LẤY DANH SÁCH YÊU THÍCH ────────────────────────────────────────────────
 $wishlistItems = [];
@@ -331,6 +341,14 @@ include 'includes/header.php';
                                     <?php endif; ?>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="profile.php?tab=returns" class="<?php echo $activeTab === 'returns' ? 'active' : ''; ?>">
+                                    <i class="bi bi-arrow-return-left"></i> Trả hàng
+                                    <?php if ($returnCount > 0): ?>
+                                        <span class="badge bg-warning text-dark rounded-pill ms-auto"><?php echo $returnCount; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </li>
                         </ul>
                     </nav>
 
@@ -502,7 +520,7 @@ include 'includes/header.php';
                                 elseif (str_contains($s, 'hủy'))          { $bClass = 'bg-danger';  $bText = 'Đã hủy'; }
                                 else                                       { $bClass = 'bg-warning text-dark'; $bText = $o['status']; }
                             ?>
-                            <a href="track_order.php?order_id=<?php echo $o['id']; ?>" class="order-mini-card">
+                            <a href="track_order.php?order_id=<?php echo $o['id']; ?>&ref=profile" class="order-mini-card">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="bg-primary bg-opacity-10 rounded-3 p-3">
@@ -587,7 +605,61 @@ include 'includes/header.php';
                     <?php endif; ?>
                 </div>
 
-                <?php endif; ?>
+                <!-- ══════ TAB: TRẢ HÀNG ══════ -->
+                <?php elseif ($activeTab === 'returns'): ?>
+                <div class="profile-card">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h2 class="section-title mb-0"><i class="bi bi-arrow-return-left me-2 text-warning"></i>Yêu cầu trả hàng</h2>
+                        <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><?php echo $returnCount; ?> YÊU CẦU</span>
+                    </div>
+                    <p class="section-sub">Theo dõi trạng thái các yêu cầu trả hàng / hoàn tiền của bạn.</p>
+
+                    <?php if (empty($returnHistory)): ?>
+                        <div class="text-center py-5">
+                            <i class="bi bi-arrow-return-left display-3 text-muted opacity-50"></i>
+                            <h5 class="fw-bold mt-4">Chưa có yêu cầu trả hàng</h5>
+                            <p class="text-muted">Bạn chưa gửi yêu cầu trả hàng nào.</p>
+                            <a href="track_order.php" class="btn btn-profile mt-2"><i class="bi bi-receipt me-2"></i>Xem đơn hàng</a>
+                        </div>
+                    <?php else: ?>
+                        <div class="d-flex flex-column gap-3">
+                        <?php
+                        $statusStyleMap = [
+                            'Chờ duyệt'    => ['bg-warning text-dark',  'bi-hourglass-split'],
+                            'Đã duyệt'     => ['bg-info text-white',     'bi-check-circle'],
+                            'Đã trả hàng'  => ['bg-primary text-white',  'bi-box-arrow-in-left'],
+                            'Đã hoàn tiền' => ['bg-success text-white',  'bi-cash-stack'],
+                            'Từ chối'      => ['bg-danger text-white',   'bi-x-circle'],
+                        ];
+                        foreach ($returnHistory as $rr):
+                            $sm = $statusStyleMap[$rr['status']] ?? ['bg-secondary text-white','bi-question-circle'];
+                        ?>
+                        <div class="order-mini-card">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                                <div>
+                                    <p class="fw-800 mb-0">Yêu cầu #<?php echo $rr['id']; ?> – <?php echo htmlspecialchars($rr['order_code']); ?></p>
+                                    <p class="text-muted small mb-1"><i class="bi bi-calendar3 me-1"></i><?php echo date('d/m/Y H:i', strtotime($rr['created_at'])); ?></p>
+                                    <p class="small text-muted mb-0"><?php echo htmlspecialchars($rr['reason_type'] ?: $rr['reason']); ?></p>
+                                </div>
+                                <span class="badge <?php echo $sm[0]; ?> rounded-pill px-3 py-2">
+                                    <i class="bi <?php echo $sm[1]; ?> me-1"></i><?php echo $rr['status']; ?>
+                                </span>
+                            </div>
+                            <?php if ($rr['admin_note']): ?>
+                            <div class="alert alert-info py-2 mt-2 mb-0 small">
+                                <i class="bi bi-chat-left-text me-1"></i><strong>Shop:</strong> <?php echo htmlspecialchars($rr['admin_note']); ?>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php endforeach; ?>
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="return_request.php" class="btn btn-profile"><i class="bi bi-arrow-return-left me-2"></i>Xem trang trả hàng đầy đủ</a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <?php endif; // end elseif returns ?>
 
             </div>
         </div>
