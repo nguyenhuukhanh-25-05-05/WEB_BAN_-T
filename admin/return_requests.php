@@ -8,14 +8,47 @@ require_once '../includes/db.php';
 // Cập nhật trạng thái
 if (isset($_POST['update_status'])) {
     $id        = (int)$_POST['id'];
-    $status    = $_POST['status'];
+    $newStatus = $_POST['status'];
     $adminNote = trim($_POST['admin_note'] ?? '');
 
+    // Lấy trạng thái hiện tại
+    $cur = $pdo->prepare("SELECT status FROM return_requests WHERE id = ?");
+    $cur->execute([$id]);
+    $currentStatus = $cur->fetchColumn();
+
+    // Thứ tự tuần tự bắt buộc (không kể Từ chối)
+    $statusOrder = ['Chờ duyệt' => 0, 'Đã duyệt' => 1, 'Đã trả hàng' => 2, 'Đã hoàn tiền' => 3];
     $validStatuses = ['Chờ duyệt', 'Đã duyệt', 'Đã trả hàng', 'Đã hoàn tiền', 'Từ chối'];
-    if (in_array($status, $validStatuses)) {
+
+    $transitionError = '';
+    if (in_array($newStatus, $validStatuses) && $currentStatus) {
+        $isRefuse = ($newStatus === 'Từ chối');
+        $alreadyRefused = ($currentStatus === 'Từ chối');
+        $alreadyDone = ($currentStatus === 'Đã hoàn tiền');
+
+        if ($alreadyRefused || $alreadyDone) {
+            // Trạng thái cuối, không cho cập nhật
+            $transitionError = 'Yêu cầu đã ở trạng thái cuối, không thể cập nhật thêm.';
+        } elseif (!$isRefuse && isset($statusOrder[$currentStatus], $statusOrder[$newStatus])) {
+            $currentIdx = $statusOrder[$currentStatus];
+            $newIdx     = $statusOrder[$newStatus];
+            // Chỉ cho phép tiến 1 bước hoặc giữ nguyên
+            if ($newIdx - $currentIdx > 1) {
+                $allowedNext = array_search($currentIdx + 1, array_flip($statusOrder));
+                $transitionError = "Không thể chuyển thẳng sang \"$newStatus\". Phải xử lý bước \"$allowedNext\" trước.";
+            }
+        }
+    }
+
+    if ($transitionError) {
+        header("Location: return_requests.php?msg=error&err=" . urlencode($transitionError));
+        exit;
+    }
+
+    if (in_array($newStatus, $validStatuses)) {
         $stmt = $pdo->prepare("UPDATE return_requests SET status = ?, admin_note = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
-        $stmt->execute([$status, $adminNote ?: null, $id]);
-        log_admin_action($pdo, 'UPDATE_RETURN_STATUS', "Cập nhật yêu cầu trả hàng ID $id → $status");
+        $stmt->execute([$newStatus, $adminNote ?: null, $id]);
+        log_admin_action($pdo, 'UPDATE_RETURN_STATUS', "Cập nhật yêu cầu trả hàng ID $id: $currentStatus → $newStatus");
     }
     header("Location: return_requests.php?msg=updated");
     exit;
@@ -88,10 +121,18 @@ include 'includes/admin_header.php';
 
 <!-- Thông báo -->
 <?php if (isset($_GET['msg'])): ?>
+<?php if ($_GET['msg'] === 'updated'): ?>
 <div class="alert alert-success alert-dismissible fade show border-0 rounded-3 mb-4">
     <i class="bi bi-check-circle-fill me-2"></i>Đã cập nhật trạng thái thành công!
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
+<?php elseif ($_GET['msg'] === 'error'): ?>
+<div class="alert alert-danger alert-dismissible fade show border-0 rounded-3 mb-4">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>Không thể cập nhật:</strong> <?= htmlspecialchars(urldecode($_GET['err'] ?? 'Lỗi không xác định')) ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+<?php endif; ?>
 <?php endif; ?>
 
 <!-- Bảng dữ liệu -->
@@ -222,6 +263,12 @@ include 'includes/admin_header.php';
                             <option value="Đã hoàn tiền">💰 Đã hoàn tiền – Đã chuyển tiền cho khách</option>
                             <option value="Từ chối">❌ Từ chối yêu cầu</option>
                         </select>
+                        <div id="status_terminal_warn" class="alert alert-warning border-0 rounded-3 mt-2 py-2 px-3 small" style="display:none;">
+                            <i class="bi bi-lock-fill me-1"></i>Yêu cầu này đã ở trạng thái cuối, không thể thay đổi thêm.
+                        </div>
+                        <div class="text-muted small mt-1">
+                            <i class="bi bi-info-circle me-1"></i>Chỉ có thể chuyển sang bước kế tiếp trong luồng xử lý.
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Ghi chú phản hồi cho khách <small class="text-muted fw-normal">(không bắt buộc)</small></label>
@@ -251,12 +298,60 @@ include 'includes/admin_header.php';
 </div>
 
 <script>
+// Thứ tự tuần tự các trạng thái
+const STATUS_ORDER = ['Chờ duyệt', 'Đã duyệt', 'Đã trả hàng', 'Đã hoàn tiền'];
+
 function openModal(id, status, note) {
-    document.getElementById('modal_id').value     = id;
-    document.getElementById('modal_status').value = status;
-    document.getElementById('modal_note').value   = note;
+    document.getElementById('modal_id').value   = id;
+    document.getElementById('modal_note').value = note;
+    updateStatusOptions(status);
     new bootstrap.Modal(document.getElementById('updateModal')).show();
 }
+
+function updateStatusOptions(currentStatus) {
+    const select = document.getElementById('modal_status');
+    const currentIdx = STATUS_ORDER.indexOf(currentStatus);
+    const isTerminal = (currentStatus === 'Từ chối' || currentStatus === 'Đã hoàn tiền');
+
+    Array.from(select.options).forEach(opt => {
+        const optIdx = STATUS_ORDER.indexOf(opt.value);
+
+        if (isTerminal) {
+            // Trạng thái cuối: disable tất cả, chỉ show trạng thái hiện tại
+            opt.disabled = (opt.value !== currentStatus);
+            opt.style.color = opt.disabled ? '#aaa' : '';
+        } else if (opt.value === 'Từ chối') {
+            // Từ chối luôn cho phép nếu chưa ở trạng thái cuối
+            opt.disabled = false;
+            opt.style.color = '';
+        } else if (optIdx === -1) {
+            opt.disabled = true;
+        } else {
+            // Chỉ cho phép: trạng thái hiện tại hoặc bước tiếp theo (currentIdx + 1)
+            const allowed = (optIdx === currentIdx || optIdx === currentIdx + 1);
+            opt.disabled = !allowed;
+            opt.style.color = !allowed ? '#aaa' : '';
+            if (optIdx < currentIdx) {
+                opt.text = opt.text.replace(/^\s*[✅📦💰⏳]\s*/, match => match) // giữ emoji
+                    .replace(/ \(đã qua\)$/, '') + ' (đã qua)';
+            } else if (optIdx > currentIdx + 1) {
+                opt.text = opt.text.replace(/ \(chưa tới\)$/, '') + ' (chưa tới)';
+            }
+        }
+    });
+
+    // Set giá trị mặc định: bước tiếp theo hoặc giữ nguyên
+    if (!isTerminal && currentIdx !== -1 && currentIdx + 1 < STATUS_ORDER.length) {
+        select.value = STATUS_ORDER[currentIdx + 1]; // tự chọn bước kế tiếp
+    } else {
+        select.value = currentStatus;
+    }
+
+    // Cảnh báo nếu terminal
+    const warn = document.getElementById('status_terminal_warn');
+    if (warn) warn.style.display = isTerminal ? 'block' : 'none';
+}
+
 function showImg(src) {
     document.getElementById('bigImg').src = src;
     new bootstrap.Modal(document.getElementById('imgModal')).show();

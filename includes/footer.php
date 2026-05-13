@@ -193,9 +193,17 @@
                 <div class="chat-message">
                     <div class="chat-avatar"><i class="bi bi-headset"></i></div>
                     <div>
-                        <div class="chat-bubble">Xin chào! Tôi có thể giúp gì cho bạn hôm nay?</div>
+                        <div class="chat-bubble">Xin chào! Em là trợ lý NHK Mobile 🤖<br>Em có thể tra giá, kiểm tra tồn kho, thông số sản phẩm theo dữ liệu thực tế nhé!</div>
                         <div class="chat-time">Vừa xong</div>
                     </div>
+                </div>
+                <!-- Gợi ý nhanh -->
+                <div class="chat-quick-actions" id="chatQuickActions">
+                    <button onclick="sendQuickMsg('Điện thoại nổi bật nhất')">🔥 Nổi bật</button>
+                    <button onclick="sendQuickMsg('Điện thoại rẻ nhất')">💸 Rẻ nhất</button>
+                    <button onclick="sendQuickMsg('Có những hãng nào')">📊 Danh mục</button>
+                    <button onclick="sendQuickMsg('iPhone đang có')">📱 iPhone</button>
+                    <button onclick="sendQuickMsg('Samsung đang bán')">📱 Samsung</button>
                 </div>
             </div>
             <div class="live-chat-footer">
@@ -559,15 +567,19 @@
 
                 removeTypingIndicator();
                 const replyTime = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-                body.innerHTML += `
-                    <div class="chat-message">
-                        <div class="chat-avatar"><i class="bi bi-robot"></i></div>
-                        <div>
-                            <div class="chat-bubble">${escapeHtml(reply)}</div>
-                            <div class="chat-time">${replyTime}</div>
-                        </div>
+                // Dùng createElement để an toàn và render HTML (link, bold) từ bot
+                const botMsg = document.createElement('div');
+                botMsg.className = 'chat-message';
+                // Chuyển \n thành <br> để xuống hàng đúng
+                const replyHtml = reply.replace(/\n/g, '<br>');
+                botMsg.innerHTML = `
+                    <div class="chat-avatar"><i class="bi bi-robot"></i></div>
+                    <div>
+                        <div class="chat-bubble chat-bubble-html">${replyHtml}</div>
+                        <div class="chat-time">${replyTime}</div>
                     </div>
                 `;
+                body.appendChild(botMsg);
                 // Lưu reply vào history
                 chatHistory.push({ role: 'assistant', content: reply });
             } catch (err) {
@@ -600,6 +612,15 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // Gửi tin nhắn gợi ý nhanh
+        function sendQuickMsg(text) {
+            // Ẩn chip sau khi dùng
+            const chips = document.getElementById('chatQuickActions');
+            if (chips) chips.style.display = 'none';
+            document.getElementById('chatInput').value = text;
+            sendChatMessage();
         }
 
         // CSS animation cho typing dots
