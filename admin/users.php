@@ -71,6 +71,23 @@ if (isset($_POST['update_status'])) {
     exit;
 }
 
+if (isset($_POST['delete_user'])) {
+    $id = $_POST['id'];
+    
+    try {
+        $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        
+        log_admin_action($pdo, 'DELETE_USER', "Xóa người dùng ID $id");
+        
+        header("Location: users.php?msg=" . urlencode("Đã xóa khách hàng thành công!"));
+        exit;
+    } catch (PDOException $e) {
+        header("Location: users.php?error=" . urlencode("Không thể xóa khách hàng: " . $e->getMessage()));
+        exit;
+    }
+}
+
 /**
  * 2. TRUY VẤN DANH SÁCH USER
  */
@@ -227,6 +244,12 @@ include 'includes/admin_header.php';
                                     <?php endif; ?>
                                 </form>
                                 <a href="users.php?edit=<?php echo $u['id']; ?>" class="btn btn-sm btn-light border p-2 ms-1 rounded-pill" title="Sửa thông tin"><i class="bi bi-pencil text-primary"></i></a>
+                                <form action="users.php" method="POST" style="display: inline-block;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không?');">
+                                    <input type="hidden" name="id" value="<?php echo $u['id']; ?>">
+                                    <button type="submit" name="delete_user" value="1" class="btn btn-sm btn-light border p-2 ms-1 rounded-pill" title="Xóa khách hàng">
+                                        <i class="bi bi-trash text-danger"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         <?php endforeach; ?>
