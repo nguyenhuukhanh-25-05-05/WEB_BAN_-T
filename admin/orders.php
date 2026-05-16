@@ -33,30 +33,50 @@ $status_filter = isset($_GET['status_filter']) ? trim($_GET['status_filter']) : 
 $start_date = isset($_GET['start_date']) ? trim($_GET['start_date']) : '';
 $end_date = isset($_GET['end_date']) ? trim($_GET['end_date']) : '';
 
-$sql = "SELECT * FROM orders WHERE 1=1";
+// Cấu hình phân trang
+$limit = 5;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
+$whereClause = " WHERE 1=1";
 $params = [];
 
 if ($search !== '') {
-    $sql .= " AND customer_phone LIKE ?";
+    $whereClause .= " AND customer_phone LIKE ?";
     $params[] = "%$search%";
 }
 if ($status_filter !== '') {
-    $sql .= " AND status = ?";
+    $whereClause .= " AND status = ?";
     $params[] = $status_filter;
 }
 if ($start_date !== '') {
-    $sql .= " AND DATE(created_at) >= ?";
+    $whereClause .= " AND DATE(created_at) >= ?";
     $params[] = $start_date;
 }
 if ($end_date !== '') {
-    $sql .= " AND DATE(created_at) <= ?";
+    $whereClause .= " AND DATE(created_at) <= ?";
     $params[] = $end_date;
 }
 
-$sql .= " ORDER BY created_at DESC";
+// Đếm tổng số bản ghi
+$sqlCount = "SELECT COUNT(*) FROM orders" . $whereClause;
+$stmtCount = $pdo->prepare($sqlCount);
+$stmtCount->execute($params);
+$totalRecords = $stmtCount->fetchColumn();
+$totalPages = ceil($totalRecords / $limit);
+
+$sql = "SELECT * FROM orders" . $whereClause . " ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $orders = $stmt->fetchAll();
+
+// Chuỗi query string cho phân trang
+$queryString = "";
+if ($search) $queryString .= '&search='.urlencode($search);
+if ($status_filter) $queryString .= '&status_filter='.urlencode($status_filter);
+if ($start_date) $queryString .= '&start_date='.urlencode($start_date);
+if ($end_date) $queryString .= '&end_date='.urlencode($end_date);
 
 $pageTitle = "Quản lý đơn hàng | Admin NHK Mobile";
 $basePath = "../";
@@ -192,9 +212,47 @@ include 'includes/admin_header.php';
                             </td>
                         </tr>
                         <?php endforeach; ?>
+                        <?php if (count($orders) === 0): ?>
+                        <tr><td colspan="7" class="text-center py-4 text-secondary">Không tìm thấy đơn hàng nào.</td></tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination UI -->
+            <?php if (isset($totalPages) && $totalPages > 1): ?>
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-end mb-0">
+                    <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?php echo $page - 1; ?><?php echo $queryString; ?>">Trước</a>
+                    </li>
+                    <?php
+                    $startPage = max(1, $page - 2);
+                    $endPage = min($totalPages, $page + 2);
+                    if ($startPage > 1) {
+                        echo '<li class="page-item"><a class="page-link" href="?page=1' . $queryString . '">1</a></li>';
+                        if ($startPage > 2) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                    }
+                    for ($i = $startPage; $i <= $endPage; $i++): ?>
+                        <li class="page-item <?php echo $page == $i ? 'active' : ''; ?>">
+                            <a class="page-link" href="?page=<?php echo $i; ?><?php echo $queryString; ?>"><?php echo $i; ?></a>
+                        </li>
+                    <?php endfor; 
+                    if ($endPage < $totalPages) {
+                        if ($endPage < $totalPages - 1) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        echo '<li class="page-item"><a class="page-link" href="?page=' . $totalPages . $queryString . '">' . $totalPages . '</a></li>';
+                    }
+                    ?>
+                    <li class="page-item <?php echo $page >= $totalPages ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?php echo $page + 1; ?><?php echo $queryString; ?>">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+            <?php endif; ?>
         </div>
 
 <?php include 'includes/admin_footer.php'; ?>

@@ -154,15 +154,30 @@ if (isset($_GET['toggle_featured'])) {
  * 2. LẤY DỮ LIỆU HIỂN THỊ
  */
 
+// Cấu hình phân trang
+$limit = 5;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
 // Lấy toàn bộ danh sách sản phẩm để hiện ra bảng (sắp xếp mới nhất lên đầu)
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-$sql = "SELECT * FROM products";
+$whereClause = "";
 $params = [];
+
 if ($search !== '') {
-    $sql .= " WHERE name ILIKE ?";
+    $whereClause = " WHERE name ILIKE ?";
     $params[] = "%$search%";
 }
-$sql .= " ORDER BY created_at DESC";
+
+// Đếm tổng số bản ghi
+$sqlCount = "SELECT COUNT(*) FROM products" . $whereClause;
+$stmtCount = $pdo->prepare($sqlCount);
+$stmtCount->execute($params);
+$totalRecords = $stmtCount->fetchColumn();
+$totalPages = ceil($totalRecords / $limit);
+
+$sql = "SELECT * FROM products" . $whereClause . " ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $products = $stmt->fetchAll();
@@ -281,9 +296,47 @@ include 'includes/admin_header.php';
                             </td>
                         </tr>
                         <?php endforeach; ?>
+                        <?php if (count($products) === 0): ?>
+                        <tr><td colspan="7" class="text-center py-4 text-secondary">Không tìm thấy sản phẩm nào.</td></tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination UI -->
+            <?php if (isset($totalPages) && $totalPages > 1): ?>
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-end mb-0">
+                    <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?php echo $page - 1; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>">Trước</a>
+                    </li>
+                    <?php
+                    $startPage = max(1, $page - 2);
+                    $endPage = min($totalPages, $page + 2);
+                    if ($startPage > 1) {
+                        echo '<li class="page-item"><a class="page-link" href="?page=1' . ($search ? '&search='.urlencode($search) : '') . '">1</a></li>';
+                        if ($startPage > 2) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                    }
+                    for ($i = $startPage; $i <= $endPage; $i++): ?>
+                        <li class="page-item <?php echo $page == $i ? 'active' : ''; ?>">
+                            <a class="page-link" href="?page=<?php echo $i; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>"><?php echo $i; ?></a>
+                        </li>
+                    <?php endfor; 
+                    if ($endPage < $totalPages) {
+                        if ($endPage < $totalPages - 1) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        echo '<li class="page-item"><a class="page-link" href="?page=' . $totalPages . ($search ? '&search='.urlencode($search) : '') . '">' . $totalPages . '</a></li>';
+                    }
+                    ?>
+                    <li class="page-item <?php echo $page >= $totalPages ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?php echo $page + 1; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+            <?php endif; ?>
             </form>
         </div>
     </main>

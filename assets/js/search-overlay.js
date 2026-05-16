@@ -1,109 +1,125 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Khởi tạo các phần tử giao diện của bộ tìm kiếm (Overlay Search)
-    const searchTrigger = document.getElementById('searchTrigger');
-    const searchOverlay = document.getElementById('searchOverlay');
-    const closeSearch = document.getElementById('closeSearch');
-    const searchInput = document.getElementById('searchInputMain');
-    const searchResults = document.getElementById('searchResults');
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Elements ──────────────────────────────────────────────────
+    const searchTrigger   = document.getElementById('searchTrigger');
+    const searchOverlay   = document.getElementById('searchOverlay');   // dropdown bar
+    const searchBackdrop  = document.getElementById('searchBackdrop');
+    const closeSearch     = document.getElementById('closeSearch');
+    const searchInput     = document.getElementById('searchInputMain');
+    const searchResults   = document.getElementById('searchResults');
     const quickSuggestions = document.getElementById('quickSuggestions');
+    const searchBarClear  = document.getElementById('searchBarClear');
 
     if (!searchTrigger || !searchOverlay) return;
 
-    /**
-     * Mở khung tìm kiếm toàn màn hình khi nhấn vào biểu tượng tìm kiếm.
-     */
-    searchTrigger.addEventListener('click', function(e) {
-        e.preventDefault();
-        searchOverlay.classList.remove('d-none'); // Hiện Overlay
-        document.body.style.overflow = 'hidden'; // Khóa cuộn trang chính
-        setTimeout(() => searchInput.focus(), 100); // Tự động tập trung vào ô nhập liệu
-    });
+    // ── Helpers ───────────────────────────────────────────────────
+    function openSearch() {
+        searchOverlay.classList.remove('d-none');
+        searchBackdrop.classList.remove('d-none');
 
-    /**
-     * Đóng khung tìm kiếm và khôi phục trạng thái ban đầu.
-     */
-    function closeOverlay() {
-        searchOverlay.classList.add('d-none'); // Ẩn Overlay
-        document.body.style.overflow = ''; // Mở lại cuộn trang
-        searchInput.value = ''; // Xóa nội dung tìm kiếm cũ
-        searchResults.classList.add('d-none'); // Ẩn kết quả tìm kiếm
-        quickSuggestions.classList.remove('d-none'); // Hiện lại gợi ý nhanh
+        // Kích hoạt animation sau 1 frame để CSS transition hoạt động
+        requestAnimationFrame(() => {
+            searchOverlay.classList.add('is-open');
+            searchBackdrop.classList.add('is-open');
+        });
+
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => searchInput.focus(), 200);
     }
 
-    // Sự kiện đóng khi nhấn nút X
-    if (closeSearch) closeSearch.addEventListener('click', closeOverlay);
-    
-    /**
-     * Đóng khung tìm kiếm khi nhấn phím ESC (Escape).
-     */
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !searchOverlay.classList.contains('d-none')) {
+    function closeOverlay() {
+        searchOverlay.classList.remove('is-open');
+        searchBackdrop.classList.remove('is-open');
+
+        // Sau khi animation xong mới ẩn khỏi DOM
+        setTimeout(() => {
+            searchOverlay.classList.add('d-none');
+            searchBackdrop.classList.add('d-none');
+        }, 370);
+
+        document.body.style.overflow = '';
+        resetSearch();
+    }
+
+    function resetSearch() {
+        searchInput.value = '';
+        searchResults.classList.add('d-none');
+        searchResults.innerHTML = '';
+        quickSuggestions.classList.remove('d-none');
+        searchBarClear.classList.add('d-none');
+    }
+
+    // ── Events ────────────────────────────────────────────────────
+    searchTrigger.addEventListener('click', function (e) {
+        e.preventDefault();
+        openSearch();
+    });
+
+    if (closeSearch)    closeSearch.addEventListener('click', closeOverlay);
+    if (searchBackdrop) searchBackdrop.addEventListener('click', closeOverlay);
+
+    if (searchBarClear) {
+        searchBarClear.addEventListener('click', function () {
+            searchInput.value = '';
+            searchInput.focus();
+            searchBarClear.classList.add('d-none');
+            searchResults.classList.add('d-none');
+            quickSuggestions.classList.remove('d-none');
+        });
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && searchOverlay.classList.contains('is-open')) {
             closeOverlay();
         }
     });
 
-    /**
-     * Xử lý logic Tìm kiếm trực tiếp (Live Search) với kỹ thuật Debounce.
-     * Tránh gửi yêu cầu liên tục lên máy chủ khi người dùng đang gõ phím nhanh.
-     */
+    // ── Live Search (Debounce) ────────────────────────────────────
     let debounceTimer;
-    searchInput.addEventListener('input', function() {
+    searchInput.addEventListener('input', function () {
         const query = this.value.trim();
+
+        // Hiện / ẩn nút xóa
+        searchBarClear.classList.toggle('d-none', query.length === 0);
+
         clearTimeout(debounceTimer);
 
-        // Nếu chuỗi tìm kiếm quá ngắn, quay lại hiển thị Gợi ý nhanh
         if (query.length < 1) {
             searchResults.classList.add('d-none');
             quickSuggestions.classList.remove('d-none');
             return;
         }
 
-        // Đợi 300ms sau khi người dùng dừng gõ mới bắt đầu tìm kiếm
         debounceTimer = setTimeout(() => {
             fetch(`${SEARCH_API_URL}?q=${encodeURIComponent(query)}`)
-                .then(response => response.json())
-                .then(data => {
-                    renderResults(data); // Hiển thị kết quả tìm được
-                })
-                .catch(err => console.error('Lỗi khi tìm kiếm:', err));
+                .then(r => r.json())
+                .then(data => renderResults(data))
+                .catch(err => console.error('Lỗi tìm kiếm:', err));
         }, 300);
     });
 
-    /**
-     * Hiển thị danh sách kết quả tìm kiếm (Sản phẩm hoặc Tin tức) lên giao diện.
-     * @param {array} data Mảng các đối tượng kết quả từ API
-     */
+    // ── Render Results ────────────────────────────────────────────
     function renderResults(data) {
-        // Trường hợp không tìm thấy kết quả nào
-        if (data.length === 0) {
-            searchResults.innerHTML = '<div class="col-12 text-center py-5 text-secondary-light">Không tìm thấy kết quả nào cho từ khóa này...</div>';
-            searchResults.classList.remove('d-none');
-            quickSuggestions.classList.add('d-none');
+        quickSuggestions.classList.add('d-none');
+        searchResults.classList.remove('d-none');
+
+        if (!data || data.length === 0) {
+            searchResults.innerHTML = '<div class="search-no-result"><i class="bi bi-search me-2"></i>Không tìm thấy kết quả nào...</div>';
             return;
         }
 
-        let html = '';
-        data.forEach(item => {
-            // Tùy biến kiểu hiển thị giá tùy theo loại kết quả (Sản phẩm hay Tin tức)
-            let priceClass = item.type === 'news' ? 'text-secondary small mt-1' : 'suggestion-price';
-            
-            html += `
-                <div class="col-md-6 col-lg-4 animate-reveal">
-                    <a href="${item.url}" class="suggestion-card">
-                        <img src="assets/images/${item.image}" class="suggestion-img" style="${item.type === 'news' ? 'object-fit: cover;' : 'object-fit: contain;'}" onerror="this.src='https://placehold.co/100x100?text=Result'">
-                        <div class="suggestion-info" style="overflow: hidden;">
-                            <div class="suggestion-name text-truncate">${item.name}</div>
-                            <div class="small ${item.type === 'news' ? 'text-primary fw-medium' : 'text-secondary'} mb-1">${item.category}</div>
-                            <div class="${priceClass} text-truncate">${item.formatted_price}</div>
-                        </div>
-                    </a>
+        searchResults.innerHTML = data.map(item => `
+            <a href="${item.url}" class="suggestion-card">
+                <img src="assets/images/${item.image}"
+                     class="suggestion-img"
+                     style="${item.type === 'news' ? 'object-fit:cover;' : 'object-fit:contain;'}"
+                     onerror="this.src='https://placehold.co/60x60?text=?'">
+                <div class="suggestion-info">
+                    <div class="suggestion-name">${item.name}</div>
+                    <div class="suggestion-price">${item.formatted_price}</div>
                 </div>
-            `;
-        });
-
-        // Cập nhật vùng hiển thị kết quả
-        searchResults.innerHTML = html;
-        searchResults.classList.remove('d-none');
-        quickSuggestions.classList.add('d-none');
+            </a>
+        `).join('');
     }
+
 });

@@ -67,7 +67,19 @@ include 'includes/header.php';
                         </nav>
                         
                         <h1 class="display-4 fw-bold mb-3"><?php echo $product['name']; ?></h1>
-                        <p class="h2 text-primary fw-bold mb-4"><?php echo number_format($product['price'], 0, ',', '.'); ?>₫</p>
+                        <p class="h2 text-primary fw-bold mb-3"><?php echo number_format($product['price'], 0, ',', '.'); ?>₫</p>
+                        
+                        <?php if(!empty($product['specs'])): ?>
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+                            <?php
+                            $specsArr = array_map('trim', explode(',', $product['specs']));
+                            foreach($specsArr as $spec): ?>
+                                <span class="badge bg-light text-dark border px-3 py-2 fs-6 rounded-pill fw-normal"><?php echo htmlspecialchars($spec); ?></span>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php else: ?>
+                            <div class="mb-4"></div>
+                        <?php endif; ?>
                         
                         <div class="mb-5">
                             <h5 class="fw-bold mb-3 text-uppercase small letter-spacing text-muted">Mô tả sản phẩm</h5>

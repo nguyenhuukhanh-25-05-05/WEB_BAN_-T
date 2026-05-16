@@ -107,19 +107,34 @@ if (isset($_GET['edit'])) {
     $editData = $stmtEdit->fetch() ?: null;
 }
 
+// Cấu hình phân trang
+$limit = 5;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
 // Lấy danh sách bảo hành kèm tên sản phẩm
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$whereClause = "";
+$params = [];
+
+if ($search !== '') {
+    $whereClause = " WHERE w.imei LIKE ?";
+    $params[] = "%$search%";
+}
+
+// Đếm tổng số bản ghi
+$sqlCount = "SELECT COUNT(*) FROM warranties w" . $whereClause;
+$stmtCount = $pdo->prepare($sqlCount);
+$stmtCount->execute($params);
+$totalRecords = $stmtCount->fetchColumn();
+$totalPages = ceil($totalRecords / $limit);
+
 $sql = "
     SELECT w.*, p.name as product_name 
     FROM warranties w 
     LEFT JOIN products p ON w.product_id = p.id 
-";
-$params = [];
-if ($search !== '') {
-    $sql .= " WHERE w.imei LIKE ?";
-    $params[] = "%$search%";
-}
-$sql .= " ORDER BY w.created_at DESC";
+" . $whereClause . " ORDER BY w.created_at DESC LIMIT $limit OFFSET $offset";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
@@ -227,6 +242,41 @@ include 'includes/admin_header.php';
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination UI -->
+            <?php if (isset($totalPages) && $totalPages > 1): ?>
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-end mb-0">
+                    <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?php echo $page - 1; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>">Trước</a>
+                    </li>
+                    <?php
+                    $startPage = max(1, $page - 2);
+                    $endPage = min($totalPages, $page + 2);
+                    if ($startPage > 1) {
+                        echo '<li class="page-item"><a class="page-link" href="?page=1' . ($search ? '&search='.urlencode($search) : '') . '">1</a></li>';
+                        if ($startPage > 2) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                    }
+                    for ($i = $startPage; $i <= $endPage; $i++): ?>
+                        <li class="page-item <?php echo $page == $i ? 'active' : ''; ?>">
+                            <a class="page-link" href="?page=<?php echo $i; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>"><?php echo $i; ?></a>
+                        </li>
+                    <?php endfor; 
+                    if ($endPage < $totalPages) {
+                        if ($endPage < $totalPages - 1) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        echo '<li class="page-item"><a class="page-link" href="?page=' . $totalPages . ($search ? '&search='.urlencode($search) : '') . '">' . $totalPages . '</a></li>';
+                    }
+                    ?>
+                    <li class="page-item <?php echo $page >= $totalPages ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?php echo $page + 1; ?><?php echo $search ? '&search='.urlencode($search) : ''; ?>">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+            <?php endif; ?>
         </div>
     </main>
 

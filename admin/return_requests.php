@@ -58,16 +58,40 @@ if (isset($_POST['update_status'])) {
 $statusFilter = trim($_GET['status_filter'] ?? '');
 $search       = trim($_GET['search'] ?? '');
 
-$sql    = "SELECT rr.*, o.total_price FROM return_requests rr LEFT JOIN orders o ON rr.order_id = o.id WHERE 1=1";
+// Cấu hình phân trang
+$limit = 5;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
+$whereClause = " WHERE 1=1";
 $params = [];
 
-if ($statusFilter !== '') { $sql .= " AND rr.status = ?"; $params[] = $statusFilter; }
-if ($search !== '')       { $sql .= " AND (rr.customer_name ILIKE ? OR rr.customer_phone ILIKE ? OR rr.order_code ILIKE ?)"; $params[] = "%$search%"; $params[] = "%$search%"; $params[] = "%$search%"; }
+if ($statusFilter !== '') { 
+    $whereClause .= " AND rr.status = ?"; 
+    $params[] = $statusFilter; 
+}
+if ($search !== '') { 
+    $whereClause .= " AND (rr.customer_name ILIKE ? OR rr.customer_phone ILIKE ? OR rr.order_code ILIKE ?)"; 
+    $params[] = "%$search%"; $params[] = "%$search%"; $params[] = "%$search%"; 
+}
 
-$sql .= " ORDER BY rr.created_at DESC";
+// Đếm tổng số bản ghi
+$sqlCount = "SELECT COUNT(*) FROM return_requests rr LEFT JOIN orders o ON rr.order_id = o.id" . $whereClause;
+$stmtCount = $pdo->prepare($sqlCount);
+$stmtCount->execute($params);
+$totalRecords = $stmtCount->fetchColumn();
+$totalPages = ceil($totalRecords / $limit);
+
+$sql = "SELECT rr.*, o.total_price FROM return_requests rr LEFT JOIN orders o ON rr.order_id = o.id" . $whereClause . " ORDER BY rr.created_at DESC LIMIT $limit OFFSET $offset";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $requests = $stmt->fetchAll();
+
+// Chuỗi query string cho phân trang
+$queryString = "";
+if ($search) $queryString .= '&search='.urlencode($search);
+if ($statusFilter) $queryString .= '&status_filter='.urlencode($statusFilter);
 
 // Đếm chờ duyệt
 $pendingCount = (int)$pdo->query("SELECT COUNT(*) FROM return_requests WHERE status = 'Chờ duyệt'")->fetchColumn();
@@ -224,6 +248,42 @@ include 'includes/admin_header.php';
     </tbody>
 </table>
 </div>
+
+<!-- Pagination UI -->
+<?php if (isset($totalPages) && $totalPages > 1): ?>
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-end mb-0">
+        <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+            <a class="page-link" href="?page=<?php echo $page - 1; ?><?php echo $queryString; ?>">Trước</a>
+        </li>
+        <?php
+        $startPage = max(1, $page - 2);
+        $endPage = min($totalPages, $page + 2);
+        if ($startPage > 1) {
+            echo '<li class="page-item"><a class="page-link" href="?page=1' . $queryString . '">1</a></li>';
+            if ($startPage > 2) {
+                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+        }
+        for ($i = $startPage; $i <= $endPage; $i++): ?>
+            <li class="page-item <?php echo $page == $i ? 'active' : ''; ?>">
+                <a class="page-link" href="?page=<?php echo $i; ?><?php echo $queryString; ?>"><?php echo $i; ?></a>
+            </li>
+        <?php endfor; 
+        if ($endPage < $totalPages) {
+            if ($endPage < $totalPages - 1) {
+                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+            echo '<li class="page-item"><a class="page-link" href="?page=' . $totalPages . $queryString . '">' . $totalPages . '</a></li>';
+        }
+        ?>
+        <li class="page-item <?php echo $page >= $totalPages ? 'disabled' : ''; ?>">
+            <a class="page-link" href="?page=<?php echo $page + 1; ?><?php echo $queryString; ?>">Sau</a>
+        </li>
+    </ul>
+</nav>
+<?php endif; ?>
+
 <?php endif; ?>
 </div>
 

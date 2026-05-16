@@ -92,9 +92,22 @@ $stmt = $pdo->query("
 ");
 $pendingResets = $stmt->fetchAll();
 
-// Get all users for manual reset
-$stmt = $pdo->query("SELECT id, fullname, email, created_at FROM users ORDER BY fullname ASC");
-$allUsers = $stmt->fetchAll();
+// Get all users for manual reset dropdown
+$stmt = $pdo->query("SELECT id, fullname, email FROM users ORDER BY fullname ASC");
+$dropdownUsers = $stmt->fetchAll();
+
+// Cấu hình phân trang cho danh sách người dùng
+$limit = 5;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
+$totalRecords = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$totalPages = ceil($totalRecords / $limit);
+
+$stmt = $pdo->prepare("SELECT id, fullname, email, created_at, last_password_reset FROM users ORDER BY fullname ASC LIMIT $limit OFFSET $offset");
+$stmt->execute();
+$paginatedUsers = $stmt->fetchAll();
 
 $pageTitle = "Quản lý đặt lại mật khẩu | Admin";
 $basePath = "../";
@@ -195,7 +208,7 @@ include 'includes/admin_header.php';
                             <label class="form-label fw-bold">Chọn người dùng</label>
                             <select name="user_id_select" class="form-select" onchange="document.getElementById('userId').value = this.value;">
                                 <option value="">-- Chọn người dùng --</option>
-                                <?php foreach ($allUsers as $u): ?>
+                                <?php foreach ($dropdownUsers as $u): ?>
                                     <option value="<?php echo $u['id']; ?>">
                                         <?php echo htmlspecialchars($u['fullname']) . ' (' . htmlspecialchars($u['email']) . ')'; ?>
                                     </option>
@@ -249,7 +262,7 @@ include 'includes/admin_header.php';
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($allUsers as $user): ?>
+                                <?php foreach ($paginatedUsers as $user): ?>
                                     <tr>
                                         <td><code>#<?php echo $user['id']; ?></code></td>
                                         <td class="fw-bold"><?php echo htmlspecialchars($user['fullname']); ?></td>
@@ -273,6 +286,43 @@ include 'includes/admin_header.php';
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- Pagination UI -->
+                    <?php if (isset($totalPages) && $totalPages > 1): ?>
+                    <div class="px-4 pb-3">
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-end mb-0">
+                                <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                                    <a class="page-link" href="?page=<?php echo $page - 1; ?>">Trước</a>
+                                </li>
+                                <?php
+                                $startPage = max(1, $page - 2);
+                                $endPage = min($totalPages, $page + 2);
+                                if ($startPage > 1) {
+                                    echo '<li class="page-item"><a class="page-link" href="?page=1">1</a></li>';
+                                    if ($startPage > 2) {
+                                        echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                    }
+                                }
+                                for ($i = $startPage; $i <= $endPage; $i++): ?>
+                                    <li class="page-item <?php echo $page == $i ? 'active' : ''; ?>">
+                                        <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                    </li>
+                                <?php endfor; 
+                                if ($endPage < $totalPages) {
+                                    if ($endPage < $totalPages - 1) {
+                                        echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                    }
+                                    echo '<li class="page-item"><a class="page-link" href="?page=' . $totalPages . '">' . $totalPages . '</a></li>';
+                                }
+                                ?>
+                                <li class="page-item <?php echo $page >= $totalPages ? 'disabled' : ''; ?>">
+                                    <a class="page-link" href="?page=<?php echo $page + 1; ?>">Sau</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

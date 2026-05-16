@@ -37,7 +37,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </div>
         </div>
         <div class="header-actions">
-            <a href="check.php" class="app-icon-btn" title="Kiểm tra hệ thống"><i class="bi bi-clipboard-check"></i></a>
             <a href="<?php echo $basePath; ?>index.php" class="app-icon-btn" title="Xem Website"><i class="bi bi-globe"></i></a>
             <a href="<?php echo $basePath; ?>logout.php" class="app-icon-btn text-danger" title="Đăng xuất"><i class="bi bi-box-arrow-right"></i></a>
         </div>
@@ -54,7 +53,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <small class="text-muted">Quản lý hệ thống</small>
                 </div>
             </div>
-            <button class="btn-close" id="sidebarClose"></button>
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.php" class="nav-link-admin <?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>"><i class="bi bi-speedometer2"></i> Tổng quan</a>

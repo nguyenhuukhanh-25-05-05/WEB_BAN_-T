@@ -14,27 +14,42 @@ $basePath = "../";
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $action_filter = isset($_GET['action_filter']) ? trim($_GET['action_filter']) : '';
 
-$sql = "SELECT l.*, a.username as admin_username 
-        FROM admin_logs l 
-        LEFT JOIN admins a ON l.admin_id = a.id 
-        WHERE 1=1";
+// Cấu hình phân trang
+$limit = 5;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
+$whereClause = " WHERE 1=1";
 $params = [];
 
 if ($search !== '') {
-    $sql .= " AND (l.details ILIKE ? OR a.username ILIKE ?)";
+    $whereClause .= " AND (l.details ILIKE ? OR a.username ILIKE ?)";
     $params[] = "%$search%";
     $params[] = "%$search%";
 }
 
 if ($action_filter !== '') {
-    $sql .= " AND l.action_type = ?";
+    $whereClause .= " AND l.action_type = ?";
     $params[] = $action_filter;
 }
 
-$sql .= " ORDER BY l.created_at DESC LIMIT 500"; // Giới hạn 500 log gần nhất
+// Đếm tổng số bản ghi
+$sqlCount = "SELECT COUNT(*) FROM admin_logs l LEFT JOIN admins a ON l.admin_id = a.id" . $whereClause;
+$stmtCount = $pdo->prepare($sqlCount);
+$stmtCount->execute($params);
+$totalRecords = $stmtCount->fetchColumn();
+$totalPages = ceil($totalRecords / $limit);
+
+$sql = "SELECT l.*, a.username as admin_username FROM admin_logs l LEFT JOIN admins a ON l.admin_id = a.id" . $whereClause . " ORDER BY l.created_at DESC LIMIT $limit OFFSET $offset";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $logs = $stmt->fetchAll();
+
+// Chuỗi query string cho phân trang
+$queryString = "";
+if ($search) $queryString .= '&search='.urlencode($search);
+if ($action_filter) $queryString .= '&action_filter='.urlencode($action_filter);
 
 // Lấy danh sách các loại action để đưa vào filter
 $actionStmt = $pdo->query("SELECT DISTINCT action_type FROM admin_logs ORDER BY action_type");
@@ -124,10 +139,39 @@ include 'includes/admin_header.php';
                 </table>
             </div>
             
-            <?php if (count($logs) === 500): ?>
-                <div class="text-center mt-3 small text-secondary">
-                    Chỉ hiển thị 500 thao tác gần nhất để đảm bảo hiệu suất.
-                </div>
+            <!-- Pagination UI -->
+            <?php if (isset($totalPages) && $totalPages > 1): ?>
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-end mb-0">
+                    <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?php echo $page - 1; ?><?php echo $queryString; ?>">Trước</a>
+                    </li>
+                    <?php
+                    $startPage = max(1, $page - 2);
+                    $endPage = min($totalPages, $page + 2);
+                    if ($startPage > 1) {
+                        echo '<li class="page-item"><a class="page-link" href="?page=1' . $queryString . '">1</a></li>';
+                        if ($startPage > 2) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                    }
+                    for ($i = $startPage; $i <= $endPage; $i++): ?>
+                        <li class="page-item <?php echo $page == $i ? 'active' : ''; ?>">
+                            <a class="page-link" href="?page=<?php echo $i; ?><?php echo $queryString; ?>"><?php echo $i; ?></a>
+                        </li>
+                    <?php endfor; 
+                    if ($endPage < $totalPages) {
+                        if ($endPage < $totalPages - 1) {
+                            echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        echo '<li class="page-item"><a class="page-link" href="?page=' . $totalPages . $queryString . '">' . $totalPages . '</a></li>';
+                    }
+                    ?>
+                    <li class="page-item <?php echo $page >= $totalPages ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?php echo $page + 1; ?><?php echo $queryString; ?>">Sau</a>
+                    </li>
+                </ul>
+            </nav>
             <?php endif; ?>
         </div>
 
