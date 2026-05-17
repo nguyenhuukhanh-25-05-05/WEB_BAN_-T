@@ -282,12 +282,21 @@ include 'includes/header.php';
             </div>
             <div class="product-grid-new">
                 <?php
-                // Lấy sản phẩm flash sale (ngẫu nhiên, giảm giá giả lập)
-                $flashSaleStmt = $pdo->query("SELECT * FROM products ORDER BY RANDOM() LIMIT 4");
+                // Lấy sản phẩm flash sale (Ưu tiên sản phẩm có discount thật)
+                $flashSaleStmt = $pdo->query("SELECT * FROM products WHERE discount > 0 ORDER BY RANDOM() LIMIT 4");
                 $flashSaleProducts = $flashSaleStmt->fetchAll();
+                
+                // Bổ sung nếu chưa đủ 4 máy (dùng discount giả lập nhẹ)
+                if (count($flashSaleProducts) < 4) {
+                    $limit = 4 - count($flashSaleProducts);
+                    $excludeIds = implode(',', array_map('intval', array_column($flashSaleProducts, 'id') ?: [0]));
+                    $moreStmt = $pdo->query("SELECT * FROM products WHERE id NOT IN ($excludeIds) ORDER BY RANDOM() LIMIT $limit");
+                    $flashSaleProducts = array_merge($flashSaleProducts, $moreStmt->fetchAll());
+                }
+
                 foreach ($flashSaleProducts as $p):
-                    $discountPercent = rand(10, 30);
-                    $salePrice = $p['price'] * (100 - $discountPercent) / 100;
+                    $discountPercent = !empty($p['discount']) ? $p['discount'] : rand(5, 15);
+                    $salePrice = $p['price'] - ($p['price'] * $discountPercent / 100);
                 ?>
                     <div class="product-card-new" style="background: #fff; border: none;">
                         <a href="product-detail.php?id=<?php echo $p['id']; ?>">
@@ -299,9 +308,9 @@ include 'includes/header.php';
                             <div class="product-info-new">
                                 <span class="p-cat"><?php echo $p['category']; ?></span>
                                 <h3 class="p-name"><?php echo $p['name']; ?></h3>
-                                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                    <span style="font-size: 18px; font-weight: 800; color: #fff;"><?php echo number_format($salePrice, 0, ',', '.'); ?>₫</span>
-                                    <span style="font-size: 14px; color: rgba(255,255,255,0.7); text-decoration: line-through;"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</span>
+                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                    <span style="font-size: 16px; font-weight: 800; color: #000;"><?php echo number_format($salePrice, 0, ',', '.'); ?>₫</span>
+                                    <span style="font-size: 13px; color: #888; text-decoration: line-through;"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</span>
                                 </div>
                                 <?php if(!empty($p['specs'])): ?>
                                 <div class="p-specs">

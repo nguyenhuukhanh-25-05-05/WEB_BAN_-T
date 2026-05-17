@@ -20,6 +20,7 @@ if (isset($_POST['save_product'])) {
     $category = trim($_POST['category'] ?? '');
     $price = $_POST['price'] ?? '';
     $stock = $_POST['stock'] ?? '';
+    $discount = $_POST['discount'] ?? 0;
     $specs = trim($_POST['specs'] ?? '');
     $description = trim($_POST['description'] ?? '');
 
@@ -53,16 +54,16 @@ if (isset($_POST['save_product'])) {
 
     if ($id) {
         // Nếu có ID -> CẬP NHẬT sản phẩm hiện tại
-        $sql = "UPDATE products SET name = ?, category = ?, price = ?, stock = ?, image = ?, description = ?, specs = ? WHERE id = ?";
+        $sql = "UPDATE products SET name = ?, category = ?, price = ?, discount = ?, stock = ?, image = ?, description = ?, specs = ? WHERE id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$name, $category, $price, $stock, $image, $description, $specs, $id]);
+        $stmt->execute([$name, $category, $price, $discount, $stock, $image, $description, $specs, $id]);
         $msg = "success";
         log_admin_action($pdo, 'UPDATE_PRODUCT', "Cập nhật sản phẩm ID $id ($name)");
     } else {
         // Nếu không có ID -> THÊM MỚI sản phẩm vào bảng
-        $sql = "INSERT INTO products (name, category, price, stock, image, description, specs) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO products (name, category, price, discount, stock, image, description, specs) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$name, $category, $price, $stock, $image, $description, $specs]);
+        $stmt->execute([$name, $category, $price, $discount, $stock, $image, $description, $specs]);
         $msg = "success";
         $new_product_id = $pdo->lastInsertId();
         log_admin_action($pdo, 'ADD_PRODUCT', "Thêm sản phẩm mới ID $new_product_id ($name)");
@@ -258,9 +259,9 @@ include 'includes/admin_header.php';
                                 <th>Hình ảnh</th>
                                 <th>Tên máy</th>
                                 <th>Hãng</th>
-                                <th>Giá niêm yết</th>
-                                <th>Tồn kho</th>
-                                <th class="text-end">Hành động</th>
+                                <th>Giá & Kho</th>
+                                <th class="d-none d-md-table-cell text-center">Giảm giá</th>
+                                <th class="d-none d-md-table-cell text-end">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -282,8 +283,17 @@ include 'includes/admin_header.php';
                                 </div>
                             </td>
                             <td><span class="badge bg-light text-dark border fw-normal"><?php echo $p['category']; ?></span></td>
-                            <td class="fw-bold text-primary"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</td>
-                            <td><span class="text-secondary"><?php echo $p['stock']; ?> chiếc</span></td>
+                            <td>
+                                <div class="fw-bold text-primary"><?php echo number_format($p['price'], 0, ',', '.'); ?> đ</div>
+                                <div class="small text-secondary"><i class="bi bi-box me-1"></i>Tồn: <?php echo $p['stock']; ?></div>
+                            </td>
+                            <td class="d-none d-md-table-cell text-center">
+                                <?php if (isset($p['discount']) && $p['discount'] > 0): ?>
+                                    <span class="badge bg-danger rounded-pill px-2 py-1">-<?php echo $p['discount']; ?>%</span>
+                                <?php else: ?>
+                                    <span class="text-muted small">Không</span>
+                                <?php endif; ?>
+                            </td>
                             <td class="text-end">
                                 <!-- Nút Đánh dấu / Gỡ bỏ Nổi bật -->
                                 <a href="products.php?toggle_featured=<?php echo $p['id']; ?>" class="btn btn-sm border p-2 <?php echo $p['is_featured'] ? 'btn-warning text-white' : 'btn-light text-warning'; ?>" title="Ghim lên đầu trang chủ">
@@ -355,30 +365,34 @@ include 'includes/admin_header.php';
                     </div>
                     <div class="modal-body p-4">
                         <!-- Input ẩn ID: Dùng để phân biệt Thêm (trống) hay Sửa (có ID) -->
-                        <input type="hidden" name="id" value="<?php echo $editProduct ? $editProduct['id'] : ''; ?>">
-                        <input type="hidden" name="current_image" value="<?php echo $editProduct ? $editProduct['image'] : 'placeholder.png'; ?>">
+                        <input type="hidden" name="id" value="<?php echo $editData['id'] ?? ''; ?>">
+                        <input type="hidden" name="current_image" value="<?php echo $editData['image'] ?? 'placeholder.png'; ?>">
                         
                         <div class="row g-3">
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold">Tên điện thoại <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control rounded-3" value="<?php echo $editProduct ? $editProduct['name'] : ''; ?>" placeholder="VD: iPhone 15 Pro Max" required>
+                                <input type="text" name="name" class="form-control rounded-3" value="<?php echo $editData['name'] ?? ''; ?>" placeholder="VD: iPhone 15 Pro Max" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Danh mục hãng <span class="text-danger">*</span></label>
                                 <select name="category" class="form-select rounded-3">
-                                    <option value="Apple" <?php echo ($editProduct && $editProduct['category'] == 'Apple') ? 'selected' : ''; ?>>Apple</option>
-                                    <option value="Samsung" <?php echo ($editProduct && $editProduct['category'] == 'Samsung') ? 'selected' : ''; ?>>Samsung</option>
-                                    <option value="Xiaomi" <?php echo ($editProduct && $editProduct['category'] == 'Xiaomi') ? 'selected' : ''; ?>>Xiaomi</option>
-                                    <option value="Oppo" <?php echo ($editProduct && $editProduct['category'] == 'Oppo') ? 'selected' : ''; ?>>Oppo</option>
+                                    <option value="Apple" <?php echo (isset($editData) && $editData['category'] == 'Apple') ? 'selected' : ''; ?>>Apple</option>
+                                    <option value="Samsung" <?php echo (isset($editData) && $editData['category'] == 'Samsung') ? 'selected' : ''; ?>>Samsung</option>
+                                    <option value="Xiaomi" <?php echo (isset($editData) && $editData['category'] == 'Xiaomi') ? 'selected' : ''; ?>>Xiaomi</option>
+                                    <option value="Oppo" <?php echo (isset($editData) && $editData['category'] == 'Oppo') ? 'selected' : ''; ?>>Oppo</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold">Giá bán (VNĐ) <span class="text-danger">*</span></label>
-                                <input type="number" name="price" class="form-control rounded-3" value="<?php echo $editProduct ? $editProduct['price'] : ''; ?>" placeholder="VD: 30000000" min="0" required>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Giá bán (VNĐ) *</label>
+                                <input type="number" name="price" class="form-control rounded-3" value="<?php echo $editData['price'] ?? ''; ?>" required placeholder="VD: 25000000">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Giảm giá (%)</label>
+                                <input type="number" name="discount" class="form-control rounded-3" value="<?php echo $editData['discount'] ?? '0'; ?>" min="0" max="100" placeholder="VD: 15">
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold">Số lượng tồn kho <span class="text-danger">*</span></label>
-                                <input type="number" name="stock" class="form-control rounded-3" value="<?php echo $editProduct ? $editProduct['stock'] : ''; ?>" placeholder="VD: 10" min="0" required>
+                                <input type="number" name="stock" class="form-control rounded-3" value="<?php echo $editData['stock'] ?? ''; ?>" placeholder="VD: 10" min="0" required>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold">Ảnh sản phẩm <?php echo !$editProduct ? '<span class="text-danger">*</span>' : ''; ?></label>

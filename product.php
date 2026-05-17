@@ -434,13 +434,25 @@ include 'includes/header.php';
 
                             <a href="product-detail.php?id=<?php echo $p['id']; ?>">
                                 <div class="product-img-box">
+                                    <?php if (!empty($p['discount']) && $p['discount'] > 0): ?>
+                                        <span class="badge-hot" style="background: #007AFF;">-<?php echo $p['discount']; ?>%</span>
+                                    <?php endif; ?>
                                     <img src="assets/images/<?php echo $p['image']; ?>" alt="<?php echo $p['name']; ?>"
                                         onerror="this.src='https://placehold.co/300x400/f5f5f7/1d1d1f?text=Phone'">
                                 </div>
                                 <div class="product-info-new">
                                     <span class="p-cat"><?php echo $p['category']; ?></span>
                                     <h3 class="p-name"><?php echo $p['name']; ?></h3>
-                                    <div class="p-price-new"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</div>
+                                    <?php if (!empty($p['discount']) && $p['discount'] > 0): 
+                                        $salePrice = $p['price'] - ($p['price'] * $p['discount'] / 100);
+                                    ?>
+                                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                            <span style="font-size: 16px; font-weight: 800; color: #000;"><?php echo number_format($salePrice, 0, ',', '.'); ?>₫</span>
+                                            <span style="font-size: 13px; color: #888; text-decoration: line-through;"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</span>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="p-price-new"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</div>
+                                    <?php endif; ?>
                                     <?php if(!empty($p['specs'])): ?>
                                     <div class="p-specs">
                                         <?php

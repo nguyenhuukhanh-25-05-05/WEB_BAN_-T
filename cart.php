@@ -42,9 +42,10 @@ if (isset($_GET['add'])) {
         if (isset($_SESSION['cart'][$productId])) {
             $_SESSION['cart'][$productId]['qty']++;
         } else {
+            $actualPrice = $product['price'] - ($product['price'] * ($product['discount'] ?? 0) / 100);
             $_SESSION['cart'][$productId] = [
                 'name' => $product['name'],
-                'price' => $product['price'],
+                'price' => $actualPrice,
                 'image' => $product['image'],
                 'qty' => 1
             ];

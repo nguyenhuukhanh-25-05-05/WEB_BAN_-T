@@ -34,7 +34,7 @@ function syncCartWithDatabase($pdo) {
     // 2. Nạp giỏ hàng từ DB nếu user đăng nhập và session đang rỗng
     if ($userId && !$isAdmin && empty($_SESSION['cart'])) {
         try {
-            $sql = "SELECT ci.*, p.name, p.price, p.image, p.stock FROM cart_items ci 
+            $sql = "SELECT ci.*, p.name, p.price, p.discount, p.image, p.stock FROM cart_items ci 
                     JOIN products p ON ci.product_id = p.id 
                     WHERE ci.user_id = ?";
             $stmt = $pdo->prepare($sql);
@@ -45,9 +45,10 @@ function syncCartWithDatabase($pdo) {
                 // Chỉ nạp vào session nếu hàng còn tồn kho
                 if ($item['stock'] > 0) {
                     $qty = min((int)$item['quantity'], $item['stock']);
+                    $actualPrice = $item['price'] - ($item['price'] * ($item['discount'] ?? 0) / 100);
                     $_SESSION['cart'][$item['product_id']] = [
                         'name'  => $item['name'],
-                        'price' => $item['price'],
+                        'price' => $actualPrice,
                         'image' => $item['image'],
                         'qty'   => $qty
                     ];
@@ -63,7 +64,7 @@ function syncCartWithDatabase($pdo) {
         try {
             $productIds = array_keys($_SESSION['cart']);
             $placeholders = implode(',', array_fill(0, count($productIds), '?'));
-            $stmt = $pdo->prepare("SELECT id, name, price, stock, image FROM products WHERE id IN ($placeholders)");
+            $stmt = $pdo->prepare("SELECT id, name, price, discount, stock, image FROM products WHERE id IN ($placeholders)");
             $stmt->execute($productIds);
             
             $dbProducts = [];
@@ -79,9 +80,10 @@ function syncCartWithDatabase($pdo) {
                     $cartModified = true;
                 } else {
                     $dbProduct = $dbProducts[$pid];
+                    $actualPrice = $dbProduct['price'] - ($dbProduct['price'] * ($dbProduct['discount'] ?? 0) / 100);
                     // Cập nhật giá và tên mới nhất từ DB
-                    if ($_SESSION['cart'][$pid]['price'] != $dbProduct['price'] || $_SESSION['cart'][$pid]['name'] != $dbProduct['name']) {
-                        $_SESSION['cart'][$pid]['price'] = $dbProduct['price'];
+                    if ($_SESSION['cart'][$pid]['price'] != $actualPrice || $_SESSION['cart'][$pid]['name'] != $dbProduct['name']) {
+                        $_SESSION['cart'][$pid]['price'] = $actualPrice;
                         $_SESSION['cart'][$pid]['name'] = $dbProduct['name'];
                         $cartModified = true;
                     }

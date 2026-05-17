@@ -199,6 +199,7 @@ try {
     try { $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS rating DECIMAL(3,2) DEFAULT 0.00;"); } catch (\PDOException $e) {}
     try { $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS review_count INT DEFAULT 0;"); } catch (\PDOException $e) {}
     try { $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS specs TEXT;"); } catch (\PDOException $e) {}
+    try { $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS discount INT DEFAULT 0;"); } catch (\PDOException $e) {}
     try { $pdo->exec("ALTER TABLE products ADD CONSTRAINT products_name_unique UNIQUE (name);"); } catch (\PDOException $e) {}
     
     // TỰ ĐỘNG VÁ LỖI MẬT KHẨU ADMIN CŨ TRÊN RENDER (Do script sql cũ bị lỗi mã băm)
