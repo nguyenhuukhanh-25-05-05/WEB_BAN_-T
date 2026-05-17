@@ -149,7 +149,7 @@ CREATE TABLE news (
 -- 3. SEED DATA (CLEAN - Chỉ để lại 1 admin + 1 user test)
 
 -- Default Admin: admin / admin123
-INSERT INTO admins (username, password) VALUES ('admin', '$2y$10$OxpLzqVPHtjUl6j9rc7Fj.JxotEpbaT0bMmUMymJNVLBZ0tVgI49K');
+INSERT INTO admins (username, password) VALUES ('admin', '$2y$10$HHrwIfRbuuGrzddNG5/P6.xZmk0AZO8EUGHBqnirhw2ZwmMIHsTJm');
 
 -- Test User: test@test.com / Test123!
 INSERT INTO users (fullname, email, password, status, phone, address) 

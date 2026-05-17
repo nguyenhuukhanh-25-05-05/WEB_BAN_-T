@@ -201,6 +201,11 @@ try {
     try { $pdo->exec("ALTER TABLE products ADD COLUMN IF NOT EXISTS specs TEXT;"); } catch (\PDOException $e) {}
     try { $pdo->exec("ALTER TABLE products ADD CONSTRAINT products_name_unique UNIQUE (name);"); } catch (\PDOException $e) {}
     
+    // TỰ ĐỘNG VÁ LỖI MẬT KHẨU ADMIN CŨ TRÊN RENDER (Do script sql cũ bị lỗi mã băm)
+    try { 
+        $pdo->exec("UPDATE admins SET password = '\$2y\$10\$HHrwIfRbuuGrzddNG5/P6.xZmk0AZO8EUGHBqnirhw2ZwmMIHsTJm' WHERE username = 'admin' AND password = '\$2y\$10\$OxpLzqVPHtjUl6j9rc7Fj.JxotEpbaT0bMmUMymJNVLBZ0tVgI49K'"); 
+    } catch (\PDOException $e) {}
+    
     // Cập nhật cấu trúc bảng Orders (Đơn hàng)
     try { $pdo->exec("ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(id);"); } catch (\PDOException $e) {}
     try { $pdo->exec("ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_phone VARCHAR(20);"); } catch (\PDOException $e) {}

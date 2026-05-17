@@ -292,6 +292,35 @@ function require_login() {
         header("Location: login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
         exit;
     }
+
+    // Kiểm tra tài khoản user xem có bị khóa trong lúc đang đăng nhập không
+    if (isset($_SESSION['user_id'])) {
+        global $pdo;
+        if (!isset($pdo)) {
+            require_once __DIR__ . '/db.php';
+        }
+        
+        try {
+            $stmt = $pdo->prepare("SELECT status FROM users WHERE id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            $status = $stmt->fetchColumn();
+            
+            if ($status === 'banned' || $status === false) {
+                // Tài khoản bị khóa hoặc bị xóa -> Hủy session
+                session_unset();
+                session_destroy();
+                
+                // Xác định đường dẫn về login.php dựa trên vị trí file hiện tại
+                $is_in_admin = str_contains($_SERVER['REQUEST_URI'], '/admin/');
+                $login_url = ($is_in_admin ? '../' : '') . 'login.php?error=banned';
+                
+                header("Location: " . $login_url);
+                exit;
+            }
+        } catch (Exception $e) {
+            error_log("[Auth Check] Lỗi khi kiểm tra trạng thái: " . $e->getMessage());
+        }
+    }
 }
 
 /**

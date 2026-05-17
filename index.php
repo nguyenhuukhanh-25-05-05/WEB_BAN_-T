@@ -320,9 +320,7 @@ include 'includes/header.php';
                     </div>
                 <?php endforeach; ?>
             </div>
-            <div class="text-center mt-5">
-                <a href="product.php" class="btn-main btn-outline" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">Xem tất cả Flash Sale</a>
-            </div>
+
         </div>
     </section>
 

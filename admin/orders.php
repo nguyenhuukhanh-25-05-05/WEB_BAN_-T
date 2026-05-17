@@ -11,13 +11,57 @@ require_once '../includes/db.php';
  */
 if (isset($_POST['update_status'])) {
     $id = $_POST['id'];
-    $status = $_POST['status'];
+    $newStatus = $_POST['status'];
     
-    // Câu lệnh SQL cập nhật trạng thái
-    $stmt = $pdo->prepare("UPDATE orders SET status = ? WHERE id = ?");
-    $stmt->execute([$status, $id]);
-    
-    log_admin_action($pdo, 'UPDATE_ORDER_STATUS', "Cập nhật trạng thái đơn hàng ID $id thành $status");
+    try {
+        $pdo->beginTransaction();
+        
+        // Lấy trạng thái hiện tại
+        $stmtCurrent = $pdo->prepare("SELECT status FROM orders WHERE id = ? FOR UPDATE");
+        $stmtCurrent->execute([$id]);
+        $currentStatus = $stmtCurrent->fetchColumn();
+        
+        if ($currentStatus !== false && $currentStatus !== $newStatus) {
+            $isOldCancelled = ($currentStatus === 'Đã hủy');
+            $isNewCancelled = ($newStatus === 'Đã hủy');
+            
+            // Nếu đổi sang Đã hủy -> Hoàn trả tồn kho
+            if (!$isOldCancelled && $isNewCancelled) {
+                $stmtItems = $pdo->prepare("SELECT product_id, quantity FROM order_items WHERE order_id = ?");
+                $stmtItems->execute([$id]);
+                $items = $stmtItems->fetchAll();
+                
+                $stmtUpdateStock = $pdo->prepare("UPDATE products SET stock = stock + ? WHERE id = ?");
+                foreach ($items as $item) {
+                    $stmtUpdateStock->execute([$item['quantity'], $item['product_id']]);
+                }
+            } 
+            // Nếu từ Đã hủy đổi sang trạng thái khác (phục hồi đơn) -> Trừ kho lại
+            else if ($isOldCancelled && !$isNewCancelled) {
+                $stmtItems = $pdo->prepare("SELECT product_id, quantity FROM order_items WHERE order_id = ?");
+                $stmtItems->execute([$id]);
+                $items = $stmtItems->fetchAll();
+                
+                $stmtUpdateStock = $pdo->prepare("UPDATE products SET stock = stock - ? WHERE id = ?");
+                foreach ($items as $item) {
+                    $stmtUpdateStock->execute([$item['quantity'], $item['product_id']]);
+                }
+            }
+            
+            // Cập nhật trạng thái mới
+            $stmt = $pdo->prepare("UPDATE orders SET status = ? WHERE id = ?");
+            $stmt->execute([$newStatus, $id]);
+            
+            log_admin_action($pdo, 'UPDATE_ORDER_STATUS', "Cập nhật trạng thái đơn hàng ID $id từ '$currentStatus' thành '$newStatus'");
+        }
+        
+        $pdo->commit();
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        error_log("[Admin Orders] Error updating status: " . $e->getMessage());
+    }
     
     // Lưu thông báo vào URL và reload trang
     header("Location: orders.php?msg=updated");

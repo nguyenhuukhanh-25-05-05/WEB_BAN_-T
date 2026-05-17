@@ -22,10 +22,17 @@ require_login();
 // Synchronize cart state for current session
 syncCartWithDatabase($pdo);
 
-// Kiểm tra giỏ hàng có đồ không, nếu không quay lại trang chủ
+// Nếu có sự thay đổi giỏ hàng (do hết hàng, xóa sản phẩm hoặc đổi giá), 
+// đẩy người dùng về trang giỏ hàng để họ xác nhận lại trước khi thanh toán
+if (isset($_SESSION['cart_notice'])) {
+    header("Location: cart.php");
+    exit;
+}
+
+// Kiểm tra giỏ hàng có đồ không, nếu không quay lại trang giỏ hàng
 $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 if (empty($cartItems) && !isset($_GET['order'])) {
-    header("Location: index.php");
+    header("Location: cart.php");
     exit;
 }
 
@@ -58,6 +65,9 @@ if (isset($_POST['place_order'])) {
                 throw new Exception("Không có kết nối cơ sở dữ liệu");
             }
 
+            // Bắt đầu Transaction
+            $pdo->beginTransaction();
+
             // Thực hiện chèn đơn hàng vào bảng orders trong Postgres
             // Ghi chú: is_installment dùng string 'true'/'false' cho PostgreSQL BOOLEAN qua PDO
             $sqlOrder = "INSERT INTO orders (customer_name, customer_phone, customer_address, total_price, status, payment_method, user_id, is_installment) 
@@ -72,11 +82,29 @@ if (isset($_POST['place_order'])) {
                 throw new Exception("Không thể lấy ID đơn hàng sau khi tạo");
             }
 
-            // Lưu từng sản phẩm trong giỏ vào bảng order_items
+            // Lưu từng sản phẩm trong giỏ vào bảng order_items VÀ TRỪ KHO
             $sqlItem = "INSERT INTO order_items (order_id, product_id, product_name, price, quantity) VALUES (?, ?, ?, ?, ?)";
             $stmtItem = $pdo->prepare($sqlItem);
+            
+            $stmtCheckStock = $pdo->prepare("SELECT stock FROM products WHERE id = ? FOR UPDATE");
+            $stmtUpdateStock = $pdo->prepare("UPDATE products SET stock = stock - ? WHERE id = ?");
+
             foreach ($cartItems as $pid => $item) {
-                $stmtItem->execute([$orderId, $pid, $item['name'], $item['price'], (int)$item['qty']]);
+                $qty = (int)$item['qty'];
+                
+                // Khóa row sản phẩm và kiểm tra tồn kho
+                $stmtCheckStock->execute([$pid]);
+                $currentStock = $stmtCheckStock->fetchColumn();
+                
+                if ($currentStock === false || $currentStock < $qty) {
+                    throw new Exception("Sản phẩm '{$item['name']}' không đủ số lượng trong kho.");
+                }
+
+                // Chèn vào order_items
+                $stmtItem->execute([$orderId, $pid, $item['name'], $item['price'], $qty]);
+                
+                // Trừ số lượng tồn kho
+                $stmtUpdateStock->execute([$qty, $pid]);
             }
             
             // Lưu thông tin đơn vừa đặt vào session để trang thành công có thể hiển thị/tra cứu
@@ -98,12 +126,18 @@ if (isset($_POST['place_order'])) {
             $stmtClearCartSession = $pdo->prepare("DELETE FROM cart_items WHERE session_id = ?");
             $stmtClearCartSession->execute([session_id()]);
             
+            // Hoàn tất transaction
+            $pdo->commit();
+
             // Chuyển hướng sang trang thông báo thành công
             header("Location: checkout.php?order=success");
             exit;
         } catch (Exception $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             error_log("[Checkout] Order creation error: " . $e->getMessage());
-            $error = "Có lỗi xảy ra khi tạo đơn hàng: " . $e->getMessage() . ". Vui lòng thử lại hoặc liên hệ cửa hàng.";
+            $error = "Có lỗi xảy ra: " . $e->getMessage() . " Vui lòng tải lại giỏ hàng và thử lại.";
         }
     }
 }
@@ -186,14 +220,45 @@ include 'includes/header.php';
                                           <label class="fw-bold mb-0 flex-grow-1" for="cod">Trả tiền mặt khi nhận hàng (COD)</label>
                                           <i class="bi bi-cash text-success"></i>
                                      </div>
-                                     <div class="bg-white border rounded-4 p-3 d-flex align-items-center gap-3">
+                                     <div class="bg-white border rounded-4 p-3 d-flex align-items-center gap-3 flex-wrap" style="cursor: pointer;" onclick="document.getElementById('momo').click();">
                                           <input type="radio" name="payment_method" value="Momo" id="momo">
                                           <label class="fw-bold mb-0 flex-grow-1" for="momo">Chuyển khoản Online / Ví Momo</label>
                                           <i class="bi bi-phone text-primary"></i>
+                                          
+                                          <!-- QR Code Container (ẩn mặc định) -->
+                                          <div class="w-100 mt-2 d-none" id="qrCodeContainer">
+                                              <div class="text-center p-3 bg-light rounded-3 border border-primary border-opacity-50">
+                                                  <p class="small fw-bold text-primary mb-2"><i class="bi bi-qr-code-scan me-1"></i> Quét mã QR để thanh toán nhanh</p>
+                                                  <!-- Sử dụng VietQR API để tự động gen mã có sẵn số tiền -->
+                                                  <img src="https://img.vietqr.io/image/mbbank-123456789-compact.png?amount=<?php echo $total; ?>&addInfo=Thanh toan NHK Mobile" alt="QR Code Thanh Toán" class="img-fluid rounded shadow-sm" style="max-width: 200px; mix-blend-mode: multiply;">
+                                                  <div class="small text-muted mt-2">
+                                                      Ngân hàng: <strong>MBBank</strong><br>
+                                                      Số TK: <strong>123456789</strong><br>
+                                                      Chủ TK: <strong>NGUYEN HUU KHANH</strong>
+                                                  </div>
+                                              </div>
+                                          </div>
                                      </div>
                                 </div>
                             </div>
                     </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const radios = document.querySelectorAll('input[name="payment_method"]');
+    const qrContainer = document.getElementById('qrCodeContainer');
+    
+    radios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'Momo') {
+                qrContainer.classList.remove('d-none');
+            } else {
+                qrContainer.classList.add('d-none');
+            }
+        });
+    });
+});
+</script>
 
                     <!-- Tóm tắt đơn hàng bên phải -->
                     <div class="col-lg-5">

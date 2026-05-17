@@ -69,12 +69,15 @@ if (isset($_GET['remove'])) {
 }
 
 if (isset($_POST['update_cart'])) {
-    foreach ($_POST['qty'] as $id => $qty) {
-        if ($qty <= 0) {
-            unset($_SESSION['cart'][$id]);
-            removeFromCartDB($pdo, $id);
-        } else {
-            $_SESSION['cart'][$id]['qty'] = $qty;
+    if (isset($_POST['qty']) && is_array($_POST['qty'])) {
+        foreach ($_POST['qty'] as $id => $qty) {
+            $qty = (int)$qty; // Ép kiểu cứng về Integer
+            if ($qty <= 0) {
+                unset($_SESSION['cart'][$id]);
+                removeFromCartDB($pdo, $id);
+            } else {
+                $_SESSION['cart'][$id]['qty'] = $qty;
+            }
         }
     }
     syncCartWithDatabase($pdo);
@@ -97,6 +100,17 @@ $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
                 <span class="section-subtitle">Giỏ hàng của bạn</span>
                 <h1 class="display-4 fw-bold">Kiểm tra đơn hàng.</h1>
             </div>
+
+            <?php if (isset($_SESSION['cart_notice'])): ?>
+                <div class="alert alert-warning alert-dismissible fade show rounded-3 border-0 shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i>
+                    <?php 
+                        echo htmlspecialchars($_SESSION['cart_notice']); 
+                        unset($_SESSION['cart_notice']);
+                    ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
 
             <?php if (empty($cartItems)): ?>
                 <div class="text-center py-5">

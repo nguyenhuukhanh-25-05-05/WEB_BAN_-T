@@ -37,7 +37,7 @@
                     <ul class="footer-links list-unstyled accordion-content-mobile">
                         <li><a href="product.php?category=Apple">iPhone Series</a></li>
                         <li><a href="product.php?category=Samsung">Samsung Galaxy</a></li>
-                        <li><a href="product.php">Phụ kiện cao cấp</a></li>
+                        <li><a href="product.php">Sản phẩm cao cấp</a></li>
                         <li><a href="news.php">Tin tức công nghệ</a></li>
                     </ul>
                 </div>
