@@ -44,6 +44,9 @@ if (isset($_POST['update_info'])) {
     if (empty($fullname)) {
         $error = "Họ tên không được để trống.";
         $activeTab = 'info';
+    } elseif (!empty($phone) && !preg_match('/^[0-9]{10}$/', $phone)) {
+        $error = "Số điện thoại không hợp lệ. Vui lòng nhập đúng 10 chữ số.";
+        $activeTab = 'info';
     } else {
         try {
             $stmt = $pdo->prepare("UPDATE users SET fullname = ?, phone = ?, address = ? WHERE id = ?");
@@ -116,6 +119,23 @@ try {
     $stmtWl->execute([$userId]);
     $wishlistItems = $stmtWl->fetchAll();
     $wishlistCount = count($wishlistItems);
+} catch (PDOException $e) { /* Bảng chưa tạo thì bỏ qua */ }
+
+// ─── LẤY DANH SÁCH BẢO HÀNH ──────────────────────────────────────────────────
+$warrantiesList = [];
+$warrantiesCount = 0;
+try {
+    $stmtWar = $pdo->prepare("
+        SELECT w.*, p.name as product_name, p.image as product_image
+        FROM warranties w 
+        JOIN orders o ON w.order_id = o.id 
+        JOIN products p ON w.product_id = p.id 
+        WHERE o.user_id = ? 
+        ORDER BY w.created_at DESC
+    ");
+    $stmtWar->execute([$userId]);
+    $warrantiesList = $stmtWar->fetchAll();
+    $warrantiesCount = count($warrantiesList);
 } catch (PDOException $e) { /* Bảng chưa tạo thì bỏ qua */ }
 
 // Thống kê nhanh
@@ -349,6 +369,14 @@ include 'includes/header.php';
                                     <?php endif; ?>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="profile.php?tab=warranties" class="<?php echo $activeTab === 'warranties' ? 'active' : ''; ?>">
+                                    <i class="bi bi-shield-check"></i> Bảo hành
+                                    <?php if ($warrantiesCount > 0): ?>
+                                        <span class="badge bg-success rounded-pill ms-auto"><?php echo $warrantiesCount; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </li>
                         </ul>
                     </nav>
 
@@ -421,9 +449,9 @@ include 'includes/header.php';
                             </div>
                             <div class="col-md-6">
                                 <label class="profile-label">Số điện thoại</label>
-                                <input type="tel" name="phone" class="form-control profile-input"
+                                <input type="tel" name="phone" pattern="[0-9]{10}" class="form-control profile-input"
                                        value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>"
-                                       placeholder="VD: 0901 234 567">
+                                       placeholder="VD: 0333444555">
                             </div>
                             <div class="col-md-6">
                                 <label class="profile-label">Ngày tham gia</label>
@@ -660,6 +688,65 @@ include 'includes/header.php';
                 </div>
 
                 <?php endif; // end elseif returns ?>
+
+                <!-- ══════ TAB: MÁY ĐANG BẢO HÀNH ══════ -->
+                <?php if ($activeTab === 'warranties'): ?>
+                <div class="d-flex justify-content-between align-items-end mb-4">
+                    <div>
+                        <h2 class="section-title mb-1"><i class="bi bi-shield-check me-2 text-primary"></i>Máy đang bảo hành</h2>
+                        <p class="section-sub mb-0">Quản lý thẻ bảo hành của các thiết bị bạn đã mua.</p>
+                    </div>
+                </div>
+
+                <?php if (empty($warrantiesList)): ?>
+                    <div class="profile-card text-center py-5">
+                        <i class="bi bi-shield-x display-1 text-muted opacity-25"></i>
+                        <h5 class="fw-bold mt-4">Chưa có thẻ bảo hành nào</h5>
+                        <p class="text-muted">Bạn chưa có sản phẩm nào được kích hoạt bảo hành.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="row g-4">
+                        <?php foreach ($warrantiesList as $w): 
+                            $isExpired = strtotime($w['expires_at']) < time();
+                            $statusClass = $isExpired || $w['status'] !== 'Active' ? 'text-danger bg-danger bg-opacity-10' : 'text-success bg-success bg-opacity-10';
+                            $statusText = $isExpired ? 'Hết hạn' : ($w['status'] === 'Active' ? 'Đang bảo hành' : 'Từ chối');
+                            $statusIcon = $isExpired || $w['status'] !== 'Active' ? 'bi-shield-x' : 'bi-shield-check';
+                        ?>
+                        <div class="col-md-6">
+                            <div class="profile-card h-100 p-0 overflow-hidden">
+                                <div class="p-4">
+                                    <div class="d-flex gap-3 align-items-start mb-3">
+                                        <img src="assets/images/<?php echo htmlspecialchars($w['product_image'] ?? 'placeholder.png'); ?>" 
+                                             class="rounded-3 border" 
+                                             style="width: 60px; height: 60px; object-fit: contain; background: #fff;"
+                                             onerror="this.src='https://placehold.co/60'">
+                                        <div>
+                                            <h6 class="fw-bold mb-1"><?php echo htmlspecialchars($w['product_name']); ?></h6>
+                                            <p class="small text-muted mb-0 font-monospace">IMEI: <?php echo htmlspecialchars($w['imei']); ?></p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center bg-light rounded-3 p-3 mb-3">
+                                        <div>
+                                            <p class="small text-muted mb-1">Ngày hết hạn</p>
+                                            <p class="fw-bold mb-0"><?php echo date('d/m/Y', strtotime($w['expires_at'])); ?></p>
+                                        </div>
+                                        <div class="text-end">
+                                            <p class="small text-muted mb-1">Trạng thái</p>
+                                            <span class="badge rounded-pill <?php echo $statusClass; ?> px-3 py-1">
+                                                <i class="bi <?php echo $statusIcon; ?> me-1"></i><?php echo $statusText; ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <a href="warranty-detail.php?imei=<?php echo urlencode($w['imei']); ?>" class="btn btn-outline-primary w-100 rounded-pill fw-bold">
+                                        Xem chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+                <?php endif; // end elseif warranties ?>
 
             </div>
         </div>

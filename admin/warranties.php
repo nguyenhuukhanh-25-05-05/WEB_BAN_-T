@@ -16,18 +16,20 @@ if (isset($_POST['save_warranty'])) {
     $order_id = $_POST['order_id'] ? $_POST['order_id'] : null;
     $status = $_POST['status'];
     $expires_at = $_POST['expires_at'];
+    $customer_name = $_POST['customer_name'] ?? null;
+    $customer_phone = $_POST['customer_phone'] ?? null;
 
     try {
         if ($id) {
             // Cập nhật
-            $sql = "UPDATE warranties SET imei = ?, product_id = ?, order_id = ?, status = ?, expires_at = ? WHERE id = ?";
+            $sql = "UPDATE warranties SET imei = ?, product_id = ?, order_id = ?, status = ?, expires_at = ?, customer_name = ?, customer_phone = ? WHERE id = ?";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$imei, $product_id, $order_id, $status, $expires_at, $id]);
+            $stmt->execute([$imei, $product_id, $order_id, $status, $expires_at, $customer_name, $customer_phone, $id]);
         } else {
             // Thêm mới
-            $sql = "INSERT INTO warranties (imei, product_id, order_id, status, expires_at) VALUES (?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO warranties (imei, product_id, order_id, status, expires_at, customer_name, customer_phone) VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$imei, $product_id, $order_id, $status, $expires_at]);
+            $stmt->execute([$imei, $product_id, $order_id, $status, $expires_at, $customer_name, $customer_phone]);
         }
         header("Location: warranties.php?msg=success");
         exit;
@@ -298,8 +300,28 @@ include 'includes/admin_header.php';
                         </div>
                         
                         <div class="mb-3">
+                            <label class="form-label small fw-bold">Mã Hóa đơn / Order ID (Tùy chọn)</label>
+                            <div class="input-group">
+                                <input type="number" name="order_id" id="order_id_input" class="form-control bg-light border-0" value="<?php echo $editData['order_id'] ?? ''; ?>" placeholder="Nhập ID đơn hàng">
+                                <button type="button" class="btn btn-outline-primary" id="btn_fetch_order"><i class="bi bi-cloud-download"></i> Tải thông tin</button>
+                            </div>
+                            <small class="text-muted" id="order_info_msg"></small>
+                        </div>
+
+                        <div class="row mb-3" id="customer_info_block">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Tên khách hàng</label>
+                                <input type="text" name="customer_name" id="customer_name_input" class="form-control bg-light border-0" value="<?php echo htmlspecialchars($editData['customer_name'] ?? ''); ?>" placeholder="Nhập tên KH (hoặc tự động tải)">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Số điện thoại</label>
+                                <input type="text" name="customer_phone" id="customer_phone_input" class="form-control bg-light border-0" value="<?php echo htmlspecialchars($editData['customer_phone'] ?? ''); ?>" placeholder="Nhập SĐT (hoặc tự động tải)">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label small fw-bold">Sản phẩm áp dụng *</label>
-                            <select name="product_id" class="form-select bg-light border-0" required>
+                            <select name="product_id" id="product_id_select" class="form-select bg-light border-0" required>
                                 <option value="">-- Chọn sản phẩm --</option>
                                 <?php foreach($productsList as $p): ?>
                                     <option value="<?php echo $p['id']; ?>" <?php echo (isset($editData['product_id']) && $editData['product_id'] == $p['id']) ? 'selected' : ''; ?>>
@@ -307,11 +329,7 @@ include 'includes/admin_header.php';
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Mã Hóa đơn / Order ID (Tùy chọn)</label>
-                            <input type="number" name="order_id" class="form-control bg-light border-0" value="<?php echo $editData['order_id'] ?? ''; ?>" placeholder="Nhập ID đơn hàng (nếu bán qua hệ thống)">
+                            <small class="text-success d-none mt-1" id="product_hint_msg"><i class="bi bi-check-circle"></i> Đã lọc sản phẩm theo đơn hàng</small>
                         </div>
 
                         <div class="row">
@@ -424,6 +442,53 @@ include 'includes/admin_header.php';
             });
             repairModal.show();
         }
+
+        // Fetch order details via AJAX
+        document.getElementById('btn_fetch_order').addEventListener('click', function() {
+            var orderId = document.getElementById('order_id_input').value.trim();
+            var msgEl = document.getElementById('order_info_msg');
+            
+            if (!orderId) {
+                msgEl.innerHTML = '<span class="text-danger">Vui lòng nhập Order ID</span>';
+                return;
+            }
+
+            msgEl.innerHTML = '<span class="text-primary"><i class="spinner-border spinner-border-sm"></i> Đang tải...</span>';
+            
+            fetch('../api/admin_get_order_info.php?order_id=' + orderId)
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        msgEl.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Tải thông tin thành công!</span>';
+                        document.getElementById('customer_name_input').value = data.data.customer_name;
+                        document.getElementById('customer_phone_input').value = data.data.customer_phone;
+                        
+                        // Lọc sản phẩm
+                        if (data.data.items && data.data.items.length > 0) {
+                            var select = document.getElementById('product_id_select');
+                            var hint = document.getElementById('product_hint_msg');
+                            // Giữ lại option mặc định
+                            select.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';
+                            data.data.items.forEach(function(item) {
+                                var option = document.createElement('option');
+                                option.value = item.product_id;
+                                option.text = item.product_name;
+                                select.appendChild(option);
+                            });
+                            // Nếu chỉ có 1 sản phẩm thì tự động chọn luôn
+                            if (data.data.items.length === 1) {
+                                select.value = data.data.items[0].product_id;
+                            }
+                            hint.classList.remove('d-none');
+                        }
+                    } else {
+                        msgEl.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-circle"></i> ' + data.message + '</span>';
+                    }
+                })
+                .catch(e => {
+                    msgEl.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Lỗi kết nối</span>';
+                });
+        });
     </script>
 
 <?php include 'includes/admin_footer.php'; ?>

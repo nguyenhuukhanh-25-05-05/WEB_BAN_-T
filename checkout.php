@@ -42,6 +42,15 @@ foreach ($cartItems as $item) {
     $total += $item['price'] * $item['qty'];
 }
 
+// Lấy thông tin người dùng để tự động điền vào form (nếu đã cập nhật trong Profile)
+$userId = get_logged_in_user_id();
+$userInfo = null;
+if ($userId) {
+    $stmtUser = $pdo->prepare("SELECT fullname, email, phone, address FROM users WHERE id = ?");
+    $stmtUser->execute([$userId]);
+    $userInfo = $stmtUser->fetch();
+}
+
 /**
  * XỬ LÝ ĐẶT HÀNG (Khi khách nhấn nút "Xác nhận đặt hàng")
  */
@@ -58,6 +67,8 @@ if (isset($_POST['place_order'])) {
     // Validate thông tin
     if (empty($name) || empty($phone)) {
         $error = "Vui lòng điền đầy đủ họ tên và số điện thoại";
+    } elseif (!preg_match('/^[0-9]{10}$/', $phone)) {
+        $error = "Số điện thoại không hợp lệ. Vui lòng nhập đúng 10 chữ số.";
     } else {
         try {
             // Kiểm tra kết nối DB trước
@@ -199,19 +210,19 @@ include 'includes/header.php';
                             <div class="row g-3">
                                 <div class="col-md-12">
                                     <label class="form-label small fw-bold">Họ và tên khách hàng</label>
-                                    <input type="text" name="full_name" class="form-control rounded-3 border-0 bg-light p-3" placeholder="Ví dụ: Nguyễn Văn A" required>
+                                    <input type="text" name="full_name" class="form-control rounded-3 border-0 bg-light p-3" placeholder="Ví dụ: Nguyễn Văn A" value="<?php echo htmlspecialchars($userInfo['fullname'] ?? ''); ?>" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold">Số điện thoại liên lạc</label>
-                                    <input type="tel" name="phone" class="form-control rounded-3 border-0 bg-light p-3" placeholder="0333..." required>
+                                    <input type="tel" name="phone" pattern="[0-9]{10}" class="form-control rounded-3 border-0 bg-light p-3" placeholder="Ví dụ: 0333444555" value="<?php echo htmlspecialchars($userInfo['phone'] ?? ''); ?>" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold">Địa chỉ Email (Không bắt buộc)</label>
-                                    <input type="email" class="form-control rounded-3 border-0 bg-light p-3" placeholder="email@example.com">
+                                    <input type="email" class="form-control rounded-3 border-0 bg-light p-3" placeholder="email@example.com" value="<?php echo htmlspecialchars($userInfo['email'] ?? ''); ?>">
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label small fw-bold">Địa chỉ giao hàng</label>
-                                    <textarea name="address" class="form-control rounded-3 border-0 bg-light p-3" rows="2" placeholder="Số nhà, tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố (để trống = nhận tại cửa hàng)"></textarea>
+                                    <textarea name="address" class="form-control rounded-3 border-0 bg-light p-3" rows="2" placeholder="Số nhà, tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố (để trống = nhận tại cửa hàng)"><?php echo htmlspecialchars($userInfo['address'] ?? ''); ?></textarea>
                                 </div>
                                 <div class="col-md-12 mt-4">
                                      <h2 class="fw-bold mb-4">Cách thức thanh toán</h2>

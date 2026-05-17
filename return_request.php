@@ -174,7 +174,7 @@ include 'includes/header.php';
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-700 small text-uppercase" style="color:#666;letter-spacing:.05em;">Số điện thoại</label>
-                <input type="tel" name="phone" class="form-control" value="<?= htmlspecialchars($currentUser['phone'] ?? $order['customer_phone'] ?? '') ?>" style="background:#f7f8fc;border-radius:.75rem;border:1.5px solid #e8eaf0;">
+                <input type="tel" name="phone" pattern="[0-9]{10}" class="form-control" value="<?= htmlspecialchars($currentUser['phone'] ?? $order['customer_phone'] ?? '') ?>" style="background:#f7f8fc;border-radius:.75rem;border:1.5px solid #e8eaf0;" required>
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-700 small text-uppercase" style="color:#666;letter-spacing:.05em;">Mã đơn hàng</label>
