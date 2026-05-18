@@ -221,7 +221,9 @@ include 'includes/header.php';
                     <div class="product-card-new">
                         <a href="product-detail.php?id=<?php echo $p['id']; ?>">
                             <div class="product-img-box">
-                                <?php if($p['is_featured']): ?>
+                                <?php if (!empty($p['discount']) && $p['discount'] > 0): ?>
+                                    <span class="badge-hot" style="background: #007AFF;">-<?php echo $p['discount']; ?>%</span>
+                                <?php elseif($p['is_featured']): ?>
                                     <span class="badge-hot">Hot Deal</span>
                                 <?php endif; ?>
                                 <img src="assets/images/<?php echo $p['image']; ?>" alt="<?php echo $p['name']; ?>"
@@ -230,7 +232,16 @@ include 'includes/header.php';
                             <div class="product-info-new">
                                 <span class="p-cat"><?php echo $p['category']; ?></span>
                                 <h3 class="p-name"><?php echo $p['name']; ?></h3>
-                                <div class="p-price-new"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</div>
+                                <?php if (!empty($p['discount']) && $p['discount'] > 0): 
+                                    $salePrice = $p['price'] - ($p['price'] * $p['discount'] / 100);
+                                ?>
+                                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <span style="font-size: 16px; font-weight: 800; color: #000;"><?php echo number_format($salePrice, 0, ',', '.'); ?>₫</span>
+                                        <span style="font-size: 13px; color: #888; text-decoration: line-through;"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</span>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="p-price-new"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</div>
+                                <?php endif; ?>
                                 <?php if(!empty($p['specs'])): ?>
                                 <div class="p-specs">
                                     <?php
@@ -283,19 +294,20 @@ include 'includes/header.php';
             <div class="product-grid-new">
                 <?php
                 // Lấy sản phẩm flash sale (Ưu tiên sản phẩm có discount thật)
-                $flashSaleStmt = $pdo->query("SELECT * FROM products WHERE discount > 0 ORDER BY RANDOM() LIMIT 4");
+                $flashSaleStmt = $pdo->query("SELECT * FROM products WHERE discount > 0 ORDER BY created_at DESC LIMIT 4");
                 $flashSaleProducts = $flashSaleStmt->fetchAll();
                 
-                // Bổ sung nếu chưa đủ 4 máy (dùng discount giả lập nhẹ)
+                // Bổ sung nếu chưa đủ 4 máy (lấy cố định theo ID, không dùng ngẫu nhiên để tránh tải lại trang bị đổi)
                 if (count($flashSaleProducts) < 4) {
                     $limit = 4 - count($flashSaleProducts);
                     $excludeIds = implode(',', array_map('intval', array_column($flashSaleProducts, 'id') ?: [0]));
-                    $moreStmt = $pdo->query("SELECT * FROM products WHERE id NOT IN ($excludeIds) ORDER BY RANDOM() LIMIT $limit");
+                    $moreStmt = $pdo->query("SELECT * FROM products WHERE id NOT IN ($excludeIds) ORDER BY id ASC LIMIT $limit");
                     $flashSaleProducts = array_merge($flashSaleProducts, $moreStmt->fetchAll());
                 }
 
                 foreach ($flashSaleProducts as $p):
-                    $discountPercent = !empty($p['discount']) ? $p['discount'] : rand(5, 15);
+                    // Lấy % giảm thật từ admin, nếu không có thì giả lập cố định một mức (ví dụ 12%) chứ không dùng ngẫu nhiên nữa
+                    $discountPercent = !empty($p['discount']) ? $p['discount'] : 12;
                     $salePrice = $p['price'] - ($p['price'] * $discountPercent / 100);
                 ?>
                     <div class="product-card-new" style="background: #fff; border: none;">
@@ -345,13 +357,25 @@ include 'includes/header.php';
                     <div class="product-card-new">
                         <a href="product-detail.php?id=<?php echo $p['id']; ?>">
                             <div class="product-img-box">
+                                <?php if (!empty($p['discount']) && $p['discount'] > 0): ?>
+                                    <span class="badge-hot" style="background: #007AFF;">-<?php echo $p['discount']; ?>%</span>
+                                <?php endif; ?>
                                 <img src="assets/images/<?php echo $p['image']; ?>" alt="<?php echo $p['name']; ?>"
                                     onerror="this.src='https://placehold.co/300x400/f5f5f7/1d1d1f?text=Phone'">
                             </div>
                             <div class="product-info-new">
                                 <span class="p-cat"><?php echo $p['category']; ?></span>
                                 <h3 class="p-name"><?php echo $p['name']; ?></h3>
-                                <div class="p-price-new"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</div>
+                                <?php if (!empty($p['discount']) && $p['discount'] > 0): 
+                                    $salePrice = $p['price'] - ($p['price'] * $p['discount'] / 100);
+                                ?>
+                                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <span style="font-size: 16px; font-weight: 800; color: #000;"><?php echo number_format($salePrice, 0, ',', '.'); ?>₫</span>
+                                        <span style="font-size: 13px; color: #888; text-decoration: line-through;"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</span>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="p-price-new"><?php echo number_format($p['price'], 0, ',', '.'); ?>₫</div>
+                                <?php endif; ?>
                                 <?php if(!empty($p['specs'])): ?>
                                 <div class="p-specs">
                                     <?php

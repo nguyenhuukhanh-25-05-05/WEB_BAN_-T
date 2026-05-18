@@ -311,6 +311,28 @@ include 'includes/header.php';
     box-shadow: 0 8px 24px rgba(102,126,234,0.45);
     color: #fff;
 }
+.btn-return-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #dc3545;
+    border-radius: 0.75rem;
+    background: #fff;
+    color: #dc3545;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.btn-return-action:hover {
+    background: #fff5f5;
+    border-color: #bd2130;
+    color: #bd2130;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.1);
+}
 </style>
 
 <main class="profile-wrapper">
@@ -547,29 +569,51 @@ include 'includes/header.php';
                                 elseif (str_contains($s, 'đang giao'))   { $bClass = 'bg-primary'; $bText = 'Đang giao'; }
                                 elseif (str_contains($s, 'hủy'))          { $bClass = 'bg-danger';  $bText = 'Đã hủy'; }
                                 else                                       { $bClass = 'bg-warning text-dark'; $bText = $o['status']; }
+                                
+                                $showReturnBtn = false;
+                                if (str_contains($s, 'hoàn thành')) {
+                                    $completedAt = strtotime($o['updated_at'] ?? $o['created_at']);
+                                    $daysPassed  = floor((time() - $completedAt) / 86400);
+                                    if ($daysPassed <= 14) {
+                                        $sc = $pdo->prepare("SELECT id FROM return_requests WHERE order_id = ? AND status NOT IN ('Từ chối')");
+                                        $sc->execute([$o['id']]);
+                                        if (!$sc->fetch()) {
+                                            $showReturnBtn = true;
+                                        }
+                                    }
+                                }
                             ?>
-                            <a href="track_order.php?order_id=<?php echo $o['id']; ?>&ref=profile" class="order-mini-card">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="bg-primary bg-opacity-10 rounded-3 p-3">
-                                            <i class="bi bi-bag-check text-primary fs-4"></i>
+                            <div class="order-mini-card p-0 overflow-hidden">
+                                <a href="track_order.php?order_id=<?php echo $o['id']; ?>&ref=profile" class="d-block text-decoration-none text-reset hover-card-body" style="padding: 1.1rem 1.25rem;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+                                                <i class="bi bi-bag-check text-primary fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <p class="fw-800 mb-0">Đơn hàng #<?php echo $o['id']; ?></p>
+                                                <p class="text-muted small mb-0">
+                                                    <i class="bi bi-calendar3 me-1"></i>
+                                                    <?php echo date('d/m/Y H:i', strtotime($o['created_at'])); ?>
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p class="fw-800 mb-0">Đơn hàng #<?php echo $o['id']; ?></p>
-                                            <p class="text-muted small mb-0">
-                                                <i class="bi bi-calendar3 me-1"></i>
-                                                <?php echo date('d/m/Y H:i', strtotime($o['created_at'])); ?>
-                                            </p>
+                                        <div class="text-end d-flex flex-column align-items-end gap-2">
+                                            <span class="badge <?php echo $bClass; ?> rounded-pill px-3 py-1"><?php echo $bText; ?></span>
+                                            <span class="fw-800 text-danger">
+                                                <?php echo number_format($o['total_price'], 0, ',', '.'); ?>đ
+                                            </span>
                                         </div>
                                     </div>
-                                    <div class="text-end d-flex flex-column align-items-end gap-2">
-                                        <span class="badge <?php echo $bClass; ?> rounded-pill px-3 py-1"><?php echo $bText; ?></span>
-                                        <span class="fw-800 text-danger">
-                                            <?php echo number_format($o['total_price'], 0, ',', '.'); ?>đ
-                                        </span>
-                                    </div>
+                                </a>
+                                <?php if ($showReturnBtn): ?>
+                                <div class="px-4 pb-4">
+                                    <a href="return_request.php?order_id=<?php echo $o['id']; ?>" class="btn-return-action">
+                                        <i class="bi bi-arrow-return-left"></i> Yêu cầu trả hàng/hoàn tiền
+                                    </a>
                                 </div>
-                            </a>
+                                <?php endif; ?>
+                            </div>
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>

@@ -67,7 +67,22 @@ include 'includes/header.php';
                         </nav>
                         
                         <h1 class="display-4 fw-bold mb-3"><?php echo $product['name']; ?></h1>
-                        <p class="h2 text-primary fw-bold mb-3"><?php echo number_format($product['price'], 0, ',', '.'); ?>₫</p>
+                        <?php 
+                            if (isset($product['discount']) && $product['discount'] > 0) {
+                                $discountedPrice = $product['price'] * (1 - $product['discount'] / 100);
+                        ?>
+                            <p class="h2 text-primary fw-bold mb-3">
+                                <?php echo number_format($discountedPrice, 0, ',', '.'); ?>₫
+                                <span class="fs-5 text-muted text-decoration-line-through ms-2"><?php echo number_format($product['price'], 0, ',', '.'); ?>₫</span>
+                                <span class="badge bg-danger fs-6 ms-2 align-middle" style="vertical-align: text-bottom !important;">-<?php echo $product['discount']; ?>%</span>
+                            </p>
+                        <?php 
+                            } else { 
+                        ?>
+                            <p class="h2 text-primary fw-bold mb-3"><?php echo number_format($product['price'], 0, ',', '.'); ?>₫</p>
+                        <?php 
+                            } 
+                        ?>
                         
                         <?php if(!empty($product['specs'])): ?>
                         <div class="d-flex flex-wrap gap-2 mb-4">
