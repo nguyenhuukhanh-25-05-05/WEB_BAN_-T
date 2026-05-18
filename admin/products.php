@@ -365,34 +365,34 @@ include 'includes/admin_header.php';
                     </div>
                     <div class="modal-body p-4">
                         <!-- Input ẩn ID: Dùng để phân biệt Thêm (trống) hay Sửa (có ID) -->
-                        <input type="hidden" name="id" value="<?php echo $editData['id'] ?? ''; ?>">
-                        <input type="hidden" name="current_image" value="<?php echo $editData['image'] ?? 'placeholder.png'; ?>">
+                        <input type="hidden" name="id" value="<?php echo $editProduct['id'] ?? ''; ?>">
+                        <input type="hidden" name="current_image" value="<?php echo $editProduct['image'] ?? 'placeholder.png'; ?>">
                         
                         <div class="row g-3">
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold">Tên điện thoại <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control rounded-3" value="<?php echo $editData['name'] ?? ''; ?>" placeholder="VD: iPhone 15 Pro Max" required>
+                                <input type="text" name="name" class="form-control rounded-3" value="<?php echo $editProduct['name'] ?? ''; ?>" placeholder="VD: iPhone 15 Pro Max" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold">Danh mục hãng <span class="text-danger">*</span></label>
                                 <select name="category" class="form-select rounded-3">
-                                    <option value="Apple" <?php echo (isset($editData) && $editData['category'] == 'Apple') ? 'selected' : ''; ?>>Apple</option>
-                                    <option value="Samsung" <?php echo (isset($editData) && $editData['category'] == 'Samsung') ? 'selected' : ''; ?>>Samsung</option>
-                                    <option value="Xiaomi" <?php echo (isset($editData) && $editData['category'] == 'Xiaomi') ? 'selected' : ''; ?>>Xiaomi</option>
-                                    <option value="Oppo" <?php echo (isset($editData) && $editData['category'] == 'Oppo') ? 'selected' : ''; ?>>Oppo</option>
+                                    <option value="Apple" <?php echo (isset($editProduct) && $editProduct['category'] == 'Apple') ? 'selected' : ''; ?>>Apple</option>
+                                    <option value="Samsung" <?php echo (isset($editProduct) && $editProduct['category'] == 'Samsung') ? 'selected' : ''; ?>>Samsung</option>
+                                    <option value="Xiaomi" <?php echo (isset($editProduct) && $editProduct['category'] == 'Xiaomi') ? 'selected' : ''; ?>>Xiaomi</option>
+                                    <option value="Oppo" <?php echo (isset($editProduct) && $editProduct['category'] == 'Oppo') ? 'selected' : ''; ?>>Oppo</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold">Giá bán (VNĐ) *</label>
-                                <input type="number" name="price" class="form-control rounded-3" value="<?php echo $editData['price'] ?? ''; ?>" required placeholder="VD: 25000000">
+                                <input type="number" name="price" class="form-control rounded-3" value="<?php echo $editProduct['price'] ?? ''; ?>" required placeholder="VD: 25000000">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold">Giảm giá (%)</label>
-                                <input type="number" name="discount" class="form-control rounded-3" value="<?php echo $editData['discount'] ?? '0'; ?>" min="0" max="100" placeholder="VD: 15">
+                                <input type="number" name="discount" class="form-control rounded-3" value="<?php echo $editProduct['discount'] ?? '0'; ?>" min="0" max="100" placeholder="VD: 15">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold">Số lượng tồn kho <span class="text-danger">*</span></label>
-                                <input type="number" name="stock" class="form-control rounded-3" value="<?php echo $editData['stock'] ?? ''; ?>" placeholder="VD: 10" min="0" required>
+                                <input type="number" name="stock" class="form-control rounded-3" value="<?php echo $editProduct['stock'] ?? ''; ?>" placeholder="VD: 10" min="0" required>
                             </div>
                             <div class="col-md-12">
                                 <label class="form-label small fw-bold">Ảnh sản phẩm <?php echo !$editProduct ? '<span class="text-danger">*</span>' : ''; ?></label>
